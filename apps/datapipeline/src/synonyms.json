@@ -1,0 +1,21 @@
+{
+  "locaties": {
+    "'s-Hertogenbosch": [
+      "'S-Hertogenbosch",
+      "'S Hertogenbosch",
+      "Den Bosch",
+      "DenBosch",
+      "Den-Bosch",
+      "`S Hertogenbosh",
+      "`S-Hertogenbosch"
+    ], "'s-Gravenhage":[
+      "'S-Gravenhage",
+      "'S Gravenhage",
+      "Den Haag",
+      "DenHaag",
+      "Den-Haag",
+      "`S Gravenhage",
+      "`S-Gravenhage"
+    ]
+  }
+}

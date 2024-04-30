@@ -1,0 +1,47 @@
+{
+  "name": "ggzoek-crawler",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "This is an example of a Crawlee project.",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.518.0",
+    "@aws-sdk/client-s3": "^3.515.0",
+    "@aws-sdk/lib-dynamodb": "^3.518.0",
+    "@google/generative-ai": "^0.2.1",
+    "aws-sdk": "^2.1563.0",
+    "cloudinary": "^2.0.3",
+    "crawlee": "^3.0.0",
+    "dotenv": "^16.4.1",
+    "drizzle-orm": "^0.30.1",
+    "meilisearch": "^0.38.0",
+    "openai": "^4.28.0",
+    "playwright": "*",
+    "postgres": "^3.4.3",
+    "winston": "^3.12.0"
+  },
+  "devDependencies": {
+    "@apify/tsconfig": "^0.1.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.0.0",
+    "drizzle-kit": "^0.20.14",
+    "esm": "^3.2.25",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.4.0",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "scrape": "tsx src/scrape.ts",
+    "complete": "tsx src/summarize.ts",
+    "pipeline": "tsx src/pipeline.ts",
+    "make_migrations": "drizzle-kit generate:pg",
+    "migrate": "tsx src/migrate.ts",
+    "supabase": "tsx src//services/supabase.ts",
+    "debug": "node --inspect --loader ts-node/esm/transpile-only src/scrape.ts",
+    "build": "tsc",
+    "test": "jest",
+    "postinstall": "npx crawlee install-playwright-browsers"
+  },
+  "author": "It's not you it's me",
+  "license": "ISC"
+}
