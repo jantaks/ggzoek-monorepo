@@ -10,7 +10,7 @@
 		<div class="lg:max-w-5xl flex flex-col items-center lg:pb-12">
 			<h1 class="text-4xl lg:text-5xl font-bold">Alle vacatures binnen de GGZ onder een dak</h1>
 			<div class="py-3 lg:py-6 lg:w-4/5 lg:text-2xl font-light space-y-0.5">
-				<p>De GGZ kent veel openstaande vacatures. </p>
+				<p>De GGZ kampt met veel openstaande vacatures. </p>
 				<p>Tegelijkertijd voelen veel professionals dat ze niet op de juiste plek zitten.</p>
 				<p><em>Het is onze missie om iedereen zijn of haar plek te laten vinden.</em></p>
 			</div>
