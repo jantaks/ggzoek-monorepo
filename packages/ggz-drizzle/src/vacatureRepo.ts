@@ -7,7 +7,8 @@ export async function closeConnection() {
 }
 
 export async function allScreenshotUrls(){
-    return await db.select({ screenshotUrl: vacatureTable.screenshotUrl }).from(vacatureTable).where(isNotNull(vacatureTable.screenshotUrl)).execute()
+    let result = await db.select({ screenshotUrl: vacatureTable.screenshotUrl }).from(vacatureTable).where(isNotNull(vacatureTable.screenshotUrl)).execute();
+    return  result.map((x: { screenshotUrl: string }) => x.screenshotUrl);
 }
 
 export async function upsertVacature(vacature: SelectVacature) {
