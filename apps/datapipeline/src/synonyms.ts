@@ -1,5 +1,5 @@
 import "dotenv/config"
-import {closeConnection, getUnsyncedVacatures, upsertVacature} from "./services/supabase.js";
+import {closeConnection, getUnsyncedVacatures, upsertVacature} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
 import {Vacature} from "./summarize.js";
 
 export const synonyms: SynonymsDictionary = {

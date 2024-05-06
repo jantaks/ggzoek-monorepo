@@ -1,5 +1,6 @@
-import {pgTable, foreignKey, pgEnum, bigint, uuid, text, numeric, boolean, json, pgSchema} from "drizzle-orm/pg-core"
-import { sql } from "drizzle-orm"
+import {pgTable, pgEnum, bigint, uuid, text, numeric, boolean, json, pgSchema} from "drizzle-orm/pg-core"
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { z } from "zod";
 
 export const keyStatus = pgEnum("key_status", ['default', 'valid', 'invalid', 'expired'])
 export const keyType = pgEnum("key_type", ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
@@ -54,5 +55,6 @@ export const vacatures = pgTable("vacatures", {
     screenshotUrl: text("screenshot_url"),
 });
 
-export type InsertVacature = typeof vacatures.$inferInsert;
+export type InsertVacature = typeof vacatures.$inferSelect;
+export type SelectVacature = typeof vacatures.$inferSelect;
 

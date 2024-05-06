@@ -1,5 +1,4 @@
 import { synonyms } from "./synonyms.js";
-import {create} from "node:domain";
 import {updateSynonyms} from "./services/meilisearch.js";
 type Synonyms = { [key: string]: string[] };
 

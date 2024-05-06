@@ -4,16 +4,30 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "npx crawlee install-playwright-browsers"
   },
   "devDependencies": {
+    "@repo/eslint-config-custom": "workspace:*",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.0.0",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.57.0",
-    "@repo/eslint-config": "workspace:*",
+    "esm": "^3.2.25",
     "prettier": "^3.2.5",
     "prettier-plugin-svelte": "^3.2.2",
-    "turbo": "latest"
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.4.0",
+    "turbo": "latest",
+    "typescript": "^5.3.3"
   },
-  "packageManager": "pnpm@8.9.0",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "winston": "^3.12.0",
+    "playwright": "*"
+  },
+  "packageManager": "pnpm@9.0.6",
   "engines": {
     "node": ">=18"
   }

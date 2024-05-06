@@ -1,12 +1,12 @@
 import type { LayoutServerLoad } from './$types';
 import type { MyLocals } from '$lib/types';
-import { supabase } from '$lib/server/supabaseClient';
+import { allScreenshotUrls } from '@ggzoek/ggz-drizzle/src/vacatureRepo';
 
-async function imgUrls() {
-	const { data } = await supabase.from('vacatures').select('screenshot_url').not('screenshot_url', 'is', 'NULL');
-	const url = data ?? [];
-	return url.map((x: { screenshot_url: string }) => x.screenshot_url);
-}
+// async function imgUrls() {
+// 	const data = await allScreenshotUrls()
+// 	const url = data ?? [];
+// 	return url.map((x: { screenshot_url: string }) => x.screenshot_url);
+// }
 
 export const load: LayoutServerLoad = async ({locals}) => {
 
@@ -17,7 +17,7 @@ export const load: LayoutServerLoad = async ({locals}) => {
 	const likesList = likes.data?.map((x: { vacature: string }) => x.vacature) as string[]
 	return {
 		likes: likesList? likesList : [],
-		imageUrls: await imgUrls(),
+		imageUrls: await allScreenshotUrls(),
 		email: email? email: null
 	};
 };

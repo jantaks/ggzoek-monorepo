@@ -1,7 +1,7 @@
 import {runCrawlers} from "./scrape.js";
 import {localstorage} from "./services/localstorage.js";
 import {summarizeVacatures, Vacature} from "./summarize.js";
-import {getUpdatedVacatures, upsertVacature, closeConnection, getUnsyncedVacatures} from "./services/supabase.js";
+import {getUpdatedVacatures, upsertVacature, closeConnection, getUnsyncedVacatures} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
 import {log} from "./utils.js";
 import {indexVacatures} from "./services/meilisearch.js";
 import {correctSpelling} from "./synonyms.js";
@@ -51,9 +51,9 @@ const step_5 = async () => {
 }
 
 await step_1()
-// await step_2()
-// await step_3()
-// await step_4()
-// await step_5().then(closeConnection)
+await step_2()
+await step_3()
+await step_4()
+await step_5().then(closeConnection)
 
 

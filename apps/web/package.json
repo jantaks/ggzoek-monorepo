@@ -55,6 +55,7 @@
 		"@supabase/ssr": "^0.1.0",
 		"@supabase/supabase-js": "^2.40.0",
 		"@vercel/kv": "^1.0.1",
+		"@ggzoek/ggz-drizzle": "workspace:*",
 		"dotenv": "^16.4.5",
 		"meilisearch": "^0.38.0",
 		"siema": "^1.5.1",
