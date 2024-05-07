@@ -54,10 +54,10 @@ export async function runCrawlers() {
 
   await Promise.all(
     [
-      // parnassiaCrawler.run(['https://werkenbijparnassiagroep.nl/home']),
-      // arkinCrawler.run(['https://werkenbijarkin.nl/vacatures/']),
-      // rvaCrawler.run(['https://www.reinierwerktenleert.nl/vacatures/']),
-      // altrechtCrawler.run(['https://www.werkenbijaltrecht.nl/vacatures/']),
+      parnassiaCrawler.run(['https://werkenbijparnassiagroep.nl/home']),
+      arkinCrawler.run(['https://werkenbijarkin.nl/vacatures/']),
+      rvaCrawler.run(['https://www.reinierwerktenleert.nl/vacatures/']),
+      altrechtCrawler.run(['https://www.werkenbijaltrecht.nl/vacatures/']),
       ggzFrieslandCrawler.run(['https://www.werkenbijggzfriesland.nl/vacatures/'])
     ]
   );

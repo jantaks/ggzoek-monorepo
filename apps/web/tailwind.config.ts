@@ -3,6 +3,7 @@ import type { Config } from 'tailwindcss';
 import { addDynamicIconSelectors } from '@iconify/tailwind';
 // 1. Import the Skeleton plugin
 import { skeleton } from '@skeletonlabs/tw-plugin';
+// @ts-ignore
 import forms from '@tailwindcss/forms';
 
 const config = {
@@ -26,23 +27,7 @@ const config = {
 		skeleton({
 			themes: { preset: ['skeleton', 'modern', 'gold-nouveau'] }
 		})
-	],
-	daisyui: {
-		themes: [
-			{
-				ggzoekLight: {
-					'primary': '#f9a8d4',
-					'secondary': '#e5258d',
-					'accent': '#37cdbe',
-					'neutral': '#3d4451',
-					'base-100': '#ffffff',
-					'base-200': '#fafafa'
-				}
-			},
-			'dark',
-			'cupcake'
-		]
-	}
+	]
 } satisfies Config;
 
 export default config;

@@ -26,7 +26,6 @@
     "pipeline": "tsx src/pipeline.ts",
     "supabase": "tsx src//services/supabase.ts",
     "debug": "node --inspect --loader ts-node/esm/transpile-only src/scrape.ts",
-    "build": "tsc",
     "test": "jest"
 
   },
