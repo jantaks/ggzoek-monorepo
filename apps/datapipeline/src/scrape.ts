@@ -23,6 +23,7 @@ import { lentisRouter } from './scrapers/lentis.js';
 import { yuliusRouter } from './scrapers/yulius.js';
 import { oostBrabantRouter } from './scrapers/oost-brabant.js';
 import { emergisRouter } from './scrapers/emergis.js';
+import { propersonaRouter } from './scrapers/propersona.js';
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ export async function runCrawlers() {
   const yuliusCrawler = await buildPlaywright('yulius', yuliusRouter);
   const ooostBrabantCrawler = await buildCheerio('oost-brabant', oostBrabantRouter);
   const emergisCrawler = await buildCheerio('emergis', emergisRouter);
+  const propersonaCrawler = await buildCheerio('propersona', propersonaRouter);
 
   await Promise.all(
     [
@@ -79,7 +81,8 @@ export async function runCrawlers() {
       // lentisCrawler.run(['https://www.werkenbijlentis.nl/vacatures/']),
       // yuliusCrawler.run(['https://www.werkenbijyulius.nl/vacatures/']),
       // ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
-      emergisCrawler.run(['https://werkenbijemergis.nl/vacatures'])
+      // emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
+      propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/'])
     ]
   );
 }
