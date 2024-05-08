@@ -1,8 +1,9 @@
 import {createPlaywrightRouter} from 'crawlee';
 import {localstorage} from "../services/localstorage.js";
-import {cleanText} from "../utils.js";
+import { acceptCookies, cleanText } from '../utils.js';
 import * as cheerio from "cheerio";
 export const router = createPlaywrightRouter();
+
 
 router.addDefaultHandler(async ({enqueueLinks, log, page}) => {
     page.setDefaultTimeout(5000)
@@ -10,6 +11,7 @@ router.addDefaultHandler(async ({enqueueLinks, log, page}) => {
     for (const job of jobs) {
         try {
             await page.goto('https://www.reinierwerktenleert.nl/vacatures/');
+            acceptCookies(page)
             log.info(`Getting jobs for ${job}`);
             await page.getByRole('button', {name: 'Functie'}).click();
             await page.getByRole("listitem").getByText(new RegExp(job, 'i')).click()

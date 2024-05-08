@@ -49,7 +49,7 @@ cloudinary.config({
 // Log the configuration
 console.log(cloudinary.config());
 
-const uploadImage = async (imagePath) => {
+const uploadImage = async (imagePath: string) => {
     const options = {
         use_filename: true,
         unique_filename: false,
@@ -66,7 +66,7 @@ const uploadImage = async (imagePath) => {
 };
 
 // await uploadImage("./screenshots/img_q70_test.jpg")
-let vacatures = await getVacaturesWithoutScreenshot()
+const vacatures = await getVacaturesWithoutScreenshot()
 // const vacatures = await db.select().from(vacatureTable).where(isNull(vacatureTable.screenshotUrl)).execute();
 // await closeConnection()
 const testUrl = "https://www.werkenbijggzfriesland.nl/vacatures/gz-psycholoog-regioteam-leeuwarden"

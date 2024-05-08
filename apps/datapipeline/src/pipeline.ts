@@ -51,9 +51,9 @@ const step_5 = async () => {
 }
 
 await step_1()
-await step_2()
-await step_3()
-await step_4()
-await step_5().then(closeConnection)
+// await step_2()
+// await step_3()
+// await step_4()
+// await step_5().then(closeConnection)
 
 

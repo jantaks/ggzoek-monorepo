@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import winston from "winston";
 import 'dotenv/config'
-import path from "node:path";
+import { Page } from 'playwright';
 
 export function cleanText(text: string) {
     let cleanedText = text.replace(/\t/g, ''); // Remove all tabs
@@ -53,3 +53,16 @@ export const log = winston.createLogger({
     ),
     transports: [new winston.transports.Console()]
 });
+
+export async function acceptCookies(page: Page) {
+    const cookieButtonLabels = ['Alles toestaan', 'Cookies toestaan', 'Alle cookies toestaan', 'Accepteren', 'Ik ga akkoord'];
+    for (const label of cookieButtonLabels) {
+        try {
+            await page.click(`text=${label}`, {timeout: 500});
+            console.log(`Clicked cookie button with label "${label}"`);
+            break;
+        } catch (error) {
+            console.log(`No cookie button found with label "${label}"`);
+        }
+    }
+}

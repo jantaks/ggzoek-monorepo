@@ -1,12 +1,13 @@
 import {createPlaywrightRouter, sleep} from 'crawlee';
 import {localstorage} from "../services/localstorage.js";
 import * as cheerio from "cheerio";
-import {cleanText, createHash} from "../utils.js";
+import { acceptCookies, cleanText, createHash } from '../utils.js';
 
 const router = createPlaywrightRouter();
 
 
 router.addDefaultHandler(async ({enqueueLinks, page, log}) => {
+    acceptCookies(page)
     log.info(`enqueueing new URLs`);
     await page.getByText('Functiecategorie').click();
     await page.getByRole('option', {name: 'Artsen & Medisch Specialisten'}).click();
