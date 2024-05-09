@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
 import { crawlMondriaan } from './scrapers/cheerio/mondriaan.js';
 import { crawlIngeest } from './scrapers/cheerio/ingeest.js';
-import { crawlDelfland } from './scrapers/playwright/delfland.js';
+import { crawlDelfland } from './scrapers/cheerio/delfland.js';
 
 function removeStorageFolder(){
   const __filename = fileURLToPath(import.meta.url);
