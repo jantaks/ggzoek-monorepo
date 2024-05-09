@@ -24,6 +24,7 @@ import { yuliusRouter } from './scrapers/yulius.js';
 import { oostBrabantRouter } from './scrapers/oost-brabant.js';
 import { emergisRouter } from './scrapers/emergis.js';
 import { propersonaRouter } from './scrapers/propersona.js';
+import { plurynRouter } from './scrapers/pluryn.js';
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ async function getConfig(name: string) {
     headless: true
   });
   const options = {
-    maxRequestsPerCrawl: 20,
+    maxRequestsPerCrawl: 1000,
     requestQueue: requestQueue
   };
   return { config, options };
@@ -67,6 +68,7 @@ export async function runCrawlers() {
   const ooostBrabantCrawler = await buildCheerio('oost-brabant', oostBrabantRouter);
   const emergisCrawler = await buildCheerio('emergis', emergisRouter);
   const propersonaCrawler = await buildCheerio('propersona', propersonaRouter);
+  const plurynCrawler = await buildPlaywright('pluryn', plurynRouter);
 
   await Promise.all(
     [
@@ -82,7 +84,8 @@ export async function runCrawlers() {
       // yuliusCrawler.run(['https://www.werkenbijyulius.nl/vacatures/']),
       // ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
       // emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
-      propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/'])
+      // propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
+      plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000'])
     ]
   );
 }
