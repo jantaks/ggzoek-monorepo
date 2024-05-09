@@ -1,7 +1,6 @@
 import { createCheerioRouter } from 'crawlee';
-import { localstorage } from '../services/localstorage.js';
-import { cleanText } from '../utils.js';
-import { start } from 'node:repl';
+import { localstorage } from '../../services/localstorage.js';
+import { cleanText } from '../../utils.js';
 
 const router = createCheerioRouter();
 
@@ -21,7 +20,7 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 
 router.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
-  $('script, style, noscript, iframe, header, nav').remove();
+  $('script, style, noscript, iframe, header, nav, form').remove();
   $('#sollicitatie-proces, .gerelateerde_vacatures, .collegas_aan_het_woord, #footer').remove();
   let text = $('body').text();
   text = cleanText(text);

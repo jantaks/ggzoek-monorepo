@@ -1,11 +1,11 @@
 import { createPlaywrightRouter, sleep } from 'crawlee';
-import { localstorage } from '../services/localstorage.js';
-import { acceptCookies, cleanText, removeParent } from '../utils.js';
+import { localstorage } from '../../services/localstorage.js';
+import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
 
 export const router = createPlaywrightRouter();
 
-const url = 'https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000';
+const url = 'https://www.werkenbijyulius.nl/vacatures/';
 
 
 router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
@@ -17,17 +17,17 @@ router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
   while (more) {
     try {
       log.info(`Clicking more jobs button`);
-      await page.getByText('Meer vacatures').click({ timeout: 2000 });
-      // const req = await page.waitForRequest('**/*', { timeout: 2000 });
+      await page.getByText('Laad meer').click({ timeout: 1000 });
+      const req = await page.waitForRequest('**/*', { timeout: 2000 });
       await page.waitForLoadState('networkidle');
-      more = await page.getByText('Meer vacatures').isVisible();
+      more = await page.getByText('Laad meer').isVisible();
     } catch (error) {
       log.error(`Failed to click the button: loaded all jobs. ${error}`);
       break;
     }
   }
   await enqueueLinks({
-    globs: ['https://www.pluryn.nl/werken-bij/vacature/**'],
+    globs: ['https://www.werkenbijyulius.nl/vacature/**'],
     label: 'detail'
   });
 });
@@ -38,15 +38,11 @@ router.addHandler('detail', async ({ request, page, log }) => {
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
   $('script, style, noscript, iframe, header').remove();
-  $('#vacancy-cta-title, .btn, .mod-breadcrumb, .sidebar-container, .vacancy-footer, .mod-footer').remove()
-  var elementWithText = $('h2:contains("Dit is Pluryn")').first();
-  removeParent(elementWithText);
-  elementWithText = $('h3:contains("Neem contact op met onze recruiters")').first();
-  removeParent(elementWithText);
+  $('.vacature-content-sidebar, .vacature-content-sidebar, #footer, .sollicitatie_proces, .btn, .btn-container, .vergelijkbare_vacatures, .extra_vacature_info').remove()
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('pluryn', { title: title, request: request, body: text });
+  await localstorage.saveData('Yulius', { title: title, request: request, body: text });
 });
 
-export const plurynRouter = router;
+export const yuliusRouter = router;

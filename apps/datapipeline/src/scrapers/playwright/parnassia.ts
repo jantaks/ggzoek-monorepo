@@ -1,7 +1,7 @@
 import {createPlaywrightRouter, sleep} from 'crawlee';
-import {localstorage} from "../services/localstorage.js";
+import {localstorage} from "../../services/localstorage.js";
 import * as cheerio from "cheerio";
-import { acceptCookies, cleanText, createHash } from '../utils.js';
+import { acceptCookies, cleanText, createHash } from '../../utils.js';
 
 const router = createPlaywrightRouter();
 

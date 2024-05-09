@@ -1,6 +1,6 @@
 import { createCheerioRouter } from 'crawlee';
-import { localstorage } from '../services/localstorage.js';
-import { cleanText } from '../utils.js';
+import { localstorage } from '../../services/localstorage.js';
+import { cleanText } from '../../utils.js';
 import { start } from 'node:repl';
 
 const router = createCheerioRouter();

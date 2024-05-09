@@ -1,6 +1,6 @@
 import { createPlaywrightRouter, sleep } from 'crawlee';
-import { localstorage } from '../services/localstorage.js';
-import { acceptCookies, cleanText, removeParent } from '../utils.js';
+import { localstorage } from '../../services/localstorage.js';
+import { acceptCookies, cleanText, removeParent } from '../../utils.js';
 import * as cheerio from 'cheerio';
 
 export const router = createPlaywrightRouter();
@@ -38,8 +38,8 @@ router.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
-  $('script, style, noscript, iframe, header, footer').remove();
-  $('.rnBreadcrumb, .elementSticky, .rowRelated, #CybotCookiebotDialog, .rnCarousel').remove()
+  $('script, style, noscript, iframe, header, footer, form').remove();
+  $('.custom-css-section-footer').remove()
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });

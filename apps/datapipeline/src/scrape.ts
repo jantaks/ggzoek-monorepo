@@ -10,48 +10,55 @@ import {
 } from 'crawlee';
 
 import dotenv from 'dotenv';
-import { arkinRouter } from './scrapers/arkin.js';
-import { parnassiaRouter } from './scrapers/parnassia.js';
-import { rvaRouter } from './scrapers/reiniervanarkel.js';
-import { altrechtRouter } from './scrapers/altrecht.js';
-import { localstorage } from './services/localstorage.js';
-import { GGZFrieslandrouter } from './scrapers/ggzfriesland.js';
-import { ggznhnRouter } from './scrapers/ggz-nh.js';
-import { breburgRouter } from './scrapers/breburg.js';
-import { dimenceRouter } from './scrapers/dimence.js';
-import { lentisRouter } from './scrapers/lentis.js';
-import { yuliusRouter } from './scrapers/yulius.js';
-import { oostBrabantRouter } from './scrapers/oost-brabant.js';
-import { emergisRouter } from './scrapers/emergis.js';
-import { propersonaRouter } from './scrapers/propersona.js';
-import { plurynRouter } from './scrapers/pluryn.js';
-import { ggzCentraalRouter } from './scrapers/ggz-centraal.js';
+import { arkinRouter } from './scrapers/playwright/arkin.js';
+import { parnassiaRouter } from './scrapers/playwright/parnassia.js';
+import { rvaRouter } from './scrapers/playwright/reiniervanarkel.js';
+import { altrechtRouter } from './scrapers/cheerio/altrecht.js';
+import { GGZFrieslandrouter } from './scrapers/cheerio/ggzfriesland.js';
+import { ggznhnRouter } from './scrapers/cheerio/ggz-nh.js';
+import { breburgRouter } from './scrapers/cheerio/breburg.js';
+import { dimenceRouter } from './scrapers/cheerio/dimence.js';
+import { lentisRouter } from './scrapers/cheerio/lentis.js';
+import { yuliusRouter } from './scrapers/playwright/yulius.js';
+import { oostBrabantRouter } from './scrapers/cheerio/oost-brabant.js';
+import { emergisRouter } from './scrapers/cheerio/emergis.js';
+import { propersonaRouter } from './scrapers/cheerio/propersona.js';
+import { plurynRouter } from './scrapers/playwright/pluryn.js';
+import { ggzCentraalRouter } from './scrapers/playwright/ggz-centraal.js';
+import { crawlRivierduinen } from './scrapers/playwright/rivierduinen.js';
+import { crawlGGZE } from './scrapers/playwright/ggze.js';
+import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
 
 dotenv.config();
 
-async function getConfig(name: string) {
-  const requestQueue = await RequestQueue.open(name);
-  const config = new Configuration({
-    persistStateIntervalMillis: 30_000,
+export function defaultConfig(name: string) {
+  return new Configuration({
+    persistStateIntervalMillis: 5_000,
     purgeOnStart: true,
     defaultKeyValueStoreId: name,
     defaultDatasetId: name,
-    headless: true
   });
-  const options = {
-    maxRequestsPerCrawl: 1000,
-    requestQueue: requestQueue
-  };
-  return { config, options };
 }
 
-async function buildPlaywright(name: string, router: RouterHandler<PlaywrightCrawlingContext>) {
-  const { config, options } = await getConfig(name);
+export async function defaultOptions(name: string) {
+  const requestQueue = await RequestQueue.open(name);
+  const options = {
+    maxRequestsPerCrawl: 1000,
+    maxRequestsPerMinute: 300,
+    requestQueue: requestQueue
+  };
+  return options;
+}
+
+export async function buildPlaywright(name: string, router: RouterHandler<PlaywrightCrawlingContext>) {
+  const config = await defaultConfig(name);
+  const options = await defaultOptions(name);
   return new PlaywrightCrawler({ ...options, requestHandler: router }, config);
 }
 
-async function buildCheerio(name: string, router: RouterHandler<CheerioCrawlingContext>) {
-  const { config, options } = await getConfig(name);
+export async function buildCheerio(name: string, router: RouterHandler<CheerioCrawlingContext>) {
+  const config = await defaultConfig(name);
+  const options = await defaultOptions(name);
   return new CheerioCrawler({ ...options, requestHandler: router }, config);
 }
 
@@ -89,7 +96,10 @@ export async function runCrawlers() {
       // emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
       // propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
       // plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000']),
-      ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures'])
+      // ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures']),
+      crawlRivierduinen(),
+      crawlGGZE(),
+      crawlGGNET()
     ]
   );
 }
