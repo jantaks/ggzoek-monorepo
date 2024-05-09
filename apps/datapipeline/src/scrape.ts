@@ -25,6 +25,7 @@ import { oostBrabantRouter } from './scrapers/oost-brabant.js';
 import { emergisRouter } from './scrapers/emergis.js';
 import { propersonaRouter } from './scrapers/propersona.js';
 import { plurynRouter } from './scrapers/pluryn.js';
+import { ggzCentraalRouter } from './scrapers/ggz-centraal.js';
 
 dotenv.config();
 
@@ -69,6 +70,8 @@ export async function runCrawlers() {
   const emergisCrawler = await buildCheerio('emergis', emergisRouter);
   const propersonaCrawler = await buildCheerio('propersona', propersonaRouter);
   const plurynCrawler = await buildPlaywright('pluryn', plurynRouter);
+  const ggzCentraalCrawler = await buildPlaywright('ggz-centraal', ggzCentraalRouter);
+
 
   await Promise.all(
     [
@@ -85,7 +88,8 @@ export async function runCrawlers() {
       // ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
       // emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
       // propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
-      plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000'])
+      // plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000']),
+      ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures'])
     ]
   );
 }

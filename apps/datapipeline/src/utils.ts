@@ -1,7 +1,8 @@
 import crypto from 'crypto';
-import winston from "winston";
-import 'dotenv/config'
+import winston from 'winston';
+import 'dotenv/config';
 import { Page } from 'playwright';
+import * as cheerio from 'cheerio';
 
 export function cleanText(text: string) {
     let cleanedText = text.replace(/\t/g, ''); // Remove all tabs
@@ -64,5 +65,12 @@ export async function acceptCookies(page: Page) {
         } catch (error) {
             console.log(`No cookie button found with label "${label}"`);
         }
+    }
+}
+
+export function removeParent(elementWithText: cheerio.Cheerio<cheerio.Element>, parentSelector: string = 'div') {
+    var parentDiv = elementWithText.closest(parentSelector);
+    if (parentDiv.length) {
+        parentDiv.remove();
     }
 }

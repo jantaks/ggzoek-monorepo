@@ -1,6 +1,6 @@
 import { createPlaywrightRouter, sleep } from 'crawlee';
 import { localstorage } from '../services/localstorage.js';
-import { acceptCookies, cleanText } from '../utils.js';
+import { acceptCookies, cleanText, removeParent } from '../utils.js';
 import * as cheerio from 'cheerio';
 
 export const router = createPlaywrightRouter();
@@ -32,13 +32,6 @@ router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
   });
 });
 
-
-function removeParent(elementWithText: cheerio.Cheerio<cheerio.Element>) {
-  var parentDiv = elementWithText.closest('div');
-  if (parentDiv.length) {
-    parentDiv.remove();
-  }
-}
 
 router.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
