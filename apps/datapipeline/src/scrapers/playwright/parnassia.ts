@@ -1,10 +1,20 @@
-import {createPlaywrightRouter, sleep} from 'crawlee';
+import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
 import {localstorage} from "../../services/localstorage.js";
 import * as cheerio from "cheerio";
-import { acceptCookies, cleanText, createHash } from '../../utils.js';
+import { acceptCookies, cleanText} from '../../utils.js';
+import { defaultConfig, defaultOptions } from '../../scrape.js';
 
 const router = createPlaywrightRouter();
+const NAME = 'parnassia';
+const options = defaultOptions(NAME)
+const config = defaultConfig(NAME)
+const crawler = new PlaywrightCrawler({ ...options, requestHandler: router }, config)
 
+const urls = ['https://werkenbijparnassiagroep.nl/home']
+
+export async function crawlParnassia() {
+    crawler.run(urls)
+}
 
 router.addDefaultHandler(async ({enqueueLinks, page, log}) => {
     acceptCookies(page)
@@ -48,6 +58,3 @@ router.addHandler('detail', async ({page, log, request}) => {
         request: request
     })
 });
-
-
-export const parnassiaRouter = router;

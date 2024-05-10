@@ -44,7 +44,7 @@ router.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('ggz-nhn', { title: title, body: text, request: request });
+  await localstorage.saveData('breburg', { title: title, body: text, request: request });
 });
 
 export const breburgRouter = router;

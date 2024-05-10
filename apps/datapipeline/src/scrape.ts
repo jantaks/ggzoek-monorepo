@@ -11,7 +11,6 @@ import {
 
 import dotenv from 'dotenv';
 import { arkinRouter } from './scrapers/playwright/arkin.js';
-import { parnassiaRouter } from './scrapers/playwright/parnassia.js';
 import { rvaRouter } from './scrapers/playwright/reiniervanarkel.js';
 import { altrechtRouter } from './scrapers/cheerio/altrecht.js';
 import { GGZFrieslandrouter } from './scrapers/cheerio/ggzfriesland.js';
@@ -28,6 +27,10 @@ import { ggzCentraalRouter } from './scrapers/playwright/ggz-centraal.js';
 import { crawlRivierduinen } from './scrapers/playwright/rivierduinen.js';
 import { crawlGGZE } from './scrapers/playwright/ggze.js';
 import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
+import { crawlMondriaan } from './scrapers/cheerio/mondriaan.js';
+import { crawlDelfland } from './scrapers/cheerio/delfland.js';
+import { crawlIngeest } from './scrapers/cheerio/ingeest.js';
+import { crawlParnassia } from './scrapers/playwright/parnassia.js';
 
 dotenv.config();
 
@@ -63,7 +66,6 @@ export async function buildCheerio(name: string, router: RouterHandler<CheerioCr
 }
 
 export async function runCrawlers() {
-  const parnassiaCrawler = await buildPlaywright('parnassia', parnassiaRouter);
   const arkinCrawler = await buildPlaywright('arkin', arkinRouter);
   const rvaCrawler = await buildPlaywright('rva', rvaRouter);
   const altrechtCrawler = await buildCheerio('altrecht', altrechtRouter);
@@ -82,24 +84,27 @@ export async function runCrawlers() {
 
   await Promise.all(
     [
-      // parnassiaCrawler.run(['https://werkenbijparnassiagroep.nl/home']),
-      // arkinCrawler.run(['https://werkenbijarkin.nl/vacatures/']),
-      // rvaCrawler.run(['https://www.reinierwerktenleert.nl/vacatures/']),
-      // altrechtCrawler.run(['https://www.werkenbijaltrecht.nl/vacatures/']),
-      // ggzFrieslandCrawler.run(['https://www.werkenbijggzfriesland.nl/vacatures/'])
-      // ggzNhnCrawler.run(['https://www.ggz-nhn.nl/werkenbij']),
-      // breburgCrawler.run(['https://www.werkenbijggzbreburg.nl/']),
-      // dimenceCrawler.run(['https://www.werkenbijdimence.nl/vacatures?page=0'])
-      // lentisCrawler.run(['https://www.werkenbijlentis.nl/vacatures/']),
-      // yuliusCrawler.run(['https://www.werkenbijyulius.nl/vacatures/']),
-      // ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
-      // emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
-      // propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
-      // plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000']),
-      // ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures']),
+      arkinCrawler.run(['https://werkenbijarkin.nl/vacatures/']),
+      rvaCrawler.run(['https://www.reinierwerktenleert.nl/vacatures/']),
+      altrechtCrawler.run(['https://www.werkenbijaltrecht.nl/vacatures/']),
+      ggzFrieslandCrawler.run(['https://www.werkenbijggzfriesland.nl/vacatures/']),
+      ggzNhnCrawler.run(['https://www.ggz-nhn.nl/werkenbij']),
+      breburgCrawler.run(['https://www.werkenbijggzbreburg.nl/']),
+      dimenceCrawler.run(['https://www.werkenbijdimence.nl/vacatures?page=0']),
+      lentisCrawler.run(['https://www.werkenbijlentis.nl/vacatures/']),
+      yuliusCrawler.run(['https://www.werkenbijyulius.nl/vacatures/']),
+      ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
+      emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
+      propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
+      plurynCrawler.run(['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000']),
+      ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures']),
       crawlRivierduinen(),
       crawlGGZE(),
-      crawlGGNET()
+      crawlGGNET(),
+      crawlMondriaan(),
+      crawlDelfland(),
+      crawlIngeest(),
+      crawlParnassia()
     ]
   );
 }

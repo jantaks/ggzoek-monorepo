@@ -7,6 +7,7 @@ import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
 import { crawlMondriaan } from './scrapers/cheerio/mondriaan.js';
 import { crawlIngeest } from './scrapers/cheerio/ingeest.js';
 import { crawlDelfland } from './scrapers/cheerio/delfland.js';
+import { crawlParnassia } from './scrapers/playwright/parnassia.js';
 
 function removeStorageFolder(){
   const __filename = fileURLToPath(import.meta.url);
@@ -19,4 +20,4 @@ function removeStorageFolder(){
 }
 
 removeStorageFolder()
-await crawlDelfland()
+await crawlParnassia()
