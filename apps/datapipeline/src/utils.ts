@@ -47,9 +47,9 @@ export const log = winston.createLogger({
         winston.format.align(),
         winston.format.printf((info) => {
             const { timestamp, level, message, ...args } = info;
-            const ts = timestamp.slice(0, 19).replace('T', ' ');
+            const formattedTimestamp = timestamp.slice(0, 19).replace('T', ' ');
             const prettyArgs = JSON.stringify(args, null, 2);
-            return `${ts} [${level}]: ${message} ${prettyArgs}`;
+            return `${formattedTimestamp} [${level}]: ${message} ${prettyArgs}`;
         })
     ),
     transports: [new winston.transports.Console()]
