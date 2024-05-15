@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import {GoogleGenerativeAI} from "@google/generative-ai"
-import {localstorage} from "./services/localstorage.js";
+import {storage} from "./services/storage.js";
 import 'dotenv/config'
 
 const template = `
@@ -50,6 +50,7 @@ Vermeld in de samenvatting geen gegevens die ook al in een van bovenstaande veld
 dotenv.config()
 
 enum Model {
+    GPT4o = "gpt-4o",
     GPT35TURBO = "gpt-3.5-turbo",
     GPT4 = "gpt-4-1106-preview",
 }
@@ -89,7 +90,7 @@ function calculateCost(model: Model, completion: OpenAI.Chat.ChatCompletion): Co
     }
 }
 
-const MODEL = Model.GPT4;
+const MODEL = Model.GPT4o;
 const openai = new OpenAI();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);

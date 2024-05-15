@@ -1,25 +1,40 @@
-import {createCheerioRouter} from 'crawlee';
-import {localstorage} from "../../services/localstorage.js";
-import {cleanText} from "../../utils.js";
+import { CheerioCrawler, createCheerioRouter } from 'crawlee';
+import { storage } from '../../services/storage.js';
+import { cleanText, logger, selectLinks, selectNewLinks } from '../../utils.js';
+import { defaultConfig, defaultOptions } from '../../scrape.js';
+import { CheerioAPI } from 'cheerio';
 
+
+const NAME = 'Altrecht'
 const router = createCheerioRouter();
+const urlList = [buildUrl()]
+const options = defaultOptions(NAME)
+const config = defaultConfig(NAME)
+const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config);
+const log = logger(NAME)
 
-router.addDefaultHandler(async ({crawler}) => {
+export function crawlAltrecht() {
+    return crawler.run(urlList)
+}
+
+function buildUrl() {
     const baseUrl = 'https://www.werkenbijaltrecht.nl/vacatures/?function=';
     const professions = ['anios', 'psychiater', 'gz-psycholoog', 'neuropsycholoog', 'orthopedagoog', 'klinisch-psycholoog', 'psycholoog', 'psychotherapeut'];
-    let url = baseUrl + encodeURIComponent(professions.join(','));
-    await crawler.requestQueue?.addRequest({url: url, label: 'start'})
-});
+    return baseUrl + encodeURIComponent(professions.join(','));
+}
 
 
-router.addHandler('start', async ({enqueueLinks}) => {
+
+router.addDefaultHandler(async ({enqueueLinks, $}) => {
+    const urls = await selectNewLinks($ as CheerioAPI,
+      { selector: '.vacancy-card',
+          globs: ['https://www.werkenbijaltrecht.nl/vacatures/**']
+      })
     await enqueueLinks({
-        globs: ['https://www.werkenbijaltrecht.nl/vacatures/**'],
-        label: 'detail',
-        selector: '.vacancy-card'
+        urls: urls,
+        label: 'detail'
     });
 });
-
 
 router.addHandler('detail', async ({request, $, log}) => {
     const title = $('h1').text();
@@ -27,7 +42,6 @@ router.addHandler('detail', async ({request, $, log}) => {
     let text = $('body').text();
     text = cleanText(text)
     log.info(`${title}`, {url: request.loadedUrl});
-    await localstorage.saveData("ALTRECHT", {title: title, body: text, request: request})
+    await storage.saveData("ALTRECHT", {title: title, body: text, request: request})
+    storage.saveToDb('Altrecht', {title: title, body: text, request: request})
 });
-
-export const altrechtRouter = router;

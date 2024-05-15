@@ -1,5 +1,5 @@
 import { createCheerioRouter } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
 
 const router = createCheerioRouter();
@@ -22,7 +22,8 @@ router.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('emergis', { title: title, body: text, request: request });
+  await storage.saveData('emergis', { title: title, body: text, request: request });
+  storage.saveToDb('Emergis', {title: title, body: text, request: request})
 });
 
 export const emergisRouter = router;

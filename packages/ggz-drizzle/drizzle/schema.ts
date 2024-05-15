@@ -1,4 +1,16 @@
-import {pgTable, pgEnum, bigint, uuid, text, numeric, boolean, json, pgSchema} from "drizzle-orm/pg-core"
+import {
+    pgTable,
+    pgEnum,
+    bigint,
+    uuid,
+    text,
+    numeric,
+    boolean,
+    json,
+    pgSchema,
+    date,
+    timestamp
+} from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from "zod";
 
@@ -40,8 +52,8 @@ export const vacatures = pgTable("vacatures", {
     summary: text("summary"),
     url: text("url"),
     bodyHash: text("body_hash"),
-    timestamp: text("timestamp"),
-    lastScraped: text("last_scraped"),
+    timestamp: timestamp('timestamp', { mode: "date",  withTimezone: true }),
+    lastScraped: timestamp('last_scraped', { mode: "date", withTimezone: true }),
     synced: boolean("synced").default(false),
     urenMin: numeric("uren_min"),
     urenMax: numeric("uren_max"),
@@ -58,3 +70,4 @@ export const vacatures = pgTable("vacatures", {
 export type InsertVacature = typeof vacatures.$inferSelect;
 export type SelectVacature = typeof vacatures.$inferSelect;
 
+export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' |  'url' | 'bodyHash' | 'timestamp' | 'lastScraped'>

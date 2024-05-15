@@ -1,5 +1,5 @@
 import {runCrawlers} from "./scrape.js";
-import {localstorage} from "./services/localstorage.js";
+import {storage} from "./services/storage.js";
 import {summarizeVacatures, Vacature} from "./summarize.js";
 import {getUpdatedVacatures, upsertVacature, closeConnection, getUnsyncedVacatures} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
 import {log} from "./utils.js";
@@ -7,7 +7,7 @@ import {indexVacatures} from "./services/meilisearch.js";
 import {correctSpelling} from "./synonyms.js";
 
 async function getVacaturesToSummarize(){
-    const vacatures = await localstorage.getVacaturesFromKVS()
+    const vacatures = await storage.getVacaturesFromKVS()
     log.debug(`Found ${vacatures.length} scraped vacatures`)
     const updated = await getUpdatedVacatures(vacatures)
     log.debug(`Found ${updated.length} updated vacatures`)
@@ -19,16 +19,28 @@ async function step_1(){
     await runCrawlers()
 }
 
+async function step_1_a(){
+    log.info("Save to database")
+    const scraped = await storage.getVacaturesFromKVS()
+    log.info(`Found ${scraped.length} scraped vacatures`)
+    const updated = await getUpdatedVacatures(scraped)
+    log.debug(`Found ${updated.length} updated vacatures`)
+    for (const vacature of updated){
+        log.info(`Storing vacature ${vacature.url}`)
+        await upsertVacature(vacature)
+    }
+}
+
 const step_2 = async () => {
     log.info("Summarizing vacatures")
     const vacaturesToSummarize = await getVacaturesToSummarize()
     const vacatures = await summarizeVacatures(vacaturesToSummarize)
-    await localstorage.storeAllCompletions(vacatures)
+    await storage.storeAllCompletions(vacatures)
 }
 
 const step_3 = async () => {
     log.info("Storing summarized vacatures in db")
-    const completed = await localstorage.getCompletedVacatures()
+    const completed = await storage.getCompletedVacatures()
     for (const vacature of completed){
         log.info(`Storing vacature ${vacature.url}`)
         await upsertVacature(vacature)
@@ -51,9 +63,12 @@ const step_5 = async () => {
 }
 
 await step_1()
+await step_1_a()
+log.info("Step 1a done")
 // await step_2()
 // await step_3()
 // await step_4()
 // await step_5().then(closeConnection)
+
 
 

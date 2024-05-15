@@ -1,5 +1,5 @@
 import {createPlaywrightRouter} from 'crawlee';
-import {localstorage} from "../../services/localstorage.js";
+import {storage} from "../../services/storage.js";
 import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from "cheerio";
 export const router = createPlaywrightRouter();
@@ -45,7 +45,8 @@ router.addHandler('detail', async ({request, page, log}) => {
     text = cleanText(text)
     text = text.split('Meer weten en solliciteren')[0]
     log.info(`${title}`, {url: request.loadedUrl});
-    await localstorage.saveData("RVA", {title: title, request: request, body: text})
+    await storage.saveData("RVA", {title: title, request: request, body: text})
+    storage.saveToDb('Reinier van Arkel Groep', {title: title, body: text, request: request})
 });
 
 export const rvaRouter = router

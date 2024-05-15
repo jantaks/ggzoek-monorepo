@@ -1,7 +1,7 @@
 import { CheerioCrawler, createCheerioRouter, PlaywrightCrawler } from 'crawlee';
 import { defaultConfig, defaultOptions } from '../../scrape.js';
 import { cleanText } from '../../utils.js';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 
 
 const url = 'https://werkenbijggnet.nl/vacatures/alle'
@@ -32,5 +32,6 @@ router.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData(NAME, { title: title, body: text, request: request });
+  await storage.saveData(NAME, { title: title, body: text, request: request });
+  storage.saveToDb('GGNet', {title: title, body: text, request: request})
 });

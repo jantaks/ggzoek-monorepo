@@ -1,13 +1,9 @@
-import { crawlRivierduinen } from './scrapers/playwright/rivierduinen.js';
-import { crawlGGZE } from './scrapers/playwright/ggze.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
-import { crawlMondriaan } from './scrapers/cheerio/mondriaan.js';
-import { crawlIngeest } from './scrapers/cheerio/ingeest.js';
-import { crawlDelfland } from './scrapers/cheerio/delfland.js';
+import { crawlAltrecht } from './scrapers/cheerio/altrecht.js';
 import { crawlParnassia } from './scrapers/playwright/parnassia.js';
+import { crawlPluryn } from './scrapers/playwright/pluryn.js';
 
 function removeStorageFolder(){
   const __filename = fileURLToPath(import.meta.url);
@@ -20,4 +16,4 @@ function removeStorageFolder(){
 }
 
 removeStorageFolder()
-await crawlParnassia()
+await crawlAltrecht()

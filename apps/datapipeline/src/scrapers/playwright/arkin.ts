@@ -1,6 +1,6 @@
 import {createPlaywrightRouter, sleep} from 'crawlee';
 import * as cheerio from 'cheerio';
-import {localstorage} from "../../services/localstorage.js";
+import {storage} from "../../services/storage.js";
 import {cleanText} from "../../utils.js";
 
 const router = createPlaywrightRouter();
@@ -26,7 +26,7 @@ router.addHandler('detail', async ({request, page, log}) => {
     text = cleanText(text)
     text = text.split('Meer weten over deze vacature?')[0]
     log.info(`${title}`, {url: request.loadedUrl});
-    await localstorage.saveData("ARKIN", {title: title, request: request, body: text})
+    await storage.saveData("ARKIN", {title: title, request: request, body: text})
 });
 
 export const arkinRouter = router;

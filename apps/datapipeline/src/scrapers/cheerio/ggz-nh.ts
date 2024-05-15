@@ -1,5 +1,5 @@
 import { createCheerioRouter } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
 import { start } from 'node:repl';
 
@@ -57,7 +57,8 @@ router.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('ggz-nhn', { title: title, body: text, request: request });
+  await storage.saveData('ggz-nhn', { title: title, body: text, request: request });
+  storage.saveToDb('GGZ Noord-Holland-Noord', {title: title, body: text, request: request})
 });
 
 export const ggznhnRouter = router;

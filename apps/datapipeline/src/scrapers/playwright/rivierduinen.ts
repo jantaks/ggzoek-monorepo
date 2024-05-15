@@ -1,5 +1,5 @@
 import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import { acceptCookies, cleanText, removeParent } from '../../utils.js';
 import * as cheerio from 'cheerio';
 import { defaultConfig, defaultOptions } from '../../scrape.js';
@@ -52,6 +52,7 @@ router.addHandler('detail', async ({ request, page, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('rivierduinen', { title: title, request: request, body: text });
+  await storage.saveData('rivierduinen', { title: title, request: request, body: text });
+  storage.saveToDb('GGZ Rivierduinen', {title: title, body: text, request: request})
 });
 

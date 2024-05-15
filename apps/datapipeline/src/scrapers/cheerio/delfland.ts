@@ -1,5 +1,5 @@
 import { CheerioCrawler, createCheerioRouter, sleep } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
 import { defaultConfig, defaultOptions } from '../../scrape.js';
 
@@ -36,6 +36,7 @@ router.addDefaultHandler(async ({ $, request, log }) => {
   let text = $('.block__vacancyintro').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData(NAME, { title: title, body: text, request: request });
+  await storage.saveData(NAME, { title: title, body: text, request: request });
+  storage.saveToDb('GGZ Delfland', {title: title, body: text, request: request})
 });
 

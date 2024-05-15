@@ -1,7 +1,7 @@
 import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import * as cheerio from 'cheerio';
-import { acceptCookies, cleanText } from '../../utils.js';
+import { acceptCookies, cleanText, logger, selectNewLinks } from '../../utils.js';
 import { defaultConfig, defaultOptions } from '../../scrape.js';
 
 const router = createPlaywrightRouter();
@@ -18,18 +18,11 @@ export async function crawlParnassia() {
 
 router.addDefaultHandler(async ({ enqueueLinks, page, log }) => {
   await acceptCookies(page);
-  // sleep(1000);
-  // await page.getByText('Functiecategorie').click();
-  // sleep(1000)
-  // await page.getByRole('option', { name: 'Artsen & Medisch Specialisten' }).click();
-  // sleep(500)
-  // await page.getByRole('option', { name: 'Psychologen & Therapeuten' }).click();
-  // // sleep(500)
-  // // await page.getByRole('option', { name: 'Verpleegkundigen & Agogen' }).click();
   sleep(500)
   await page.waitForLoadState('networkidle');
   let more = true;
-  while (more) {
+  let pageNo = 1
+  while (more && pageNo < 2) {
     const moreButton = await page.locator('.css_button.ui_jobs_more').locator('visible=true').first();
     more = await moreButton.count() > 0;
     if (!more) break;
@@ -38,10 +31,18 @@ router.addDefaultHandler(async ({ enqueueLinks, page, log }) => {
     await sleep(1000);
     const vacatureCount = await page.locator('.css_jobsCell').count();
     log.info(`Meer vacatures geladen: ${vacatureCount} vacatures`);
+    pageNo++;
   }
-  log.info(`enqueueing new URLs`);
+  const bodyHtml = await page.content();
+  const $: cheerio.CheerioAPI = cheerio.load(bodyHtml);
+  const urls = await selectNewLinks($, {
+    baseUrl: 'https://werkenbijparnassiagroep.nl',
+    globs: ['/ad/**']
+  });
+
+  log.info(`enqueueing new URLs: ${urls.length}`);
   await enqueueLinks({
-    globs: ['https://werkenbijparnassiagroep.nl/ad/**'],
+    urls: urls,
     label: 'detail'
   });
 });
@@ -54,9 +55,10 @@ router.addHandler('detail', async ({ page, log, request }) => {
   let text = $('main').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('PARNASSIA', {
+  await storage.saveData('PARNASSIA', {
     title: title,
     body: text,
     request: request
   });
+  storage.saveToDb('Parnassia', {title: title, body: text, request: request})
 });

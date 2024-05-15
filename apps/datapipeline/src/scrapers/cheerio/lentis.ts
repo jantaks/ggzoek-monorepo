@@ -1,5 +1,5 @@
 import { createCheerioRouter } from 'crawlee';
-import { localstorage } from '../../services/localstorage.js';
+import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
 import { start } from 'node:repl';
 
@@ -44,7 +44,8 @@ router.addHandler('detail', async ({ request, $, log }) => {
 
   content = cleanText(content);
   log.info(`${title}`, { url: request.loadedUrl });
-  await localstorage.saveData('lentis', { title: title, body: content, request: request });
+  await storage.saveData('lentis', { title: title, body: content, request: request });
+  storage.saveToDb('Lentis', {title: title, body: content, request: request})
 });
 
 export const lentisRouter = router;
