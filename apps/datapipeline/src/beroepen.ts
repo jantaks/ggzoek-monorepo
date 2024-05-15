@@ -8,21 +8,31 @@ export enum Beroep {
   GZPsycholoog = 'GZ-psycholoog',
   Verpleegkundige = 'Verpleegkundige',
   VerpleegkundigSpecialist = 'Verpleegkundig Specialist',
-  SociaalPsychiatrischVerpleegkundige = 'Psychiatrisch Verpleegkundige',
+  SociaalPsychiatrischVerpleegkundige = 'Sociaal Psychiatrisch Verpleegkundige',
   PsychomotorischTherapeut = 'Psychomotorisch Therapeut',
   Basispsycholoog = 'Basispsycholoog',
   Therapeut = 'Therapeut',
   ANIOS = 'ANIOS',
 }
 
-const synonyms: { [key: string]: Beroep } = {
-  'Psych verpl.': Beroep.SociaalPsychiatrischVerpleegkundige,
-  'SPV': Beroep.SociaalPsychiatrischVerpleegkundige,
-  'Psychiatrisch Verpleegkundige': Beroep.SociaalPsychiatrischVerpleegkundige,
+const synonyms: { [key in Beroep]?: string[] } = {
+  [Beroep.SociaalPsychiatrischVerpleegkundige]: ['Psych verpl.', 'SPV', 'Psychiatrisch Verpleegkundige'],
   // Add more synonyms as needed
 };
 
-const beroepen: string[] = Object.values(Beroep);
+const beroepen = Object.values(Beroep);
+const allOptions = [...beroepen, ...Object.values(synonyms).flat()];
+
+export function findSynonym(value: string): Beroep | undefined {
+  for (const key of Object.keys(synonyms) as Array<keyof typeof synonyms>) {
+    const cleanedSynonyms = synonyms[key]?.map(cleanString);
+    if (cleanedSynonyms?.includes(cleanString(value))) {
+      return key;
+    }
+  }
+  return undefined;
+}
+
 
 const cleanString = (text: string): string =>
   text.normalize('NFD').replace(/[‘’'`\s\u0300-\u036f-]/g, '').toLowerCase();
@@ -36,22 +46,25 @@ function getMaxTokens(beroepen: readonly string[]): number {
   }, 0);
 }
 
-const getClosestMatch = (target: string, options: readonly string[]): { closestMatch?: string, minDistance: number } => {
+const getClosestMatch = (target: string, options: readonly string[]): { closestMatch?: string, minRelativeDistance: number } => {
   let closestMatch: string | undefined = undefined;
   let minDistance = Infinity;
 
   options.forEach(option => {
-    const distance = levenshtein(target, option);
-    if (distance < minDistance) {
-      minDistance = distance;
+    const absoluteDistance = levenshtein(target, option);
+    const maxDistance = Math.max(target.length, option.length);
+    const relativeDistance = absoluteDistance / maxDistance;
+    if (relativeDistance < minDistance) {
+      minDistance = relativeDistance;
       closestMatch = option;
     }
   });
 
-  return { closestMatch, minDistance };
+  return { closestMatch, minRelativeDistance: minDistance };
 };
 
 export function getBeroep(title: string): Beroep {
+  console.log(allOptions);
   const tokens = tokenize(title);
 
   const margin = 0.2;
@@ -60,23 +73,23 @@ export function getBeroep(title: string): Beroep {
   for (let windowSize = maxWindowSize; windowSize > 0; windowSize--) {
     let closestMatch: Beroep | undefined = undefined;
     let minDistance = Infinity;
-    let threshold = 0;
 
     for (let i = 0; i <= tokens.length - windowSize; i++) {
       const tokenWindow = tokens.slice(i, i + windowSize).join('');
       const cleanedTokenWindow = cleanString(tokenWindow);
 
-      const { closestMatch: match, minDistance: distance } = getClosestMatch(cleanedTokenWindow, beroepen.map(cleanString));
+      const { closestMatch: match, minRelativeDistance: distance } = getClosestMatch(cleanedTokenWindow, allOptions.map(cleanString));
 
       if (distance < minDistance) {
         minDistance = distance;
-        closestMatch = beroepen.find(beroep => cleanString(beroep) === match);
+        closestMatch = beroepen.find(beroep => cleanString(beroep) === match)
+          || findSynonym(match as string) as Beroep;
+        console.log(closestMatch)
       }
     }
 
     if (closestMatch) {
-      threshold = margin * closestMatch.length;
-      if (minDistance <= threshold) {
+      if (minDistance <= margin) {
         return closestMatch as Beroep;
       }
     }
