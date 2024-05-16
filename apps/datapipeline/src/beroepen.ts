@@ -2,7 +2,6 @@
 import levenshtein from 'js-levenshtein'
 
 export enum Beroep {
-  Onbekend = 'Onbekend',
   KindJeugdPsychiater = 'Kinder- & Jeugd Psychiater',
   Psychiater = 'Psychiater',
   KlinischPsycholoog = 'Klinisch Psycholoog',
@@ -75,35 +74,26 @@ const getClosestMatch = (target: string, options: readonly string[]): { closestM
   return { closestMatch, minRelativeDistance: minDistance };
 };
 
-export function getBeroep(title: string): Beroep {
+export function getBeroep(title: string): Beroep[] {
   const tokens = tokenize(title);
-
+  const result: Beroep[] = []
   const margin = 0.15;
   const maxWindowSize = Math.min(tokens.length, getMaxTokens(beroepen));
 
   for (let windowSize = maxWindowSize; windowSize > 0; windowSize--) {
-    let closestMatch: Beroep | undefined = undefined;
-    let minDistance = Infinity;
-
     for (let i = 0; i <= tokens.length - windowSize; i++) {
       const tokenWindow = tokens.slice(i, i + windowSize).join('');
       const cleanedTokenWindow = cleanString(tokenWindow);
 
       const { closestMatch: match, minRelativeDistance: distance } = getClosestMatch(cleanedTokenWindow, allOptions.map(cleanString));
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestMatch = beroepen.find(beroep => cleanString(beroep) === match)
+      if (distance < margin) {
+        const beroep = beroepen.find(beroep => cleanString(beroep) === match)
           || findSynonym(match as string) as Beroep;
-      }
-    }
-
-    if (closestMatch) {
-      if (minDistance <= margin) {
-        return closestMatch as Beroep;
+        result.push(beroep);
       }
     }
   }
 
-  return Beroep.Onbekend;
+  return Array.from(new Set(result))
 }
