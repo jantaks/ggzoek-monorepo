@@ -1,6 +1,6 @@
 import { randomItems } from './utils.js';
 import { expect, test, describe, it } from 'vitest';
-import { getBeroep, Beroep, findSynonym } from './beroepen.js';
+import { getBeroep, Beroep, findSynonym, cleanString, tokenize } from './beroepen.js';
 
 
 describe('randomItems', () => {
@@ -48,7 +48,7 @@ describe('extracts beroepen from title', () => {
         expect(beroep).toEqual(Beroep.SociaalPsychiatrischVerpleegkundige);
     })
     it('Taalfoutje 3', () => {
-        const title = 'Verpegkundig';
+        const title = 'Ingeest zoekt een Verpeegkundig voor de afdeling psychiatrie';
         const beroep = getBeroep(title);
         expect(beroep).toEqual(Beroep.Verpleegkundige);
     })
@@ -68,12 +68,31 @@ describe('extracts beroepen from title', () => {
         expect(beroep).toEqual(Beroep.GZPsycholoog);
     })
     it('Finds synonyms', () => {
-        const title = 'wij zoeken een SPV';
+        const title = 'wij zoeken een spv voor een instelling';
         const beroep = getBeroep(title);
         expect(beroep).toEqual(Beroep.SociaalPsychiatrischVerpleegkundige);
     })
-    it('Finds synonymsREMOVE', () => {
-        const result = findSynonym('spv ');
+    it('Finds synonyms 2', () => {
+        let title = 'wij zoeken een Kinderpsychater voor een instelling';
+        let beroep = getBeroep(title);
+        expect(beroep).toEqual(Beroep.KindJeugdPsychiater);
+        title = 'wij zoeken een Kind- en Jeugdpsychater voor een instelling';
+        beroep = getBeroep(title);
+        expect(beroep).toEqual(Beroep.KindJeugdPsychiater);
+    })
+    it('Removes /', () => {
+        const title = 'ANIOS/Basisarts psychiatrie (ggz) – (Reinier van Arkel) ';
+        const result = getBeroep(title);
+        expect(result).toEqual(Beroep.ANIOS);
+    })
+    it('Ignores certain words, e.g. psychiatrie', () => {
+        const title = 'Spv voor in de kind- en jeugd psychiatrie';
+        const result = getBeroep(title);
         expect(result).toEqual(Beroep.SociaalPsychiatrischVerpleegkundige);
+    })
+    it('Ignores certain words, e.g. psychiatrie (2)', () => {
+        const title = 'Sociotherapeut Deeltijdbehandeling 6-12 jaar Kinder- en Jeugdpsychiatrie (24-32 uur)';
+        const result = getBeroep(title);
+        expect(result).toEqual(Beroep.Sociotherapeut);
     })
 })
