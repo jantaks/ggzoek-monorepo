@@ -2,13 +2,13 @@ import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
 import { storage } from '../../services/storage.js';
 import { acceptCookies, cleanText, removeParent } from '../../utils.js';
 import * as cheerio from 'cheerio';
-import { defaultConfig, defaultOptions } from '../../scrape.js';
+import { defaultConfig, defaultOptions } from '../crawlers.js';
 
 
 const router = createPlaywrightRouter();
 const URL = 'https://rivierduinen.recruitee.com/vacatures'
 const NAME = 'rivierduinen'
-const options = {...defaultOptions(NAME), maxRequestsPerMinute: 10}
+const options = {...defaultOptions(), maxRequestsPerMinute: 10}
 const config = defaultConfig(NAME)
 const crawler = new PlaywrightCrawler({ ... options, requestHandler: router}, config);
 

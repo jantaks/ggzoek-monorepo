@@ -1,18 +1,12 @@
 import {runCrawlers} from "./scrape.js";
 import {storage} from "./services/storage.js";
 import {summarizeVacatures, Vacature} from "./summarize.js";
-import {getUpdatedVacatures, upsertVacature, closeConnection, getUnsyncedVacatures} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
-import {log} from "./utils.js";
+import {getUpdatedVacatures, upsertVacature, getUnsyncedVacatures} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
+import {log} from "@ggzoek/logging/src/logger.js";
 import {indexVacatures} from "./services/meilisearch.js";
 import {correctSpelling} from "./synonyms.js";
+import {getVacaturesToSummarize} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js"
 
-async function getVacaturesToSummarize(){
-    const vacatures = await storage.getVacaturesFromKVS()
-    log.debug(`Found ${vacatures.length} scraped vacatures`)
-    const updated = await getUpdatedVacatures(vacatures)
-    log.debug(`Found ${updated.length} updated vacatures`)
-    return updated
-}
 
 async function step_1(){
     log.info("Running crawlers")
@@ -62,10 +56,10 @@ const step_5 = async () => {
     }
 }
 
-await step_1()
-await step_1_a()
-log.info("Step 1a done")
-// await step_2()
+// await step_1()
+// await step_1_a()
+// log.info("Step 1a done")
+await step_2()
 // await step_3()
 // await step_4()
 // await step_5().then(closeConnection)

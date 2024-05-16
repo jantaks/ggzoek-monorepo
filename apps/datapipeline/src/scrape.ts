@@ -2,10 +2,8 @@
 import {
   CheerioCrawler,
   CheerioCrawlingContext,
-  Configuration,
   PlaywrightCrawler,
   PlaywrightCrawlingContext,
-  RequestQueue,
   RouterHandler
 } from 'crawlee';
 
@@ -22,61 +20,44 @@ import { oostBrabantRouter } from './scrapers/cheerio/oost-brabant.js';
 import { emergisRouter } from './scrapers/cheerio/emergis.js';
 import { propersonaRouter } from './scrapers/cheerio/propersona.js';
 import { ggzCentraalRouter } from './scrapers/playwright/ggz-centraal.js';
-import { crawlGGZE } from './scrapers/playwright/ggze.js';
 import { crawlGGNET } from './scrapers/cheerio/ggnet.js';
 import { crawlMondriaan } from './scrapers/cheerio/mondriaan.js';
 import { crawlDelfland } from './scrapers/cheerio/delfland.js';
 import { crawlIngeest } from './scrapers/cheerio/ingeest.js';
-import { crawlParnassia } from './scrapers/playwright/parnassia.js';
-import { crawlAltrecht } from './scrapers/cheerio/altrecht.js';
-import { log } from './utils.js';
-import { crawlPluryn } from './scrapers/playwright/pluryn.js';
+import { Parnassia } from './scrapers/playwright/parnassia.js';
+import { log } from '@ggzoek/logging/src/logger.js';
+import { Pluryn } from './scrapers/playwright/pluryn.js';
+import { Altrecht } from './scrapers/cheerio/altrecht.js';
+import { defaultConfig, defaultOptions } from './scrapers/crawlers.js';
+import { GGZE } from './scrapers/playwright/ggze.js';
 
 dotenv.config();
 
-export function defaultConfig(name: string) {
-  return new Configuration({
-    persistStateIntervalMillis: 5_000,
-    purgeOnStart: true,
-    defaultKeyValueStoreId: name,
-    defaultDatasetId: name,
-  });
-}
-
-export async function defaultOptions(name: string) {
-  const requestQueue = await RequestQueue.open(name);
-  return {
-    maxRequestsPerCrawl: 1000,
-    maxRequestsPerMinute: 300,
-    requestQueue: requestQueue
-  };
-}
-
-export async function buildPlaywright(name: string, router: RouterHandler<PlaywrightCrawlingContext>) {
-  const config = await defaultConfig(name);
-  const options = await defaultOptions(name);
+export function buildPlaywright(name: string, router: RouterHandler<PlaywrightCrawlingContext>) {
+  const config = defaultConfig(name);
+  const options = defaultOptions();
   return new PlaywrightCrawler({ ...options, requestHandler: router }, config);
 }
 
-export async function buildCheerio(name: string, router: RouterHandler<CheerioCrawlingContext>) {
-  const config = await defaultConfig(name);
-  const options = await defaultOptions(name);
+export function buildCheerio(name: string, router: RouterHandler<CheerioCrawlingContext>) {
+  const config = defaultConfig(name);
+  const options = defaultOptions();
   return new CheerioCrawler({ ...options, requestHandler: router }, config);
 }
 
 export async function runCrawlers() {
-  const arkinCrawler = await buildPlaywright('arkin', arkinRouter);
-  const rvaCrawler = await buildPlaywright('rva', rvaRouter);
-  const ggzFrieslandCrawler = await buildCheerio('ggzfriesland', GGZFrieslandrouter);
-  const ggzNhnCrawler = await buildCheerio('ggznhn', ggznhnRouter);
-  const breburgCrawler = await buildCheerio('breburg', breburgRouter);
-  const dimenceCrawler = await buildCheerio('dimence', dimenceRouter);
-  const lentisCrawler = await buildCheerio('lentis', lentisRouter);
-  const yuliusCrawler = await buildPlaywright('yulius', yuliusRouter);
-  const ooostBrabantCrawler = await buildCheerio('oost-brabant', oostBrabantRouter);
-  const emergisCrawler = await buildCheerio('emergis', emergisRouter);
-  const propersonaCrawler = await buildCheerio('propersona', propersonaRouter);
-  const ggzCentraalCrawler = await buildPlaywright('ggz-centraal', ggzCentraalRouter);
+  const arkinCrawler = buildPlaywright('arkin', arkinRouter);
+  const rvaCrawler = buildPlaywright('rva', rvaRouter);
+  const ggzFrieslandCrawler = buildCheerio('ggzfriesland', GGZFrieslandrouter);
+  const ggzNhnCrawler = buildCheerio('ggznhn', ggznhnRouter);
+  const breburgCrawler = buildCheerio('breburg', breburgRouter);
+  const dimenceCrawler = buildCheerio('dimence', dimenceRouter);
+  const lentisCrawler = buildCheerio('lentis', lentisRouter);
+  const yuliusCrawler = buildPlaywright('yulius', yuliusRouter);
+  const ooostBrabantCrawler = buildCheerio('oost-brabant', oostBrabantRouter);
+  const emergisCrawler = buildCheerio('emergis', emergisRouter);
+  const propersonaCrawler = buildCheerio('propersona', propersonaRouter);
+  const ggzCentraalCrawler = buildPlaywright('ggz-centraal', ggzCentraalRouter);
 
 
   await Promise.all(
@@ -94,17 +75,17 @@ export async function runCrawlers() {
       propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
       ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures']),
       // crawlRivierduinen(),
-      crawlGGZE(),
       crawlGGNET(),
       crawlMondriaan(),
       crawlDelfland(),
       crawlIngeest(),
-      crawlParnassia(),
-      crawlAltrecht(),
-      crawlPluryn()
+      Parnassia.crawl(),
+      Altrecht.crawl(),
+      Pluryn.crawl(),
+      GGZE.crawl()
     ]
   );
 
-  log.info('All crawlers have finished')
+  log.info('All crawlers have finished');
 }
 

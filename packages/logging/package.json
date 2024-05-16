@@ -1,0 +1,19 @@
+{
+  "name": "@ggzoek/logging",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Logging utitlies for ggzoek",
+  "dependencies": {
+    "pino": "^9.1.0",
+    "pino-caller": "^3.4.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.14"
+  },
+  "scripts": {
+    "test": "tsx src/main.ts"
+  },
+  "author": "It's not you it's me",
+  "license": "ISC"
+}

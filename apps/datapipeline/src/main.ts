@@ -1,19 +1,25 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { crawlAltrecht } from './scrapers/cheerio/altrecht.js';
-import { crawlParnassia } from './scrapers/playwright/parnassia.js';
-import { crawlPluryn } from './scrapers/playwright/pluryn.js';
+import { GGZE } from './scrapers/playwright/ggze.js';
+import { log } from '@ggzoek/logging/src/logger.js';
+import {getVacaturesToSummarize} from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
+
 
 function removeStorageFolder(){
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const storageFolderPath = path.join(__dirname, '../storage');
   if (fs.existsSync(storageFolderPath)) {
-    console.log('Removing storage folder')
+    log.info('Removing storage folder')
     fs.rmSync(storageFolderPath, { recursive: true, force: true });
   }
 }
 
-removeStorageFolder()
-await crawlAltrecht()
+// await removeStorageFolder()
+// await GGZE.crawl()
+// log.info("Crawling completed.")
+
+const vacs = await getVacaturesToSummarize()
+
+log.info(vacs.length)

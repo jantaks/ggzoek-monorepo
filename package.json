@@ -24,9 +24,8 @@
   },
   "dependencies": {
     "dotenv": "^16.4.1",
-    "winston": "^3.12.0",
-    "playwright": "*"
-
+    "playwright": "*",
+    "vitest": "^1.2.0"
   },
   "resolutions": {
     "htmlparser2": "9.1.0"

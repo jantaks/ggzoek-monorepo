@@ -1,6 +1,6 @@
 import { MinimumVacature, SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
 import { client, db } from './client.js';
-import { eq, gt, gte, isNotNull, isNull, lt } from 'drizzle-orm';
+import { and, arrayContains, arrayOverlaps, eq, gt, gte, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
 
 export async function closeConnection() {
     await client.end()
@@ -89,4 +89,35 @@ export async function allUrlsForOrganisation(organisation: string) {
 export async function getAllUrlsScrapedWithinHours(hours: number = 24): Promise<string[]> {
     const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(gt(vacatureTable.lastScraped, new Date(Date.now() - hours * 60 * 60 * 1000))).execute();
     return result.map((x: { url: string }) => x.url);
+}
+
+export async function getAll(){
+    return await db.select().from(vacatureTable).execute() as SelectVacature[];
+}
+
+export async function getAllWithoutProfessie(){
+    return await db.select().from(vacatureTable).where(sql`array_length(${vacatureTable.professie}, 1) IS NULL OR array_length(${vacatureTable.professie}, 1) = 0`).execute() as SelectVacature[];
+
+}
+
+
+/**
+ * Retrieves all vacatures that have at least one of the provided professies.
+ * @param professies
+ */
+export async function getAllWithProfessies(professies: string[]){
+    return await db.select().from(vacatureTable).where(arrayOverlaps(vacatureTable.professie, professies)).execute() as SelectVacature[];
+}
+
+export async function getVacaturesToSummarize(){
+    const professies = ['Psychiater']
+    return await db.select()
+      .from(vacatureTable)
+      .where(
+        and(
+          arrayOverlaps(vacatureTable.professie, professies),
+          or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary))
+        )
+      )
+      .execute() as SelectVacature[];
 }

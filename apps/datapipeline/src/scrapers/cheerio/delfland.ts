@@ -1,7 +1,7 @@
 import { CheerioCrawler, createCheerioRouter, sleep } from 'crawlee';
 import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
-import { defaultConfig, defaultOptions } from '../../scrape.js';
+import { defaultConfig, defaultOptions } from '../crawlers.js';
 
 
 
@@ -21,7 +21,7 @@ async function getURLs(){
 
 const router = createCheerioRouter();
 const NAME = 'delfland'
-const options = defaultOptions(NAME)
+const options = defaultOptions()
 const config = defaultConfig(NAME)
 const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config)
 

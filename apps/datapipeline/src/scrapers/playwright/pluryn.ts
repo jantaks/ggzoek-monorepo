@@ -1,23 +1,13 @@
-import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
-import { storage } from '../../services/storage.js';
+import { sleep } from 'crawlee';
 import { acceptCookies, cleanText, removeParent, selectNewLinks } from '../../utils.js';
 import * as cheerio from 'cheerio';
-import { defaultConfig, defaultOptions } from '../../scrape.js';
+import { PlaywrightScraper } from '../crawlers.js';
 
 
-const url = 'https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000';
+const s = new PlaywrightScraper('Pluryn', ['https://www.pluryn.nl/werken-bij/vacature?filter=&address=&distance=10000'])
+export const Pluryn = s
 
-const router = createPlaywrightRouter();
-const NAME = 'Pluryn';
-const options = defaultOptions(NAME);
-const config = defaultConfig(NAME);
-const crawler = new PlaywrightCrawler({ ...options, requestHandler: router }, config);
-
-export async function crawlPluryn() {
-  crawler.run([url]);
-}
-
-router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
+s.router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
   page.setDefaultTimeout(5000);
   // await page.goto(url);
   await acceptCookies(page);
@@ -54,7 +44,7 @@ router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
 });
 
 
-router.addHandler('detail', async ({ request, page, log }) => {
+s.router.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
@@ -67,6 +57,5 @@ router.addHandler('detail', async ({ request, page, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('pluryn', { title: title, request: request, body: text });
-  storage.saveToDb('Pluryn', {title: title, body: text, request: request})
+  await s.save({ title: title, request: request, body: text });
 });

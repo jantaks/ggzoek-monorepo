@@ -1,14 +1,14 @@
 import { CheerioCrawler, createCheerioRouter, PlaywrightCrawler } from 'crawlee';
-import { defaultConfig, defaultOptions } from '../../scrape.js';
 import { cleanText } from '../../utils.js';
 import { storage } from '../../services/storage.js';
+import { defaultConfig, defaultOptions } from '../crawlers.js';
 
 
 const url = 'https://werkenbijggnet.nl/vacatures/alle'
 
 const router = createCheerioRouter();
 const NAME = 'ggnet';
-const options = defaultOptions(NAME)
+const options = defaultOptions()
 const config = defaultConfig(NAME)
 const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config)
 

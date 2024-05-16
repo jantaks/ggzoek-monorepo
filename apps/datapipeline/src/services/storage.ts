@@ -1,13 +1,16 @@
 import { Dataset, Dictionary, KeyValueStore, Request } from 'crawlee';
-import { createHash, log } from '../utils.js';
+import { createHash } from '../utils.js';
 import { Vacature } from '../summarize.js';
 import path from 'node:path';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import {  MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import { getVacature, upsertVacature } from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
+import { getBeroepen } from '../beroepen.js';
+import { log } from '@ggzoek/logging/src/logger.js';
 
-type Data = {
+
+export type Data = {
   request: Request<Dictionary>
   body: string,
   title: string,
@@ -27,6 +30,7 @@ export async function saveToDb(organisatie: string, data: Data) {
     bodyHash: createHash(data.body),
     timestamp: new Date(),
     lastScraped: new Date(),
+    professie: getBeroepen(data.title)
   };
 
   const stored = await getVacature(vacature.urlHash);

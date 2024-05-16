@@ -12,7 +12,6 @@ import {
     timestamp
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from "zod";
 
 export const keyStatus = pgEnum("key_status", ['default', 'valid', 'invalid', 'expired'])
 export const keyType = pgEnum("key_type", ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
@@ -58,6 +57,7 @@ export const vacatures = pgTable("vacatures", {
     urenMin: numeric("uren_min"),
     urenMax: numeric("uren_max"),
     beroepen: json("beroepen"),
+    professie: text("professie").array(),
     stoornissen: json("stoornissen"),
     behandelmethoden: json("behandelmethoden"),
     fwg: text("FWG"),
@@ -70,4 +70,4 @@ export const vacatures = pgTable("vacatures", {
 export type InsertVacature = typeof vacatures.$inferSelect;
 export type SelectVacature = typeof vacatures.$inferSelect;
 
-export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' |  'url' | 'bodyHash' | 'timestamp' | 'lastScraped'>
+export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' |  'url' | 'bodyHash' | 'timestamp' | 'lastScraped' | 'professie'>

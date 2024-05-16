@@ -1,12 +1,17 @@
 import crypto from 'crypto';
-import winston from 'winston';
 import 'dotenv/config';
 import { Page } from 'playwright';
 import * as cheerio from 'cheerio';
-
-import { minimatch } from 'minimatch';
 import { CheerioAPI } from 'cheerio';
+import { minimatch } from 'minimatch';
 import { getAllUrlsScrapedWithinHours } from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
+import { log } from '@ggzoek/logging/src/logger.js';
+
+
+export async function getCheerioFromPage(page: Page) {
+  const bodyHtml = await page.content();
+  return cheerio.load(bodyHtml);
+}
 
 
 export function cleanText(text: string) {
@@ -44,39 +49,6 @@ export function randomItems<T>(items: T[], count: number) {
   return result;
 }
 
-export const log = winston.createLogger({
-  level: process.env.LOG_LEVEL,
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.timestamp(),
-    winston.format.align(),
-    winston.format.printf((info) => {
-      const { timestamp, level, message, ...args } = info;
-      const formattedTimestamp = timestamp.slice(0, 19).replace('T', ' ');
-      const prettyArgs = JSON.stringify(args, null, 2);
-      return `${formattedTimestamp} [${level}]: ${message} ${prettyArgs}`;
-    })
-  ),
-  transports: [new winston.transports.Console()]
-});
-
-export function logger(name: string) {
-  return winston.createLogger({
-    level: process.env.LOG_LEVEL,
-    format: winston.format.combine(
-      winston.format.colorize({all: true}),
-      winston.format.timestamp(),
-      winston.format.align(),
-      winston.format.printf((info) => {
-        const { timestamp, level, message, ...args } = info;
-        const formattedTimestamp = timestamp.slice(0, 19).replace('T', ' ');
-        const prettyArgs = JSON.stringify(args, null, 2);
-        return `${formattedTimestamp} ${name} [${level}]: ${message} ${prettyArgs}`;
-      })
-    ),
-    transports: [new winston.transports.Console()]
-  });
-};
 
 export async function acceptCookies(page: Page) {
   const cookieButtonLabels = ['Alles toestaan', 'Cookies toestaan', 'Alle cookies toestaan', 'Accepteren', 'Ik ga akkoord'];
@@ -104,7 +76,6 @@ type LinkOptions = {
   selector?: string
 }
 
-
 export function selectLinks($: CheerioAPI, options: LinkOptions) {
   let urls = [];
 
@@ -129,11 +100,18 @@ export function selectLinks($: CheerioAPI, options: LinkOptions) {
   return urls;
 }
 
+/**
+ * Selects only new links that have not been scraped in the last 48 hours
+ * @param $
+ * @param options
+ */
 export async function selectNewLinks($: CheerioAPI, options: LinkOptions) {
   const urls = selectLinks($, options);
-  const skipUrls = await getAllUrlsScrapedWithinHours(60)
+  const skipUrls = await getAllUrlsScrapedWithinHours(60);
   const filteredUrls = urls.filter(url => !skipUrls.includes(url));
-  log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last 60 hours`);
-  log.info('Selected urls:', filteredUrls)
-  return filteredUrls
+  log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last 48 hours`);
+  log.debug('Selected urls:', filteredUrls);
+  return filteredUrls;
 }
+
+
