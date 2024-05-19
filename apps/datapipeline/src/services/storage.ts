@@ -1,6 +1,5 @@
 import { Dataset, Dictionary, KeyValueStore, Request } from 'crawlee';
 import { createHash } from '../utils.js';
-import { Vacature } from '../summarize.js';
 import path from 'node:path';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
@@ -8,6 +7,7 @@ import {  MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import { getVacature, upsertVacature } from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
 import { getBeroepen } from '../beroepen.js';
 import { log } from '@ggzoek/logging/src/logger.js';
+import { Vacature } from '../ai/types.js';
 
 
 export type Data = {
@@ -19,7 +19,7 @@ export type Data = {
 // Sla de gescrapete vacature op of update deze obv de volgende regels:
 // 1 Sla de gehele vacature op als deze nog niet bestaat in de database (obv urlHash)
 // 2 Als de vacature al bestaat in de database, bewaar de timestamp van de eerste keer dat deze is opgeslagen
-// 3 Als de bodyhash is gewijzigd, verander de synced status naar false
+//TODO:  3 Als de bodyhash is gewijzigd, verander de synced status naar false
 export async function saveToDb(organisatie: string, data: Data) {
   const vacature: MinimumVacature = {
     organisatie: organisatie,
@@ -83,13 +83,7 @@ async function getCompletedVacatures() {
 }
 
 async function storeCompletions(vacature: Vacature) {
-  const vacatureJson = JSON.stringify(vacature, null, 2);
-  const dirPath = path.join(process.cwd(), '/storage/completions');
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-  const outputPath = path.join(dirPath, `${vacature.organisatie}_${vacature?.urlHash}.json`);
-  await fsPromises.writeFile(outputPath, vacatureJson);
+  log.info(`Vacature ${vacature.url} has been summarized: ${vacature.summary}`);
 }
 
 async function storeAllCompletions(vacatures: Vacature[]) {

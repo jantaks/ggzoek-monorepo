@@ -1,6 +1,6 @@
-import {Vacature} from "../summarize.js";
 import {formatDate} from "../utils.js";
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
+import { Vacature } from '../ai/types.js';
 
 
 export class s3Saver {

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import {MeiliSearch, Synonyms} from 'meilisearch'
-import {Vacature} from "../summarize.js";
+
+import { Vacature } from '../ai/types.js';
 
 const url = process.env.MEILISEARCH_URL
 const key = process.env.MEILISEARCH_KEY

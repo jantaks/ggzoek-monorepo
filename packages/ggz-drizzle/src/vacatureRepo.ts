@@ -1,6 +1,12 @@
-import { MinimumVacature, SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
+import {
+    completionsResultSchema,
+    MinimumVacature,
+    SelectVacature,
+    vacatures as vacatureTable
+} from '../drizzle/schema.js';
 import { client, db } from './client.js';
 import { and, arrayContains, arrayOverlaps, eq, gt, gte, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
+import { z } from 'zod';
 
 export async function closeConnection() {
     await client.end()
@@ -20,7 +26,7 @@ export async function getVacature(urlHash: string) {
 
 }
 
-export async function upsertVacature(vacature: MinimumVacature) {
+export async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>) {
     const columns = Object.keys(vacatureTable);
     const valuesToInsert = columns.reduce((acc, col) => {
         acc[col] = vacature[col];

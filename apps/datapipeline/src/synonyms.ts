@@ -1,6 +1,7 @@
 import "dotenv/config"
 import {closeConnection, getUnsyncedVacatures, upsertVacature} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
-import {Vacature} from "./summarize.js";
+
+import { Vacature } from './ai/types.js';
 
 export const synonyms: SynonymsDictionary = {
     "locaties": {

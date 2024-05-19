@@ -1,10 +1,8 @@
-import OpenAI from "openai";
-import dotenv from "dotenv";
-import {GoogleGenerativeAI} from "@google/generative-ai"
-import {storage} from "./services/storage.js";
-import 'dotenv/config'
+import { Vacature } from './types.js';
+import { log } from '@ggzoek/logging/src/logger.js';
+import fs from 'fs';
 
-const template = `
+export const template = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke GezondheidsZorg (GGZ).
 Je taak is om gestructureerd data uit vacature teksten te halen. Maak een JSON en gebruik onderstaande velden, volg de instructies nauwgezet. Bij een keuzelijst mag je alleen uit geboden keuzes kiezen!!! Dus niet "Psychotische stoornis" maar "Psychose" ook al wordt in de tekst alleen gesproken over "Psychotische stoornis". Numbers mogen alleen hele getallen zijn, dus geen strings!!!
 
@@ -47,120 +45,14 @@ Vermeld in de samenvatting geen gegevens die ook al in een van bovenstaande veld
 {user_input}
 `;
 
-dotenv.config()
-
-enum Model {
-    GPT4o = "gpt-4o",
-    GPT35TURBO = "gpt-3.5-turbo",
-    GPT4 = "gpt-4-1106-preview",
+export function buildPrompt(vacature: Vacature) {
+  if (!vacature.body) {
+    throw new Error('Vacature body is missing');
+  }
+  let prompt = template.replace('{user_input}', vacature.body);
+  let wordCount = prompt.split(' ').length;
+  log.info(`Word count for prompt: ${wordCount} (${vacature.url})`);
+  const timestamp = new Date().toISOString().replace(/:/g, '-');
+  fs.writeFileSync(`promptlog/${timestamp}.txt`, prompt);
+  return prompt;
 }
-
-type Pricing = {
-    input: number,
-    output: number,
-}
-
-type Cost = {
-    input: number,
-    output: number,
-    total: number,
-}
-
-const pricingTable: Record<Model, Pricing> = {
-    [Model.GPT35TURBO]: {
-        input: 0.0005,
-        output: 0.0015,
-    },
-    [Model.GPT4]: {
-        input: 0.01,
-        output: 0.03,
-    },
-}
-function calculateCost(model: Model, completion: OpenAI.Chat.ChatCompletion): Cost | undefined {
-    const pricing = pricingTable[model];
-    if (completion.usage === undefined){
-        return undefined
-    }
-    const input = pricing.input * completion.usage.prompt_tokens / 1000;
-    const output = pricing.output * completion.usage.completion_tokens / 1000;
-    return {
-        input,
-        output,
-        total: input + output,
-    }
-}
-
-const MODEL = Model.GPT4o;
-const openai = new OpenAI();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-
-async function runGemini(vacature: Vacature) {
-    if (!vacature.body){
-        throw new Error("Vacature body is missing")
-    }
-    const prompt = template.replace("{user_input}", vacature.body);
-    // For text-only input, use the gemini-pro model
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    console.log(text);
-}
-
-export async function summarizeVacatures(vacatures: Vacature[]){
-    const tasks = vacatures.map(vacature => summarize(vacature));
-    return await Promise.all(tasks);
-}
-
-export type Vacature = {
-    organisatie: string;
-    bodyHash?: string;
-    url?: string;
-    urlHash: string;
-    title?: string,
-    body?: string
-    cost?: Cost
-    summary?: string
-    llmParams?: {
-        template: string,
-        cost: Cost,
-        model: Model
-    },
-    synced: boolean
-    [key: string]: any;
-
-}
-
-function buildPrompt(vacature: Vacature) {
-    if (!vacature.body){
-        throw new Error("Vacature body is missing")
-    }
-    return template.replace("{user_input}", vacature.body);
-}
-
-async function summarize(vacature: Vacature) {
-    const prompt = buildPrompt(vacature);
-    console.log(`Requesting completion for ${vacature.url}`)
-    const completion = await openai.chat.completions.create({
-        messages: [{role: "system", content: prompt}],
-        model: MODEL,
-        response_format: {"type": "json_object"}
-    });
-    let result = completion.choices[0].message.content;
-    if (result){
-        const resultJson = JSON.parse(result);
-        const cost = calculateCost(MODEL, completion)
-        return {
-            ...vacature,
-            ...resultJson,
-            completionTimeStamp: new Date().toISOString(),
-            has_summary: "true",
-            llmParams: {template, cost, model: MODEL}} as Vacature;
-    }
-    return {} as Vacature;
-}
-
-
-
-

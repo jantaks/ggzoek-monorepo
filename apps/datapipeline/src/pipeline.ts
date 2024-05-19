@@ -1,11 +1,17 @@
-import {runCrawlers} from "./scrape.js";
-import {storage} from "./services/storage.js";
-import {summarizeVacatures, Vacature} from "./summarize.js";
-import {getUpdatedVacatures, upsertVacature, getUnsyncedVacatures} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
-import {log} from "@ggzoek/logging/src/logger.js";
-import {indexVacatures} from "./services/meilisearch.js";
-import {correctSpelling} from "./synonyms.js";
-import {getVacaturesToSummarize} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js"
+import { runCrawlers } from './scrape.js';
+import { storage } from './services/storage.js';
+import {
+    getUnsyncedVacatures,
+    getUpdatedVacatures,
+    getVacaturesToSummarize,
+    upsertVacature
+} from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
+import { log } from '@ggzoek/logging/src/logger.js';
+import { indexVacatures } from './services/meilisearch.js';
+import { correctSpelling } from './synonyms.js';
+import { Vacature } from './ai/types.js';
+import { Provider, summarizeVacatures } from './ai/summarize.js';
+import { MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 
 
 async function step_1(){
@@ -13,7 +19,7 @@ async function step_1(){
     await runCrawlers()
 }
 
-async function step_1_a(){
+async function step_2(){
     log.info("Save to database")
     const scraped = await storage.getVacaturesFromKVS()
     log.info(`Found ${scraped.length} scraped vacatures`)
@@ -25,20 +31,11 @@ async function step_1_a(){
     }
 }
 
-const step_2 = async () => {
-    log.info("Summarizing vacatures")
-    const vacaturesToSummarize = await getVacaturesToSummarize()
-    const vacatures = await summarizeVacatures(vacaturesToSummarize)
-    await storage.storeAllCompletions(vacatures)
-}
-
 const step_3 = async () => {
-    log.info("Storing summarized vacatures in db")
-    const completed = await storage.getCompletedVacatures()
-    for (const vacature of completed){
-        log.info(`Storing vacature ${vacature.url}`)
-        await upsertVacature(vacature)
-    }
+    log.info("Summarizing vacatures")
+    const vacaturesToSummarize = await getVacaturesToSummarize() as Vacature[]
+    log.info(`Found ${vacaturesToSummarize.length} vacatures to summarize`)
+    const completed = await summarizeVacatures(vacaturesToSummarize, Provider.ANTHROPIC)
 }
 
 const step_4 = async () => {
@@ -57,10 +54,8 @@ const step_5 = async () => {
 }
 
 // await step_1()
-// await step_1_a()
-// log.info("Step 1a done")
-await step_2()
-// await step_3()
+// await step_2()
+await step_3()
 // await step_4()
 // await step_5().then(closeConnection)
 

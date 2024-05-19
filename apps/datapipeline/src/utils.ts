@@ -92,7 +92,12 @@ export function selectLinks($: CheerioAPI, options: LinkOptions) {
   }
 
   if (options.baseUrl) {
-    urls = urls.map(url => options.baseUrl + url);
+    urls = urls.map(url => {
+      if (url.startsWith(options.baseUrl!)){
+        return url
+      }
+      return options.baseUrl + url;
+    });
   }
 
   urls = Array.from(new Set(urls));

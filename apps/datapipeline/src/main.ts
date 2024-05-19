@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GGZE } from './scrapers/playwright/ggze.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import {getVacaturesToSummarize} from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
+
+import { IHUB } from './scrapers/cheerio/ihub.js';
 
 
 function removeStorageFolder(){
@@ -16,10 +16,5 @@ function removeStorageFolder(){
   }
 }
 
-// await removeStorageFolder()
-// await GGZE.crawl()
-// log.info("Crawling completed.")
-
-const vacs = await getVacaturesToSummarize()
-
-log.info(vacs.length)
+removeStorageFolder()
+await IHUB.crawl()

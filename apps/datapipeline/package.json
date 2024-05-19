@@ -4,12 +4,13 @@
   "type": "module",
   "description": "This is an example of a Crawlee project.",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.21.0",
     "@aws-sdk/client-dynamodb": "^3.518.0",
     "@aws-sdk/client-s3": "^3.515.0",
     "@aws-sdk/lib-dynamodb": "^3.518.0",
     "@ggzoek/ggz-drizzle": "workspace:*",
     "@ggzoek/logging": "workspace:*",
-    "@google/generative-ai": "^0.2.1",
+    "@google/generative-ai": "^0.11.3",
     "aws-sdk": "^2.1563.0",
     "cheerio": "^1.0.0-rc.12",
     "cloudinary": "^2.0.3",
@@ -24,7 +25,7 @@
   },
   "scripts": {
     "scrape": "tsx src/main.ts",
-    "complete": "tsx src/summarize.ts",
+    "complete": "tsx src/ai/openAi.ts",
     "pipeline": "tsx src/pipeline.ts",
     "supabase": "tsx src//services/supabase.ts",
     "debug": "node --inspect --loader ts-node/esm/transpile-only src/scrape.ts",

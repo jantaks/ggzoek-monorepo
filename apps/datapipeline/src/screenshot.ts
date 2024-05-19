@@ -1,6 +1,5 @@
 import "dotenv/config.js";
 import {chromium, firefox, webkit, devices} from 'playwright'
-import {Vacature} from "./summarize.js";
 import {closeConnection, db, getVacaturesWithoutScreenshot} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
 import {vacatures as vacatureTable} from "../../../packages/ggz-drizzle/drizzle/schema.js";
 import {eq, isNull} from "drizzle-orm";
@@ -40,6 +39,7 @@ async function createScreenshots(vacatures: Vacature[]) {
     await browser.close();
 }
 import {v2 as cloudinary} from 'cloudinary';
+import { Vacature } from './ai/types.js';
 
 // Return "https" URLs by setting secure: true
 cloudinary.config({
