@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Alle drizzle-gerelateerde code",
   "dependencies": {
+    "@ggzoek/logging": "workspace:*",
     "drizzle-orm": "^0.30.1",
     "drizzle-zod": "^0.5.1",
     "postgres": "^3.4.3",
