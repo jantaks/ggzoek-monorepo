@@ -1,17 +1,19 @@
 import _ from 'lodash';
-import { db, getDb } from './client.js';
+import { getDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { completionsResultSchema, MinimumVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
+type DbFunction = (...args: any[]) => Promise<any>;
 
-function withDb(fn: (...args: any) => any) {
+
+function withDb<T extends DbFunction>(fn: T): T {
   const { client: client, db: db } = getDb();
-  const operation = _.partialRight(fn, db);
-  return async (...args) => {
+  const partiallyAppliedFunction = _.partialRight(fn, db) as T;
+  const operation =  async (...args) => {
     try {
-      return await operation(...args);
+      return await partiallyAppliedFunction(args);
     } catch (e) {
       log.error(e, `Error in ${fn.name}`);
     } finally {
@@ -19,6 +21,7 @@ function withDb(fn: (...args: any) => any) {
       await client.end()
     }
   };
+  return operation as T
 };
 
 async function allUrlsForOrganisation(organisation: string, db?) {
@@ -26,7 +29,7 @@ async function allUrlsForOrganisation(organisation: string, db?) {
   return result.map((x: { url: string }) => x.url);
 }
 
-async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>) {
+async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>, db?) {
   log.warn("DEPRECATED! User Repo class instead")
   const columns = Object.keys(vacatureTable);
   const valuesToInsert = columns.reduce((acc, col) => {
@@ -49,6 +52,10 @@ async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>)
       });
 }
 
+
+
 export const repo = {
-  allUrlsForOrganisation: withDb(allUrlsForOrganisation) as typeof allUrlsForOrganisation,
+  allUrlsForOrganisation: withDb(allUrlsForOrganisation),
+  upsert: withDb(upsertVacature)
 }
+
