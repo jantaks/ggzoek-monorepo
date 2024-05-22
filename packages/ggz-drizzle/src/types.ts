@@ -1,36 +1,22 @@
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { completionsResultSchema, MinimumVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
-import { eq } from 'drizzle-orm';
+// Define the decorator function that injects the last argument
 import { getDb } from './client.js';
-import { log } from '@ggzoek/logging/src/logger.js';
+import _ from 'lodash';
 
-type DbOperationArguments = {
-  [k: PropertyKey]: any
-  db: PostgresJsDatabase
+type DB = ReturnType<typeof getDb>;
+
+function provideDb<T extends any[], D extends DB>(fn: (...args: [...T, D]) => any, db:D) {
+  const partiallyAppliedFunction = _.partialRight(fn, db)
+  return (...args: T) => {
+    return partiallyAppliedFunction(...args)
+  };
 }
 
-type DbOperation = (args: DbOperationArguments) => Promise<any>
+// Example function with multiple arguments
+function exampleDbOperation(arg1: string, arg2: number, db:DB): void {
+  console.log(`arg1: ${arg1}, arg2: ${arg2}, db: ${db}`);
+}
+// Use the decorator to create a new function
+const newFunction = provideDb(exampleDbOperation, getDb());
 
-type DbProvider = (DbOperation) => (args: Omit<DbOperationArguments, 'db'>) => any
-
-const exampleOp: DbOperation = async (args: { db: PostgresJsDatabase, organisation: string }) => {
-  const result = await args.db.select({ url: vacatureTable.url }).from(vacatureTable).where(eq(vacatureTable.instelling, args.organisation)).execute();
-  return result.map((x: { url: string }) => x.url);
-};
-
-const provider: DbProvider = (operation: DbOperation) => {
-  return async (args: Omit<DbOperationArguments, 'db'>) => {
-    const { db: db, client: client } = getDb();
-    try {
-      return await operation({ db: db, ...args });
-    } catch (e) {
-      log.error(e, `Error in ${operation.name}`);
-    } finally {
-      log.info(`Closing connection`);
-      await client.end();
-    }
-  };
-};
-
-const x = provider(exampleOp);
-console.log(await x({ organisation: 'Lentis' }));
+// Call the new function with the remaining arguments
+newFunction('Hello', 42); // Output: arg1: Hello, arg2: 42, arg3: true, arg4: GeneratedValue
