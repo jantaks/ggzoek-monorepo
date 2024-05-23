@@ -58,7 +58,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (event.request.method === 'POST') {
 			const data = await event.request.formData();
 			next = data.get('next') as string;
-			console.log('NEXT: (HOOK): ', next);
+			log.info('NEXT: (HOOK): ', next);
 		} else {
 			next = url.pathname;
 		}

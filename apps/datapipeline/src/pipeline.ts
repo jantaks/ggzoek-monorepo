@@ -1,17 +1,12 @@
 import { runCrawlers } from './scrape.js';
 import { storage } from './services/storage.js';
-import {
-    getUnsyncedVacatures,
-    getUpdatedVacatures,
-    getVacaturesToSummarize,
-    upsertVacature
-} from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { indexVacatures } from './services/meilisearch.js';
 import { correctSpelling } from './synonyms.js';
 import { Vacature } from './ai/types.js';
 import { Provider, summarizeVacatures } from './ai/summarize.js';
 import { MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import repo from '../../../packages/ggz-drizzle/src/repo.js';
 
 
 async function step_1(){
@@ -19,23 +14,11 @@ async function step_1(){
     await runCrawlers()
 }
 
-async function step_2(){
-    log.info("Save to database")
-    const scraped = await storage.getVacaturesFromKVS()
-    log.info(`Found ${scraped.length} scraped vacatures`)
-    const updated = await getUpdatedVacatures(scraped)
-    log.debug(`Found ${updated.length} updated vacatures`)
-    for (const vacature of updated){
-        log.info(`Storing vacature ${vacature.url}`)
-        await upsertVacature(vacature)
-    }
-}
-
 const step_3 = async () => {
     log.info("Summarizing vacatures")
-    const vacaturesToSummarize = await getVacaturesToSummarize() as Vacature[]
+    const vacaturesToSummarize = await repo.getVacaturesToSummarize() as Vacature[]
     log.info(`Found ${vacaturesToSummarize.length} vacatures to summarize`)
-    const completed = await summarizeVacatures(vacaturesToSummarize, Provider.ANTHROPIC)
+    await summarizeVacatures(vacaturesToSummarize, Provider.ANTHROPIC)
 }
 
 const step_4 = async () => {
@@ -44,12 +27,12 @@ const step_4 = async () => {
 
 const step_5 = async () => {
     log.info("Adding vacatures to search index")
-    const completed = await getUnsyncedVacatures() as Vacature[]
+    const completed = await repo.getUnsyncedVacatures()
     //TODO: set synced to true after indexing
     await indexVacatures(completed)
     for (const vacature of completed){
         log.info(`Marking ${vacature.url} as synced`)
-        await upsertVacature({...vacature, synced: true})
+        await repo.upsert({...vacature, synced: true})
     }
 }
 

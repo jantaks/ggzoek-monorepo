@@ -6,13 +6,10 @@ const url = 'https://www.werkenbijihub.nl/vacatures';
 
 const s = new CheerioScraper('iHub', [url]);
 
-s.router.addDefaultHandler(async ({ enqueueLinks, $ }) => {
-  const urls = await selectNewLinks($ as CheerioAPI, {
+s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
+  await s.enqueuNewLinks($ as CheerioAPI, {
     baseUrl: url,
-    selector: ".card--vacature"
-  });
-  await enqueueLinks({
-    urls: urls,
+    selector: ".card--vacature",
     label: 'detail'
   });
   await enqueueLinks({
@@ -21,7 +18,7 @@ s.router.addDefaultHandler(async ({ enqueueLinks, $ }) => {
 });
 
 
-s.router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form').remove();
   $('#sollicitatie-proces, .gerelateerde_vacatures, .collegas_aan_het_woord, #footer').remove();

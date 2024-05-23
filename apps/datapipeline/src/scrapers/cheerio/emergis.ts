@@ -1,29 +1,38 @@
-import { createCheerioRouter } from 'crawlee';
 import { storage } from '../../services/storage.js';
-import { cleanText } from '../../utils.js';
+import { cleanText, selectNewLinks } from '../../utils.js';
+import { CheerioScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
-const router = createCheerioRouter();
 
 const baseUrl = 'https://werkenbijemergis.nl/vacatures';
 
-router.addDefaultHandler(async ({ enqueueLinks }) => {
-    await enqueueLinks({
-      globs: ['https://werkenbijemergis.nl/vacatures/**'],
-      label: 'detail',
-      selector: '.teaser__link'
-    });
+const s = new CheerioScraper('Emergis', [baseUrl]);
+
+s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
+  const urls = await selectNewLinks($ as CheerioAPI,
+    {
+      baseUrl: "https://werkenbijemergis.nl",
+      selector: '.teaser__link',
+      globs: ['**/vacatures/**']
+    }
+  );
+
+  await enqueueLinks({
+    urls: urls,
+    label: 'detail',
+  });
 });
 
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form').remove();
-  $('.site-navbar, .site-header, .site-footer, .ta-cookies, .block-share-page, .btn').remove()
+  $('.site-navbar, .site-header, .site-footer, .ta-cookies, .block-share-page, .btn').remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
   await storage.saveData('emergis', { title: title, body: text, request: request });
-  storage.saveToDb('Emergis', {title: title, body: text, request: request})
+  storage.saveToDb('Emergis', { title: title, body: text, request: request });
 });
 
-export const emergisRouter = router;
+export const Emergis = s;

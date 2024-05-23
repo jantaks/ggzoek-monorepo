@@ -52,7 +52,7 @@ export const vacatures = pgTable('vacatures', {
   summary: text('summary'),
   url: text('url'),
   bodyHash: text('body_hash'),
-  timestamp: timestamp('timestamp', { mode: 'date', withTimezone: true }),
+  firstScraped: timestamp('first_scraped', { mode: 'date', withTimezone: true }),
   lastScraped: timestamp('last_scraped', { mode: 'date', withTimezone: true }),
   synced: boolean('synced').default(false),
   urenMin: numeric('uren_min'),
@@ -68,19 +68,22 @@ export const vacatures = pgTable('vacatures', {
   screenshotUrl: text('screenshot_url')
 });
 
-export type InsertVacature = typeof vacatures.$inferSelect;
-export type SelectVacature = typeof vacatures.$inferSelect;
+const selectSchema = createSelectSchema(vacatures)
 
-export const completionsResultSchema = createInsertSchema(vacatures, {
+
+
+export const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),
-  summary: (schema) => schema.summary.min(100),
-  title: (schema) => schema.title.min(5)
+  summary: (schema) => schema.summary.min(100).nullable(),
+  title: (schema) => schema.title.min(5),
+  professie: (schema) => schema.professie.array(),
 }).required({
   title: true,
   summary: true,
   urlHash: true
 }).omit({opleidingsbudgetSize: true });
 
+export type InsertVacature = z.infer<typeof insertSchema>;
+export type SelectVacature = z.infer<typeof selectSchema>;
 
-
-export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' | 'url' | 'bodyHash' | 'timestamp' | 'lastScraped' | 'professie'>
+export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' | 'url' | 'bodyHash' | 'firstScraped' | 'lastScraped' | 'professie'>

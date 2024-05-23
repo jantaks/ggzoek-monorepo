@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { buildPrompt } from './promptTemplates.js';
 import { Vacature } from './types.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { completionsResultSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { insertSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import Message = Anthropic.Message;
 
 const anthropic = new Anthropic({
@@ -33,5 +33,5 @@ export function procesRawCompletionResult(json: string, vacature: Vacature) {
   let maybeVacature = JSON.parse(json) as Vacature;
   maybeVacature.url = vacature.url;
   maybeVacature.urlHash = vacature.urlHash;
-  return completionsResultSchema.parse(maybeVacature)
+  return insertSchema.parse(maybeVacature)
 }

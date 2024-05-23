@@ -1,9 +1,5 @@
-import { createCheerioRouter } from 'crawlee';
-import { storage } from '../../services/storage.js';
-import { cleanText } from '../../utils.js';
-import { start } from 'node:repl';
-
-const router = createCheerioRouter();
+import { cleanText, filterNewUrls } from '../../utils.js';
+import { CheerioScraper } from '../crawlers.js';
 
 const baseUrl = 'https://www.ggz-nhn.nl';
 
@@ -41,24 +37,26 @@ type Response = {
 
 }
 
-router.addDefaultHandler(async ({ enqueueLinks }) => {
+async function getUrls(){
+  const resultUrls = []
   for (const functie of ['Psychiater', 'Psycholoog', 'Verpleegkundige', 'Verpleegkundig specialist']) {
     const url = selectUrl + functies[functie];
     const response = await fetch(url).then(res => res.json()) as Response;
     const urls = response.details.map(detail => baseUrl + detail.nr);
-    await enqueueLinks({ urls: urls, label: 'detail' });
+    resultUrls.push(...urls);
   }
-});
+  return filterNewUrls(resultUrls);
+}
 
+const s = new CheerioScraper('GGZ Noord-Holland-Noord', await getUrls());
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addDefaultHandler(async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('ggz-nhn', { title: title, body: text, request: request });
-  storage.saveToDb('GGZ Noord-Holland-Noord', {title: title, body: text, request: request})
+  s.save({ title: title, body: text, request: request });
 });
 
-export const ggznhnRouter = router;
+export const GGZNHN = s;

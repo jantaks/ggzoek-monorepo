@@ -3,7 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { log } from '@ggzoek/logging/src/logger.js';
 
-import { IHUB } from './scrapers/cheerio/ihub.js';
+import { GGZFriesland } from './scrapers/cheerio/ggzfriesland.js';
+import { Dimence } from './scrapers/cheerio/dimence.js';
+import { Ingeest } from './scrapers/cheerio/ingeest.js';
 
 
 function removeStorageFolder(){
@@ -17,4 +19,4 @@ function removeStorageFolder(){
 }
 
 removeStorageFolder()
-await IHUB.crawl()
+await Ingeest.crawl()

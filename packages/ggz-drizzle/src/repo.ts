@@ -2,27 +2,28 @@ import _ from 'lodash';
 import { getDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import {
-  completionsResultSchema,
+  insertSchema,
   MinimumVacature,
   SelectVacature,
   vacatures as vacatureTable
 } from '../drizzle/schema.js';
-import { and, arrayOverlaps, eq, gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
+import { and, arrayOverlaps, eq, gt, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 
-function provideDb<T extends any[], D extends PostgresJsDatabase>(fn: (...args: [...T, D]) => any, D?)  {
-
-  return async (...args: T) => {
-    const { client: client, db: db } = getDb();
+function provideDb<T extends any[], R, D extends PostgresJsDatabase>(
+  fn: (...args: [...T, D]) => Promise<R> | R
+): (...args: T) => Promise<R> {
+  return async (...args: T): Promise<R> => {
+    const { client, db } = getDb();
     const partiallyAppliedFunction = _.partialRight(fn, db);
     try {
       return await partiallyAppliedFunction(...args);
-    } catch(e){
-      log.error(e, `Error in ${fn.name}`);
+    } catch (e) {
+      log.error(e, `Error in ${fn.name}`); // Adjusted for generic logging
     } finally {
-      log.info(`Closing connection: ${client.name}`);
+      log.debug(`Closing connection: ${client.name}`);
       await client.end();
     }
   };
@@ -30,10 +31,10 @@ function provideDb<T extends any[], D extends PostgresJsDatabase>(fn: (...args: 
 
 async function allUrlsForOrganisation(organisation: string, db) {
   const result =  await db.select({ url: vacatureTable.url }).from(vacatureTable).where(eq(vacatureTable.instelling, organisation)).execute();
-  return result.map((x: { url: string }) => x.url);
+  return result.map((x: { url: string }) => x.url) as string[];
 }
 
-async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>, db) {
+async function upsertVacature(vacature: z.infer<typeof insertSchema>, db) {
   const columns = Object.keys(vacatureTable);
   const valuesToInsert = columns.reduce((acc, col) => {
     acc[col] = vacature[col];
@@ -53,11 +54,12 @@ async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>,
         target: vacatureTable.urlHash,
         set: valuesToUpdate
       });
+    log.info(`Upserted vacature ${vacature.url}`)
 }
 
 async function allScreenshotUrls(db){
   const result = await db.select({ screenshotUrl: vacatureTable.screenshotUrl }).from(vacatureTable).where(isNotNull(vacatureTable.screenshotUrl)).execute();
-  return  result.map((x: { screenshotUrl: string }) => x.screenshotUrl);
+  return  result.map((x: { screenshotUrl: string }) => x.screenshotUrl) as string[];
 }
 
  async function getVacature(urlHash: string, db) {
@@ -68,8 +70,16 @@ async function allScreenshotUrls(db){
   return result[0] as SelectVacature
 }
 
+async function getVacatureByUrl(url: string, db) {
+  const result = await db.select().from(vacatureTable).where(eq(vacatureTable.url, url)).limit(1).execute();
+  if (result.length === 0) {
+    return undefined;
+  }
+  return result[0] as SelectVacature
+}
+
 async function getUnsyncedVacatures(db) {
-  const result = await db.select().from(vacatureTable).where(eq(vacatureTable.synced, false)).execute();
+  const result = await db.select().from(vacatureTable).where(eq(vacatureTable.synced, false)).execute() as SelectVacature[];
   return result;
 }
 
@@ -91,20 +101,13 @@ async function getUpdatedVacatures(vacatures: SelectVacature[], db) {
   return updatedVacatures
 }
 
-async function allUrls(db) {
+async function allUrls(db): Promise<string[]>  {
   const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).execute();
   return result.map((x: { url: string }) => x.url);
 }
 
-/**
- * Retrieves all URLs that have been scraped within a certain number of hours.
- *
- * @param {number} hours - The number of hours to look back for scraped URLs. Defaults to 24 hours if no argument is provided.
- * @param db
- * @returns {Promise<string[]>} - A promise that resolves to an array of URLs that have been scraped within the specified number of hours.
- */
-async function getAllUrlsScrapedWithinHours(hours: number = 24, db): Promise<string[]> {
-  const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(gt(vacatureTable.lastScraped, new Date(Date.now() - hours * 60 * 60 * 1000))).execute();
+async function getAllUrlsScrapedWithinHours(timeperiodHours: number = 48, db): Promise<string[]> {
+  const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(lt(vacatureTable.lastScraped, new Date(Date.now() - timeperiodHours * 60 * 60 * 1000))).execute();
   return result.map((x: { url: string }) => x.url);
 }
 
@@ -149,16 +152,19 @@ async function getVacaturesToSummarize(db){
 }
 
 const repo  = {
+  // Retrieves a list of all screenshot urls
   allScreenshotUrls: provideDb(allScreenshotUrls),
   allUrls: provideDb(allUrls),
   allUrlsForOrganisation: provideDb(allUrlsForOrganisation),
   getAll: provideDb(getAll),
+  // Retrieves a list of URLs that have been scraped within the given time period (@param timeperiodHours).
   getAllUrlsScrapedWithinHours: provideDb(getAllUrlsScrapedWithinHours),
   getAllWithProfessies: provideDb(getAllWithProfessies),
   getAllWithoutProfessie: provideDb(getAllWithoutProfessie),
   getUnsyncedVacatures: provideDb(getUnsyncedVacatures),
   getUpdatedVacatures: provideDb(getUpdatedVacatures),
   getVacature: provideDb(getVacature),
+  getVacatureByUrl: provideDb(getVacatureByUrl),
   getVacaturesToSummarize: provideDb(getVacaturesToSummarize),
   getVacaturesWithoutScreenshot: provideDb(getVacaturesWithoutScreenshot),
   upsert: provideDb(upsertVacature)

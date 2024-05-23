@@ -2,6 +2,7 @@ import "dotenv/config";
 import {MeiliSearch, Synonyms} from 'meilisearch'
 
 import { Vacature } from '../ai/types.js';
+import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 
 const url = process.env.MEILISEARCH_URL
 const key = process.env.MEILISEARCH_KEY
@@ -17,7 +18,7 @@ const client = new MeiliSearch({
     apiKey: key,
 })
 
-export async function indexVacatures(vacatures: Vacature[]) {
+export async function indexVacatures(vacatures: SelectVacature[]) {
     const index = client.index('vacatures')
     await index.updateFilterableAttributes([...FACETS])
     return await index.addDocuments(vacatures, {primaryKey: 'urlHash'})

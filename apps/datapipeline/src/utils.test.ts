@@ -112,3 +112,5 @@ describe('extracts beroepen from title', () => {
         expect(result).toEqual([Beroep.Basispsycholoog]);
     })
 })
+
+

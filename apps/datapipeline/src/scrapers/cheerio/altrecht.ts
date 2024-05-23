@@ -10,7 +10,7 @@ function buildUrl() {
 
 const s = new CheerioScraper('Altrecht', [buildUrl()])
 
-s.router.addDefaultHandler(async ({enqueueLinks, $}) => {
+s.addDefaultHandler(async ({enqueueLinks, $}) => {
     const urls = await selectNewLinks($ as CheerioAPI,
       { selector: '.vacancy-card',
           globs: ['https://www.werkenbijaltrecht.nl/vacatures/**']
@@ -21,7 +21,7 @@ s.router.addDefaultHandler(async ({enqueueLinks, $}) => {
     });
 });
 
-s.router.addHandler('detail', async ({request, $, log}) => {
+s.addHandler('detail', async ({request, $, log}) => {
     const title = $('h1').text();
     $('script, style, noscript, iframe, header, nav').remove();
     let text = $('body').text();

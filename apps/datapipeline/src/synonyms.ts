@@ -1,7 +1,7 @@
 import "dotenv/config"
-import {closeConnection, getUnsyncedVacatures, upsertVacature} from "@ggzoek/ggz-drizzle/src/vacatureRepo.js";
 
 import { Vacature } from './ai/types.js';
+import repo from '../../../packages/ggz-drizzle/src/repo.js';
 
 export const synonyms: SynonymsDictionary = {
     "locaties": {
@@ -115,7 +115,7 @@ type SynonymsDictionary = {
 }
 
 export async function correctSpelling() {
-    const vacatures = await getUnsyncedVacatures() as Vacature[]
+    const vacatures = await repo.getUnsyncedVacatures() as Vacature[]
     for (const vacature of vacatures) {
         for (const field in vacature) {
             let isUpdated = false;
@@ -146,7 +146,7 @@ export async function correctSpelling() {
             }
             if (isUpdated) {
                 console.log(`Updating vacature ${vacature.url}`)
-                await upsertVacature(vacature)
+                await repo.upsert(vacature)
             }
         }
     }

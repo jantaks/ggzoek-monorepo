@@ -1,20 +1,8 @@
-import { CheerioCrawler, createCheerioRouter } from 'crawlee';
-import { cleanText } from '../../utils.js';
-import { storage } from '../../services/storage.js';
-import { defaultConfig, defaultOptions } from '../crawlers.js';
+import { cleanText, filterNewUrls } from '../../utils.js';
+import { CheerioScraper } from '../crawlers.js';
 
 
-
-const router = createCheerioRouter();
-const NAME = 'ingeest';
-const options = defaultOptions()
-const config = defaultConfig(NAME)
-const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config)
-
-export async function crawlIngeest() {
-  const urls = await getURLs()
-  crawler.run(urls)
-}
+const s = new CheerioScraper('Ingeest', await getURLs());
 
 type Response = {
   id: number,
@@ -35,16 +23,17 @@ async function getURLs(){
       offset += 100;
     }
   }
-  return urls
+  return await filterNewUrls(urls)
 }
 
-router.addDefaultHandler(async ({ $, request, log }) => {
+s.addDefaultHandler(async ({ $, request, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form, footer').remove();
   $('.apply-box').remove();
   let text = $('.entry__content').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData(NAME, { title: title, body: text, request: request });
-  storage.saveToDb('GGZ Ingeest', {title: title, body: text, request: request})
+  s.save({ title: title, body: text, request: request });
 });
+
+export const Ingeest = s;

@@ -16,7 +16,6 @@ import { breburgRouter } from './scrapers/cheerio/breburg.js';
 import { dimenceRouter } from './scrapers/cheerio/dimence.js';
 import { lentisRouter } from './scrapers/cheerio/lentis.js';
 import { yuliusRouter } from './scrapers/playwright/yulius.js';
-import { oostBrabantRouter } from './scrapers/cheerio/oost-brabant.js';
 import { emergisRouter } from './scrapers/cheerio/emergis.js';
 import { propersonaRouter } from './scrapers/cheerio/propersona.js';
 import { ggzCentraalRouter } from './scrapers/playwright/ggz-centraal.js';
@@ -30,6 +29,7 @@ import { Pluryn } from './scrapers/playwright/pluryn.js';
 import { Altrecht } from './scrapers/cheerio/altrecht.js';
 import { defaultConfig, defaultOptions } from './scrapers/crawlers.js';
 import { GGZE } from './scrapers/playwright/ggze.js';
+import { OostBrabant } from './scrapers/cheerio/oost-brabant.js';
 
 dotenv.config();
 
@@ -54,7 +54,6 @@ export async function runCrawlers() {
   const dimenceCrawler = buildCheerio('dimence', dimenceRouter);
   const lentisCrawler = buildCheerio('lentis', lentisRouter);
   const yuliusCrawler = buildPlaywright('yulius', yuliusRouter);
-  const ooostBrabantCrawler = buildCheerio('oost-brabant', oostBrabantRouter);
   const emergisCrawler = buildCheerio('emergis', emergisRouter);
   const propersonaCrawler = buildCheerio('propersona', propersonaRouter);
   const ggzCentraalCrawler = buildPlaywright('ggz-centraal', ggzCentraalRouter);
@@ -70,7 +69,6 @@ export async function runCrawlers() {
       dimenceCrawler.run(['https://www.werkenbijdimence.nl/vacatures?page=0']),
       lentisCrawler.run(['https://www.werkenbijlentis.nl/vacatures/']),
       yuliusCrawler.run(['https://www.werkenbijyulius.nl/vacatures/']),
-      ooostBrabantCrawler.run(['https://ggzoostbrabant.recruitee.com']),
       emergisCrawler.run(['https://werkenbijemergis.nl/vacatures']),
       propersonaCrawler.run(['https://www.werkenbijpropersona.nl/vacature-overzicht/']),
       ggzCentraalCrawler.run(['https://www.werkenbijggzcentraal.nl/vacatures']),
@@ -82,7 +80,8 @@ export async function runCrawlers() {
       Parnassia.crawl(),
       Altrecht.crawl(),
       Pluryn.crawl(),
-      GGZE.crawl()
+      GGZE.crawl(),
+      OostBrabant.crawl()
     ]
   );
 

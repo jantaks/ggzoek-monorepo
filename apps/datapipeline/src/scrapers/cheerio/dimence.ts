@@ -1,17 +1,19 @@
-import { createCheerioRouter } from 'crawlee';
-import { storage } from '../../services/storage.js';
-import { cleanText } from '../../utils.js';
-import { start } from 'node:repl';
 
-const router = createCheerioRouter();
+import { cleanText} from '../../utils.js';
+import { CheerioScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
+import { log } from '@ggzoek/logging/src/logger.js';
+
+const s = new CheerioScraper('Dimence', ['https://www.werkenbijdimence.nl/vacatures']);
 
 const baseUrl = 'https://www.werkenbijdimence.nl/vacatures';
 
-router.addDefaultHandler(async ({ enqueueLinks }) => {
-    await enqueueLinks({
-      globs: ['https://www.werkenbijdimence.nl/vacatures/**'],
+s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
+    await s.enqueuNewLinks($ as CheerioAPI, {
+      baseUrl: "https://www.werkenbijdimence.nl/",
+      globs: ['**/vacatures/**'],
       label: 'detail',
-    });
+    })
     await enqueueLinks({
       baseUrl: baseUrl,
       selector: '.pagination a',
@@ -19,14 +21,13 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 });
 
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $}) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('dimence', { title: title, body: text, request: request });
-  storage.saveToDb('Dimence', {title: title, body: text, request: request})
+  s.save({ title: title, body: text, request: request });
 });
 
-export const dimenceRouter = router;
+export const Dimence = s

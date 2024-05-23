@@ -1,5 +1,5 @@
 import {
-    completionsResultSchema,
+    insertSchema,
     MinimumVacature,
     SelectVacature,
     vacatures as vacatureTable
@@ -7,6 +7,7 @@ import {
 import { client, db } from './client.js';
 import { and, arrayContains, arrayOverlaps, eq, gt, gte, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { log } from '@ggzoek/logging/src/logger.js';
 
 export async function closeConnection() {
     await client.end()
@@ -23,10 +24,10 @@ export async function getVacature(urlHash: string) {
         return null;
     }
     return result[0] as SelectVacature
-
 }
 
-export async function upsertVacature(vacature: z.infer<typeof completionsResultSchema>) {
+export async function upsertVacature(vacature: z.infer<typeof insertSchema>) {
+    log.warn("DEPRECATED! User Repo class instead")
     const columns = Object.keys(vacatureTable);
     const valuesToInsert = columns.reduce((acc, col) => {
         acc[col] = vacature[col];

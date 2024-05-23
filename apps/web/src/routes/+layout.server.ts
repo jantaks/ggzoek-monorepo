@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import type { MyLocals } from '$lib/types';
-import { allScreenshotUrls } from '@ggzoek/ggz-drizzle/src/vacatureRepo';
+import repo from '@ggzoek/ggz-drizzle/src/repo';
 
 // async function imgUrls() {
 // 	const data = await allScreenshotUrls()
@@ -17,7 +17,7 @@ export const load: LayoutServerLoad = async ({locals}) => {
 	const likesList = likes.data?.map((x: { vacature: string }) => x.vacature) as string[]
 	return {
 		likes: likesList? likesList : [],
-		imageUrls: await allScreenshotUrls(),
+		imageUrls: await repo.allScreenshotUrls(),
 		email: email? email: null
 	};
 };

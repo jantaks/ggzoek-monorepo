@@ -1,30 +1,27 @@
 import { CheerioCrawler, createCheerioRouter, PlaywrightCrawler } from 'crawlee';
-import { cleanText } from '../../utils.js';
+import { cleanText, selectNewLinks } from '../../utils.js';
 import { storage } from '../../services/storage.js';
-import { defaultConfig, defaultOptions } from '../crawlers.js';
+import { CheerioScraper} from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
 
 const url = 'https://werkenbijggnet.nl/vacatures/alle'
 
-const router = createCheerioRouter();
-const NAME = 'ggnet';
-const options = defaultOptions()
-const config = defaultConfig(NAME)
-const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config)
+const s = new CheerioScraper('GGNet', [url]);
 
-export function crawlGGNET() {
-  return crawler.run([url])
-}
-
-router.addDefaultHandler(async ({ enqueueLinks, log }) => {
+s.addDefaultHandler(async ({ enqueueLinks, log, $ }) => {
+  const urls = await selectNewLinks($ as CheerioAPI, {
+    baseUrl: "https://werkenbijggnet.nl/",
+    globs:['**/vacatures/*'],
+  })
   log.info('enqueueing new URLs')
   await enqueueLinks({
-    globs: ['https://werkenbijggnet.nl/vacatures/**'],
+    urls: urls,
     label: 'detail',
   });
 });
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form, footer').remove();
   $('.footer, .skip').remove();
@@ -32,6 +29,7 @@ router.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData(NAME, { title: title, body: text, request: request });
-  storage.saveToDb('GGNet', {title: title, body: text, request: request})
+  await s.save({ title: title, body: text, request: request });
 });
+
+export const GGNet = s;

@@ -2,8 +2,8 @@ import { Vacature } from './types.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { summarize as OpenAi } from './openAi.js';
 import { summarize as Antropic } from './anthropic.js';
-import { upsertVacature } from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
-import { completionsResultSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { insertSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import repo from '../../../../packages/ggz-drizzle/src/repo.js';
 
 function getSummaryFunction(provider: Provider) {
   switch (provider) {
@@ -25,9 +25,9 @@ function createCompletionTask(vacature: Vacature, provider: Provider) {
     let maybeVacature = JSON.parse(json) as Vacature;
     maybeVacature.url = vacature.url;
     maybeVacature.urlHash = vacature.urlHash;
-    const completedVacature = completionsResultSchema.parse(maybeVacature)
+    const completedVacature = insertSchema.parse(maybeVacature)
     log.info(`Upserting vacature ${completedVacature.url}`);
-    await upsertVacature(completedVacature);
+    await repo.upsert(completedVacature);
   };
 }
 
