@@ -1,36 +1,56 @@
-import { createCheerioRouter } from 'crawlee';
-import { storage } from '../../services/storage.js';
-import { cleanText } from '../../utils.js';
-import { start } from 'node:repl';
+import { cleanText, filterNewUrls } from '../../utils.js';
+import { CheerioScraper } from '../crawlers.js';
+import { log } from '@ggzoek/logging/src/logger.js';
 
-const router = createCheerioRouter();
-
-const apiJson = 'https://www.werkenbijlentis.nl/wp-json/wp/v2/vacancies?page=';
-
-type Response = {
+type SuccessResponse = {
   id: number,
   link: string,
+}[]
+
+type ErrorResponse = {
+  code: string,
+  message: string,
+  data: {
+    status: number,
+  }
 }
 
-router.addDefaultHandler(async ({ enqueueLinks }) => {
+type Response = SuccessResponse| ErrorResponse
+
+function isSuccessful(response: Response): response is SuccessResponse {
+  return 'link' in response;
+}
+
+async function getUrls() {
+  const apiJson = 'https://www.werkenbijlentis.nl/wp-json/wp/v2/vacancies?page=';
   let page = 1;
   let more = true;
-  while (more == true) {
-    const response = await fetch(apiJson + page).then(res => res.json()) as Response[];
-    const urls = response.map((detail) => detail.link);
-    if (urls.length == 0) {
-      console.log('no more pages, last page: ' + page)
-      more = false
+  let resultUrls = [];
+  while (more) {
+    const response = await fetch(apiJson + page).then(res => res.json()) as Response;
+    if (isSuccessful(response)) {
+      const urls = response.map((detail) => detail.link);
+      if (urls.length == 0) {
+        console.log('no more pages, last page: ' + page);
+        more = false;
+      } else {
+        page++;
+        resultUrls.push(...urls);
+      }
     }
     else {
-      page++;
-      enqueueLinks({ urls: urls, label: 'detail' });
+      log.error(response, 'error response');
+      more = false;
     }
+
   }
+  return filterNewUrls(resultUrls);
+}
 
-});
 
-router.addHandler('detail', async ({ request, $, log }) => {
+const s = new CheerioScraper('Lentis', await getUrls());
+
+s.addDefaultHandler( async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
   $('.pt-goto-links').remove();
@@ -44,8 +64,7 @@ router.addHandler('detail', async ({ request, $, log }) => {
 
   content = cleanText(content);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('lentis', { title: title, body: content, request: request });
-  storage.saveToDb('Lentis', {title: title, body: content, request: request})
+  s.save({ title: title, body: content, request: request });
 });
 
-export const lentisRouter = router;
+export const Lentis = s;
