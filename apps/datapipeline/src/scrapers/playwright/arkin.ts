@@ -1,21 +1,22 @@
-import {createPlaywrightRouter, sleep} from 'crawlee';
+import { sleep} from 'crawlee';
 import * as cheerio from 'cheerio';
-import {storage} from "../../services/storage.js";
 import {cleanText} from "../../utils.js";
+import { PlaywrightScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
-const router = createPlaywrightRouter();
+const s = new PlaywrightScraper('Arkin', ['https://werkenbijarkin.nl/vacatures/']);
 
-router.addDefaultHandler(async ({page, enqueueLinks}) => {
-    await page.getByText(/Psychologen/i).click();
-    await page.getByText(/Psychiaters en artsen/i).click();
-    await sleep(1000)
-    await enqueueLinks({
-        globs: ['https://werkenbijarkin.nl/vacatures/**'],
+s.addDefaultHandler(async ({page, parseWithCheerio}) => {
+    await page.waitForLoadState('networkidle')
+    const $ = await parseWithCheerio();
+    await s.enqueuNewLinks($ as CheerioAPI, {
+        globs: ['**/vacatures/**'],
         label: 'detail',
+        selector: '.standard.vacature-hover'
     });
 });
 
-router.addHandler('detail', async ({request, page, log}) => {
+s.addHandler('detail', async ({request, page, log}) => {
     const bodyHtml = await page.content()
     const $ = cheerio.load(bodyHtml);
     const title = $('h1').text();
@@ -26,7 +27,7 @@ router.addHandler('detail', async ({request, page, log}) => {
     text = cleanText(text)
     text = text.split('Meer weten over deze vacature?')[0]
     log.info(`${title}`, {url: request.loadedUrl});
-    await storage.saveData("ARKIN", {title: title, request: request, body: text})
+    s.save({title: title, request: request, body: text})
 });
 
-export const arkinRouter = router;
+export const ARKIN = s;

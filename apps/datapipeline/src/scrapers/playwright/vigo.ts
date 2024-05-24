@@ -8,7 +8,7 @@ const url = 'https://werkenbijvigogroep.recruitee.com/'
 const options = {...defaultOptions(), maxRequestsPerMinute: 10}
 const s = new PlaywrightScraper('Vincent van Gogh GGZ', [url], options)
 
-s.router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
+s.addDefaultHandler(async ({ log, page }) => {
   page.setDefaultTimeout(5000);
   await acceptCookies(page);
 
@@ -25,18 +25,15 @@ s.router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
     }
   }
   const $ = await getCheerioFromPage(page)
-  const urls = await selectNewLinks($, {
+  const urls = await s.enqueuNewLinks($ , {
     baseUrl: url,
-    globs: ['**/o/*']
-  })
-  await enqueueLinks({
-    urls: urls,
+    globs: ['**/o/*'],
     label: 'detail'
-  });
+  })
 });
 
 
-s.router.addHandler('detail', async ({ request, page, log }) => {
+s.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();

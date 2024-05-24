@@ -1,5 +1,6 @@
-import { cleanText, getCheerioFromPage, selectNewLinks } from '../../utils.js';
+import { cleanText, getCheerioFromPage } from '../../utils.js';
 import { PlaywrightScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
 
 const urls = [
@@ -11,21 +12,18 @@ const urls = [
 const s = new PlaywrightScraper("GGzE", urls)
 export const GGZE = s
 
-s.router.addDefaultHandler(async ({ enqueueLinks, page, request, log }) => {
+s.addDefaultHandler(async ({ page, request, log, parseWithCheerio }) => {
   await page.waitForLoadState('networkidle')
   log.info('page loaded: ' + request.loadedUrl)
-  const $ = await getCheerioFromPage(page)
-  const urls = await selectNewLinks($, {
+  const $ = await parseWithCheerio()
+  await s.enqueuNewLinks($ as CheerioAPI, {
     baseUrl: 'https://www.werkenbijggze.nl',
-    selector: '.vtlink'
+    selector: '.vtlink',
+    label: 'detail'
   })
-  await enqueueLinks({
-    urls: urls,
-    label: 'detail',
-  });
 });
 
-s.router.addHandler('detail', async ({ request, page, log }) => {
+s.addHandler('detail', async ({ request, page, log }) => {
   const $ = await getCheerioFromPage(page)
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form').remove();

@@ -48,13 +48,13 @@ async function upsertVacature(vacature: z.infer<typeof insertSchema>, db) {
     return acc;
   }, {} as MinimumVacature);
 
-    await db.insert(vacatureTable)
+   const result =  await db.insert(vacatureTable)
       .values(valuesToInsert)
       .onConflictDoUpdate({
         target: vacatureTable.urlHash,
         set: valuesToUpdate
       });
-    log.info(`Upserted vacature ${vacature.url}`)
+    log.debug(`UPSERTED ${vacature.url}`)
 }
 
 async function allScreenshotUrls(db){
@@ -106,8 +106,8 @@ async function allUrls(db): Promise<string[]>  {
   return result.map((x: { url: string }) => x.url);
 }
 
-async function getAllUrlsScrapedWithinHours(timeperiodHours: number = 48, db): Promise<string[]> {
-  const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(lt(vacatureTable.lastScraped, new Date(Date.now() - timeperiodHours * 60 * 60 * 1000))).execute();
+async function getAllUrlsScrapedWithinHours(period, db): Promise<string[]> {
+  const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(gt(vacatureTable.lastScraped, new Date(Date.now() - period * 60 * 60 * 1000))).execute();
   return result.map((x: { url: string }) => x.url);
 }
 

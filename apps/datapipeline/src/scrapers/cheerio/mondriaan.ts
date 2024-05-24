@@ -1,25 +1,18 @@
-import { CheerioCrawler, createCheerioRouter } from 'crawlee';
 import { cleanText } from '../../utils.js';
-import { storage } from '../../services/storage.js';
-import { defaultConfig, defaultOptions } from '../crawlers.js';
+import { CheerioScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
 
 const url = 'https://www.werkenbijmondriaan.nl/vacatures'
 
-const router = createCheerioRouter();
-const NAME = 'mondriaan';
-const options = defaultOptions()
-const config = defaultConfig(NAME)
-const crawler = new CheerioCrawler({ ...options, requestHandler: router }, config)
+const s = new CheerioScraper('Mondriaan', [url]);
 
-export function crawlMondriaan() {
-  return crawler.run([url])
-}
 
-router.addDefaultHandler(async ({ enqueueLinks, log }) => {
+s.addDefaultHandler(async ({ enqueueLinks, log, $ }) => {
   log.info('enqueueing new URLs')
-  await enqueueLinks({
-    globs: ['https://www.werkenbijmondriaan.nl/vacatures/**'],
+  await s.enqueuNewLinks($ as CheerioAPI, {
+    baseUrl: 'https://www.werkenbijmondriaan.nl',
+    globs: ['**/vacatures/**'],
     label: 'detail',
   });
   await enqueueLinks({
@@ -28,13 +21,14 @@ router.addDefaultHandler(async ({ enqueueLinks, log }) => {
   });
 });
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form, footer').remove();
   $('.footer, .skip-link-container, .offcanvas, .cta').remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData(NAME, { title: title, body: text, request: request });
-  storage.saveToDb('Mondriaan', {title: title, body: text, request: request})
+  await s.save({ title: title, body: text, request: request });
 });
+
+export const Mondriaan = s;

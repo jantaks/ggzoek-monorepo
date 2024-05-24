@@ -1,7 +1,7 @@
-import {  randomItems } from './utils.js';
+import { combineUrl, formatDate, randomItems } from './utils.js';
 import { expect, describe, it } from 'vitest';
 import { getBeroepen, Beroep} from './beroepen.js';
-
+import { z } from 'zod';
 
 describe('randomItems', () => {
     it('should return the correct number of items', () => {
@@ -113,4 +113,37 @@ describe('extracts beroepen from title', () => {
     })
 })
 
+describe('date formatting', () => {
+    it('should return the correct date format', () => {
+        const dateString = 'Fri May 24 2024 08:46:47 GMT+0200 (Central European Summer Time)'
+        const date = new Date(dateString);
+        let result = formatDate(date);
+        expect(result).toBe('2024-05-24T08:46:47');
+        result = formatDate(dateString);
+        expect(result).toBe('2024-05-24T08:46:47');
+        result = formatDate("bullshit")
+        expect(result).toBe(undefined);
+    });
+})
 
+describe('combines baseUrl and Path', () => {
+    it('adds a / if needed', () => {
+        const baseUrl = "https://www.werkenbijggze.nl"
+        const urlFragment = "portal-werkenbij/psychologen"
+        let combined = combineUrl(urlFragment, baseUrl)
+        expect(combined).toEqual("https://www.werkenbijggze.nl/portal-werkenbij/psychologen")
+    })
+    it('does not duplicate the baseUrl', () => {
+        const baseUrl = "https://www.werkenbijggze.nl"
+        const urlFragment = "portal-werkenbij/psychologen"
+        let combined = combineUrl(urlFragment, baseUrl)
+        expect(combined).toEqual("https://www.werkenbijggze.nl/portal-werkenbij/psychologen")
+    })
+    it('does not duplicate the fragment', () => {
+        const baseUrl = "https://www.werkenbijggze.nl/portal-werkenbij/psychologen"
+        const urlFragment = "portal-werkenbij/psychologen"
+        let combined = combineUrl(urlFragment, baseUrl)
+        expect(combined).toEqual("https://www.werkenbijggze.nl/portal-werkenbij/psychologen")
+    })
+
+})

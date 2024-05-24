@@ -19,13 +19,14 @@
     "js-levenshtein": "^1.1.6",
     "meilisearch": "^0.38.0",
     "minimatch": "^9.0.4",
-    "openai": "^4.28.0"
+    "openai": "^4.28.0",
+    "zod": "^3.23.6"
   },
   "devDependencies": {
     "@apify/tsconfig": "^0.1.0"
   },
   "scripts": {
-    "scrape": "tsx src/main.ts",
+    "main": "tsx src/main.ts",
     "complete": "tsx src/ai/openAi.ts",
     "pipeline": "tsx src/pipeline.ts",
     "supabase": "tsx src//services/supabase.ts",

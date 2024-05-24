@@ -2,41 +2,27 @@ import {createPlaywrightRouter} from 'crawlee';
 import {storage} from "../../services/storage.js";
 import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from "cheerio";
-export const router = createPlaywrightRouter();
+import { PlaywrightScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
+
+const s = new PlaywrightScraper('Reinier van Arkel', ['https://www.reinierwerktenleert.nl/vacatures/']);
 
 
-router.addDefaultHandler(async ({enqueueLinks, log, page}) => {
-    page.setDefaultTimeout(5000)
-    const jobs = ["gz-psycholoog ", "psychiater ", "anios ", "klinisch psycholoog ", "orthopedagoog ", "verpleegkundig specialist " ]
-    for (const job of jobs) {
-        try {
-            await page.goto('https://www.reinierwerktenleert.nl/vacatures/');
-            acceptCookies(page)
-            log.info(`Getting jobs for ${job}`);
-            await page.getByRole('button', {name: 'Functie'}).click();
-            await page.getByRole("listitem").getByText(new RegExp(job, 'i')).click()
-            await page.getByText(/pas filter toe/i).click();
-            while (true){
-                await enqueueLinks({
-                    globs: ['https://www.reinierwerktenleert.nl/vacature/**'],
-                    label: 'detail',
-                });
-                if (!await page.getByText(/volgende/i).isVisible()) {
-                    break;
-                }
-                await page.getByText(/volgende/i).click();
-            }
-            await page.getByText(/reset filters/i).click();
-        }
-        catch (error) {
-            log.error(`Error getting jobs for ${job}: ${error}`);
-        }
+s.addDefaultHandler(async ({enqueueLinks, parseWithCheerio}) => {
+   const $ = await parseWithCheerio()
+    await s.enqueuNewLinks($ as CheerioAPI, {
+        globs: ['**/vacature/**'],
+        label: 'detail',
+        selector: '.card-link'
+    })
+    await enqueueLinks({
+        selector: '.page-numbers',
 
-    }
+    })
 });
 
 
-router.addHandler('detail', async ({request, page, log}) => {
+s.addHandler('detail', async ({request, page, log}) => {
     const bodyHtml = await page.content()
     const $ = cheerio.load( bodyHtml);
     const title = $('h1').text();
@@ -49,4 +35,4 @@ router.addHandler('detail', async ({request, page, log}) => {
     storage.saveToDb('Reinier van Arkel Groep', {title: title, body: text, request: request})
 });
 
-export const rvaRouter = router
+export const RVA = s

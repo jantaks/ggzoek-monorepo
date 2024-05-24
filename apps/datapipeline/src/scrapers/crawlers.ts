@@ -1,7 +1,8 @@
 import {
+  BasicCrawlerOptions,
   CheerioCrawler,
   CheerioCrawlingContext,
-  Configuration, CrawlingContext,
+  Configuration, ConfigurationOptions, CrawlingContext,
   createCheerioRouter,
   createPlaywrightRouter, enqueueLinks, EnqueueLinksOptions,
   PlaywrightCrawler,
@@ -17,7 +18,7 @@ interface Scraper {
   crawl(): Promise<void>;
 }
 
-type Options = { maxRequestsPerCrawl: number, maxRequestsPerMinute: number }
+type Options = Pick<BasicCrawlerOptions, "requestHandlerTimeoutSecs" | "statisticsOptions" | "maxRequestsPerCrawl" | "maxRequestsPerMinute">
 
 export function defaultConfig(name: string) {
   return new Configuration({
@@ -28,31 +29,46 @@ export function defaultConfig(name: string) {
   });
 }
 
-export function defaultOptions() {
+export function defaultOptions(): BasicCrawlerOptions {
   return {
-    maxRequestsPerCrawl: 1000,
-    maxRequestsPerMinute: 300
+    // maxRequestsPerCrawl: 1000,
+    // maxRequestsPerMinute: 300,
+    statisticsOptions: {
+      logIntervalSecs: 10
+    }
   };
 }
+
+const DEFAULT_OPTIONS: BasicCrawlerOptions = {
+  statisticsOptions: {
+    logIntervalSecs: 10
+  }
+};
+
+const DEFAULT_CONFIG: ConfigurationOptions = {
+  persistStateIntervalMillis: 5_000,
+  purgeOnStart: true
+};
 
 export abstract class BaseScraper implements Scraper {
   protected abstract router: RouterHandler<PlaywrightCrawlingContext> | RouterHandler<CheerioCrawlingContext>;
   protected abstract crawler: CheerioCrawler | PlaywrightCrawler;
+  protected config: Configuration;
 
   protected constructor(
-    private readonly name: string,
+    readonly name: string,
     private readonly urls: string[],
     protected readonly options?: Options,
-    protected readonly config?: Configuration
+    protected readonly configOptions?: ConfigurationOptions
   ) {
     this.urls = urls;
     this.name = name;
-    if (!this.options) {
-      this.options = defaultOptions();
-    }
-    if (!this.config) {
-      this.config = defaultConfig(this.name);
-    }
+    this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.config = new Configuration({
+      ...DEFAULT_CONFIG,
+      defaultKeyValueStoreId: name,
+      defaultDatasetId: name, ...configOptions
+    });
   }
 
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
@@ -67,27 +83,26 @@ export abstract class BaseScraper implements Scraper {
     await saveToDb(this.name, data);
   }
 
-
+  async enqueuNewLinks($: CheerioAPI, options: LinksOptions) {
+    const q = await this.crawler.getRequestQueue();
+    const urls = await selectNewLinks($, options);
+    await enqueueLinks({ label: options.label, urls: urls, requestQueue: q });
+  }
 }
 
 export class CheerioScraper extends BaseScraper {
   protected override crawler: CheerioCrawler;
   protected override router: RouterHandler<CheerioCrawlingContext>;
 
-  constructor(name: string, urls: string[], options?: Options, config?: Configuration) {
+  constructor(name: string, urls: string[], options?: Options, config?: ConfigurationOptions) {
     super(name, urls, options, config);
     this.router = createCheerioRouter();
     this.crawler = new CheerioCrawler({ ...this.options, requestHandler: this.router }, this.config);
   }
 
-  async enqueuNewLinks($: CheerioAPI, options: LinksOptions) {
-    const q = await this.crawler.getRequestQueue()
-    const urls = await selectNewLinks($, options)
-    await enqueueLinks({label: options.label, urls: urls, requestQueue: q})
-  }
 
   override addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>) {
-    this.router.addDefaultHandler(...args)
+    this.router.addDefaultHandler(...args);
   }
 
   override addHandler(...args: Parameters<typeof this.router.addHandler>) {
@@ -109,12 +124,11 @@ export class PlaywrightScraper extends BaseScraper {
   protected override crawler: PlaywrightCrawler;
   protected override router: RouterHandler<PlaywrightCrawlingContext>;
 
-  constructor(name: string, urls: string[], options?: Options, config?: Configuration) {
+  constructor(name: string, urls: string[], options?: Options, config?: ConfigurationOptions) {
     super(name, urls, options, config);
     this.router = createPlaywrightRouter();
-    this.crawler = new PlaywrightCrawler({ ...this.options, requestHandler: this.router }, config);
+    this.crawler = new PlaywrightCrawler({ ...this.options, requestHandler: this.router }, this.config);
   }
-
 
 
   override addHandler(...args: Parameters<typeof this.router.addHandler>) {
@@ -124,6 +138,6 @@ export class PlaywrightScraper extends BaseScraper {
   }
 
   override addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>) {
-    this.router.addDefaultHandler(...args)
+    this.router.addDefaultHandler(...args);
   }
 }

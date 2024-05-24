@@ -2,48 +2,54 @@ import { createPlaywrightRouter, sleep } from 'crawlee';
 import { storage } from '../../services/storage.js';
 import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
+import { PlaywrightScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
+import { log } from '@ggzoek/logging/src/logger.js';
+import { errors } from 'playwright';
 
-export const router = createPlaywrightRouter();
 
 const url = 'https://www.werkenbijyulius.nl/vacatures/';
 
+const s = new PlaywrightScraper('Yulius', [url]);
 
-router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
-  page.setDefaultTimeout(5000);
-  // await page.goto(url);
+
+s.addDefaultHandler(async ({ parseWithCheerio, page }) => {
   await acceptCookies(page);
-
-  let more = true;
-  while (more) {
+  while (true) {
     try {
       log.info(`Clicking more jobs button`);
-      await page.getByText('Laad meer').click({ timeout: 1000 });
-      const req = await page.waitForRequest('**/*', { timeout: 2000 });
-      await page.waitForLoadState('networkidle');
-      more = await page.getByText('Laad meer').isVisible();
-    } catch (error) {
-      log.error(`Failed to click the button: loaded all jobs. ${error}`);
-      break;
+      await page.getByText('Laad meer').click({ timeout: 2000 });
+      await page.waitForRequest('**/*', { timeout: 2000 });
+      await sleep(1000)
+    } catch (error: unknown) {
+      if (error instanceof errors.TimeoutError && error.message.includes('page.waitForRequest')) {
+        log.info('No more jobs to load');
+        break;
+      }
+      else {
+        log.error(`Error occured in ${s.name}`);
+        break;
+      }
     }
   }
-  await enqueueLinks({
-    globs: ['https://www.werkenbijyulius.nl/vacature/**'],
+  await s.enqueuNewLinks(await parseWithCheerio() as CheerioAPI, {
+    globs: ['**/vacature/**'],
+    baseUrl: 'https://www.werkenbijyulius.nl',
     label: 'detail'
   });
 });
 
 
-router.addHandler('detail', async ({ request, page, log }) => {
+s.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
   $('script, style, noscript, iframe, header').remove();
-  $('.vacature-content-sidebar, .vacature-content-sidebar, #footer, .sollicitatie_proces, .btn, .btn-container, .vergelijkbare_vacatures, .extra_vacature_info').remove()
+  $('.vacature-content-sidebar, .vacature-content-sidebar, #footer, .sollicitatie_proces, .btn, .btn-container, .vergelijkbare_vacatures, .extra_vacature_info').remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('Yulius', { title: title, request: request, body: text });
-  storage.saveToDb('Yulius', {title: title, body: text, request: request})
+  await s.save({ title: title, request: request, body: text });
 });
 
-export const yuliusRouter = router;
+export const Yulius = s;

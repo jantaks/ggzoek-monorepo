@@ -1,5 +1,5 @@
 
-import { cleanText, selectNewLinks } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 
@@ -7,22 +7,18 @@ import { CheerioAPI } from 'cheerio';
 const baseUrl = 'https://ggzoostbrabant.recruitee.com/';
 
 
-const s = new CheerioScraper('GGZ Oost-Brabant', [baseUrl])
+const s = new CheerioScraper('GGZ Oost-Brabant', [baseUrl], { maxRequestsPerMinute: 20 })
 
-s.router.addDefaultHandler(async ({ enqueueLinks, $ }) => {
-  const urls = await selectNewLinks($ as CheerioAPI, {
+s.addDefaultHandler(async ({ $ }) => {
+  await s.enqueuNewLinks($ as CheerioAPI, {
     baseUrl: baseUrl,
-    globs: ['/o/**']
+    globs: ['/o/**'],
+    label: 'detail',
   })
-
-    await enqueueLinks({
-      urls: urls,
-      label: 'detail',
-    });
 });
 
 
-s.router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form').remove();
   let text = $('body').text();

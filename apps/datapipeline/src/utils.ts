@@ -8,7 +8,6 @@ import { log } from '@ggzoek/logging/src/logger.js';
 import repo from '../../../packages/ggz-drizzle/src/repo.js';
 import { sleep } from 'crawlee';
 
-
 export async function getCheerioFromPage(page: Page) {
   const bodyHtml = await page.content();
   return cheerio.load(bodyHtml);
@@ -22,13 +21,25 @@ export function cleanText(text: string) {
   return cleanedText;
 }
 
-export function formatDate(date: Date) {
+export function formatDate(date: Date | string | number | null){
+  if (!date) return undefined
+  function isDate(date: Date | string | number): date is Date {
+    return date instanceof Date;
+  }
+  if (!isDate(date)) {
+    date = new Date(date);
+  }
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  if (isNaN(year)){
+    return undefined
+  }
 
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
@@ -87,6 +98,21 @@ export type LinksOptions = {
   label?: string
 }
 
+
+
+
+export function combineUrl(urlFragment: string, baseUrl: string) {
+  if (urlFragment.startsWith(baseUrl!)) {
+    return urlFragment;
+  }
+  if (baseUrl.endsWith(urlFragment)){
+    return baseUrl;
+  }
+  if (baseUrl?.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+  if (urlFragment.startsWith('/')) urlFragment = urlFragment.slice(1);
+  return baseUrl + '/' + urlFragment
+}
+
 export function selectLinks($: CheerioAPI, options: LinksOptions) {
   let urls = [];
 
@@ -103,13 +129,9 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   }
 
   if (options.baseUrl) {
+    const baseUrl = options.baseUrl;
     urls = urls.map(url => {
-      if (url.startsWith(options.baseUrl!)){
-        return url
-      }
-      if (options.baseUrl?.endsWith('/')) options.baseUrl = options.baseUrl.slice(0, -1);
-      if (url.startsWith('/')) url = url.slice(1);
-      return options.baseUrl + '/' + url;
+      return combineUrl(url, baseUrl);
     });
   }
 
@@ -120,11 +142,21 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   return urls;
 }
 
-//Removes urls that have been scraoer in the (optionally) provided timeperiod. Default is 48 hours.
-export async function filterNewUrls(urls: string[], timeperiod=48) {
-  const skipUrls = await repo.getAllUrlsScrapedWithinHours(timeperiod);
+export function getTimePeriod() {
+  let period: number | undefined = parseFloat(process.env.TIMEPERIOD as string) || undefined;
+  if (!period) {
+    log.debug('No TIMEPERIOD set, defaulting to 48 hours');
+    period = 48;
+  }
+  return period;
+}
+
+//Removes urls that have been scraoer in the (optionally) provided timeperiod.
+export async function filterNewUrls(urls: string[]) {
+  let period = getTimePeriod();
+  const skipUrls = await repo.getAllUrlsScrapedWithinHours(period);
   const filteredUrls = urls.filter(url => !skipUrls.includes(url));
-  log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last 48 hours`);
+  log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`);
   log.debug(filteredUrls, 'Selected urls:');
   return filteredUrls;
 }

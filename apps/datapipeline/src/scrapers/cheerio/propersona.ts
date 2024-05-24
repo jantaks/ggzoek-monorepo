@@ -1,12 +1,14 @@
 import { createCheerioRouter } from 'crawlee';
 import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
-
-const router = createCheerioRouter();
+import { CheerioScraper } from '../crawlers.js';
 
 const url ='https://www.werkenbijpropersona.nl/vacature-overzicht/'
 
-router.addDefaultHandler(async ({ enqueueLinks }) => {
+
+const s = new CheerioScraper('Propersona', [url]);
+
+s.addDefaultHandler(async ({ enqueueLinks }) => {
     await enqueueLinks({
       globs: ['https://www.werkenbijpropersona.nl/vacature/**'],
       label: 'detail',
@@ -18,7 +20,7 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 });
 
 
-router.addHandler('detail', async ({ request, $, log }) => {
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav, form').remove();
   $('#sollicitatie-proces, .gerelateerde_vacatures, .collegas_aan_het_woord, #footer').remove();
@@ -29,4 +31,4 @@ router.addHandler('detail', async ({ request, $, log }) => {
   storage.saveToDb('Propersona', {title: title, body: text, request: request})
 });
 
-export const propersonaRouter = router;
+export const Propersona = s;

@@ -1,5 +1,5 @@
 import { Dataset, Dictionary, KeyValueStore, Request } from 'crawlee';
-import { createHash } from '../utils.js';
+import { createHash, formatDate } from '../utils.js';
 import { InsertVacature, MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
 import { log } from '@ggzoek/logging/src/logger.js';
@@ -30,8 +30,11 @@ export async function saveToDb(organisatie: string, data: Data) {
 
   const stored = await repo.getVacature(vacature.urlHash);
   if (stored) {
-    log.debug(`Vacature ${vacature.url} already exists, last scraped at ${stored.lastScraped}`);
+    log.debug(`Vacature ${vacature.url} already exists, last scraped at ${formatDate(stored.lastScraped)})`);
     vacature.firstScraped = stored.firstScraped;
+  }
+  else {
+    log.info(`New Vacature!!! ${vacature.url}`);
   }
   await repo.upsert(vacature)
 }

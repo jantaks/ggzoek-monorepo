@@ -1,22 +1,14 @@
-import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
-import { storage } from '../../services/storage.js';
-import { acceptCookies, cleanText, removeParent } from '../../utils.js';
+import {  sleep } from 'crawlee';
+import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
-import { defaultConfig, defaultOptions } from '../crawlers.js';
+import {  PlaywrightScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
 
-const router = createPlaywrightRouter();
-const URL = 'https://rivierduinen.recruitee.com/vacatures'
-const NAME = 'rivierduinen'
-const options = {...defaultOptions(), maxRequestsPerMinute: 10}
-const config = defaultConfig(NAME)
-const crawler = new PlaywrightCrawler({ ... options, requestHandler: router}, config);
+const s = new PlaywrightScraper('Rivierduinen', ['https://rivierduinen.recruitee.com/vacatures'], {maxRequestsPerMinute: 10});
+export const Rivierduinen = s;
 
-export function crawlRivierduinen() {
-  return crawler.run([URL])
-}
-
-router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
+s.addDefaultHandler(async ({ parseWithCheerio, log, page }) => {
   page.setDefaultTimeout(5000);
   await acceptCookies(page);
 
@@ -32,14 +24,16 @@ router.addDefaultHandler(async ({ enqueueLinks, log, page }) => {
       break;
     }
   }
-  await enqueueLinks({
+  const $ = await parseWithCheerio();
+  await s.enqueuNewLinks($ as CheerioAPI, {
+    baseUrl: "https://rivierduinen.recruitee.com",
     globs: ['**/o/*'],
     label: 'detail'
   });
 });
 
 
-router.addHandler('detail', async ({ request, page, log }) => {
+s.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
@@ -52,7 +46,6 @@ router.addHandler('detail', async ({ request, page, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('rivierduinen', { title: title, request: request, body: text });
-  storage.saveToDb('GGZ Rivierduinen', {title: title, body: text, request: request})
+  s.save({ title: title, request: request, body: text });
 });
 
