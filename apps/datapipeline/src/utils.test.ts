@@ -1,7 +1,7 @@
-import { combineUrl, formatDate, randomItems } from './utils.js';
+import { cleanText, cleanTitle, combineUrl, formatDate, randomItems } from './utils.js';
 import { expect, describe, it } from 'vitest';
 import { getBeroepen, Beroep} from './beroepen.js';
-import { z } from 'zod';
+import { log } from '@ggzoek/logging/src/logger.js';
 
 describe('randomItems', () => {
     it('should return the correct number of items', () => {
@@ -147,3 +147,16 @@ describe('combines baseUrl and Path', () => {
     })
 
 })
+
+describe('should clean up text', () => {
+    const text = '\n\t\t\t\t\t\t\t  Vacature Psychiater – Jonx ambulant\t\t\t\t\t\t'
+    const text2 = 'Werken bij \n\r GGz Breburg\n\r Verpleegkundig Specialist - Angst- en Stemmingsstoornissen'
+    it('removes tabs', () => {
+        const result = cleanTitle(text)
+        expect(result).toEqual('Vacature Psychiater – Jonx ambulant')
+    });
+    it('removes newlines', () => {
+        const result = cleanTitle(text2)
+        expect(result).toEqual('Werken bij GGz Breburg Verpleegkundig Specialist - Angst- en Stemmingsstoornissen')
+    });
+});

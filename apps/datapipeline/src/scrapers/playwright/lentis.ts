@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 import { PlaywrightScraper } from '../crawlers.js';
 
 const url = 'https://www.werkenbijlentis.nl/alle-vacatures/?q='
-const s = new PlaywrightScraper('Vincent van Gogh GGZ', [url])
+const s = new PlaywrightScraper('Lentis', [url])
 
 s.addDefaultHandler(async ({ log, page }) => {
   page.setDefaultTimeout(5000);

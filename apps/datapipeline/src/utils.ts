@@ -21,6 +21,15 @@ export function cleanText(text: string) {
   return cleanedText;
 }
 
+export function cleanTitle(text: string) {
+  let cleanedText = text.replace(/\t/g, ''); // Remove all tabs
+  cleanedText = cleanedText.trim()
+  cleanedText = cleanedText.replace(/\n/g, ''); // Replace \n followed by any number of whitespaces and another \n with a single \n// Remove all double or more newlines
+  cleanedText = cleanedText.replace(/\r/g, ''); // Replace \n followed by any number of whitespaces and another \n with a single \n// Remove all double or more newlines
+  cleanedText = cleanedText.replace(/  +/g, ' ');// Replace double or more spaces with a single space// Replace double or more newlines with a single newline
+  return cleanedText;
+}
+
 export function formatDate(date: Date | string | number | null){
   if (!date) return undefined
   function isDate(date: Date | string | number): date is Date {

@@ -1,5 +1,5 @@
 import { Dataset, Dictionary, KeyValueStore, Request } from 'crawlee';
-import { createHash, formatDate } from '../utils.js';
+import { cleanTitle, createHash, formatDate } from '../utils.js';
 import { InsertVacature, MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
 import { log } from '@ggzoek/logging/src/logger.js';
@@ -17,7 +17,7 @@ export type Data = {
 export async function saveToDb(organisatie: string, data: Data) {
   const vacature: InsertVacature = {
     organisatie: organisatie,
-    title: data.title,
+    title: cleanTitle(data.title),
     body: data.body,
     url: data.request.loadedUrl as string,
     urlHash: createHash(data.request.uniqueKey),
