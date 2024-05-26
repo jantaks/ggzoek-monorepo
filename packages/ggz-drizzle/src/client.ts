@@ -8,9 +8,9 @@ export const db = drizzle(client);
 import { log } from '@ggzoek/logging/src/logger.js';
 
 export function getDb(){
-  log.debug(`Connecting to ${connectionString}`);
-  const client = postgres(connectionString)
-  const db =  drizzle(client)
+  // log.debug(`Connecting to ${connectionString}`);
+  // const client = postgres(connectionString)
+  // const db =  drizzle(client)
   return {client, db}
 }
 

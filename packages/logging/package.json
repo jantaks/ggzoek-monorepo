@@ -6,7 +6,8 @@
   "dependencies": {
     "pino": "^9.1.0",
     "pino-caller": "^3.4.0",
-    "pino-pretty": "^11.0.0"
+    "pino-pretty": "^11.0.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "drizzle-kit": "^0.20.14"

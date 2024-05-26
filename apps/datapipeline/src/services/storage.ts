@@ -1,6 +1,6 @@
 import { Dataset, Dictionary, KeyValueStore, Request } from 'crawlee';
 import { cleanTitle, createHash, formatDate } from '../utils.js';
-import { InsertVacature, MinimumVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { InsertVacature, MinimumVacature, SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { Vacature } from '../ai/types.js';

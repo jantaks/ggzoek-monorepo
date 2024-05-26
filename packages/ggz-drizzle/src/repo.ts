@@ -23,8 +23,8 @@ function provideDb<T extends any[], R, D extends PostgresJsDatabase>(
     } catch (e) {
       log.error(e, `Error in ${fn.name}`); // Adjusted for generic logging
     } finally {
-      log.debug(`Closing connection: ${client.name}`);
-      await client.end();
+      // log.debug(`Closing connection: ${client.name}`);
+      // await client.end();
     }
   };
 }

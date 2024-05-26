@@ -101,6 +101,7 @@ export function removeParent(elementWithText: cheerio.Cheerio<cheerio.Element>, 
 }
 
 export type LinksOptions = {
+  urls? : string[]
   baseUrl?: string
   globs?: string[]
   selector?: string
@@ -120,6 +121,15 @@ export function combineUrl(urlFragment: string, baseUrl: string) {
   if (baseUrl?.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
   if (urlFragment.startsWith('/')) urlFragment = urlFragment.slice(1);
   return baseUrl + '/' + urlFragment
+}
+
+export function getTimePeriod() {
+  let period: number | undefined = parseFloat(process.env.TIMEPERIOD as string) || undefined;
+  if (!period) {
+    log.debug('No TIMEPERIOD set, defaulting to 48 hours');
+    period = 48;
+  }
+  return period;
 }
 
 export function selectLinks($: CheerioAPI, options: LinksOptions) {
@@ -151,18 +161,11 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   return urls;
 }
 
-export function getTimePeriod() {
-  let period: number | undefined = parseFloat(process.env.TIMEPERIOD as string) || undefined;
-  if (!period) {
-    log.debug('No TIMEPERIOD set, defaulting to 48 hours');
-    period = 48;
-  }
-  return period;
-}
+
 
 //Removes urls that have been scraoer in the (optionally) provided timeperiod.
 export async function filterNewUrls(urls: string[]) {
-  let period = getTimePeriod();
+  const period = getTimePeriod();
   const skipUrls = await repo.getAllUrlsScrapedWithinHours(period);
   const filteredUrls = urls.filter(url => !skipUrls.includes(url));
   log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`);

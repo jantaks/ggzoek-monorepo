@@ -1,37 +1,28 @@
 import { sleep } from 'crawlee';
 import * as cheerio from 'cheerio';
-import { acceptCookies, cleanText } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import {  PlaywrightScraper } from '../crawlers.js';
+import { Page } from 'playwright';
 
 const s = new PlaywrightScraper('Parnassia', ['https://werkenbijparnassiagroep.nl/home'], {requestHandlerTimeoutSecs: 180});
 export const Parnassia = s;
 
 
-s.addDefaultHandler(async ({ page, log }) => {
-  await page.getByRole('button', { name: 'Accepteren' }).click();
-  sleep(500);
-  await page.waitForLoadState('networkidle');
-  let more = true;
-  let pageNo = 1;
-  while (more && pageNo < 1000) {
-    const moreButton = page.locator('.css_button.ui_jobs_more').locator('visible=true').first();
-    more = await moreButton.count() > 0;
-    if (!more) break;
-    log.info(`Loading more vacatures: ${pageNo}`);
-    await moreButton.click({timeout: 2000});
-    await page.waitForLoadState('networkidle');
-    await sleep(1000);
-    const vacatureCount = await page.locator('.css_jobsCell').count();
-    log.info(`Meer vacatures geladen: ${vacatureCount} vacatures`);
-    pageNo++;
+s.addDefaultHandler(async ({ page }) => {
+  try{
+    await page.getByRole('button', { name: 'Accepteren' }).click({timeout: 2000});
   }
-  const bodyHtml = await page.content();
-  const $: cheerio.CheerioAPI = cheerio.load(bodyHtml);
-  await s.enqueuNewLinks($, {
+  catch(e){
+    console.log('No cookies to accept')
+  }
+  await sleep(2000);
+  await page.waitForLoadState('networkidle');
+  const buttonLocator = (page: Page)=>page.locator('.css_button.ui_jobs_more').locator('visible=true')
+  await s.expand(page, buttonLocator, {
     baseUrl: 'https://werkenbijparnassiagroep.nl',
     globs: ['/ad/**'],
     label: 'detail'
-  });
+  })
 });
 
 s.addHandler('detail', async ({ page, log, request }) => {

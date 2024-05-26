@@ -2,17 +2,21 @@ import {
   BasicCrawlerOptions,
   CheerioCrawler,
   CheerioCrawlingContext,
-  Configuration, ConfigurationOptions, CrawlingContext,
-  createCheerioRouter,
-  createPlaywrightRouter, enqueueLinks, EnqueueLinksOptions,
-  PlaywrightCrawler,
-  PlaywrightCrawlingContext, Router,
-  RouterHandler
+  Configuration, ConfigurationOptions, createCheerioRouter,
+  createPlaywrightRouter, enqueueLinks, PlaywrightCrawler,
+  PlaywrightCrawlingContext, RouterHandler, sleep
 } from 'crawlee';
 import { Data, saveToDb } from '../services/storage.js';
-import { log } from '@ggzoek/logging/src/logger.js';
+import { log, MyLogger } from '@ggzoek/logging/src/logger.js';
 import { CheerioAPI } from 'cheerio';
-import { LinksOptions, selectNewLinks } from '../utils.js';
+import {
+  getCheerioFromPage,
+  getTimePeriod,
+  LinksOptions,
+  selectLinks
+} from '../utils.js';
+import { Locator, Page } from 'playwright';
+import repo from '../../../../packages/ggz-drizzle/src/repo.js';
 
 interface Scraper {
   crawl(): Promise<void>;
@@ -31,8 +35,6 @@ export function defaultConfig(name: string) {
 
 export function defaultOptions(): BasicCrawlerOptions {
   return {
-    // maxRequestsPerCrawl: 1000,
-    // maxRequestsPerMinute: 300,
     statisticsOptions: {
       logIntervalSecs: 10
     }
@@ -54,6 +56,9 @@ export abstract class BaseScraper implements Scraper {
   protected abstract router: RouterHandler<PlaywrightCrawlingContext> | RouterHandler<CheerioCrawlingContext>;
   protected abstract crawler: CheerioCrawler | PlaywrightCrawler;
   protected config: Configuration;
+  private existingUrls: string[] | undefined = undefined;
+  protected logger: MyLogger
+
 
   protected constructor(
     readonly name: string,
@@ -69,6 +74,8 @@ export abstract class BaseScraper implements Scraper {
       defaultKeyValueStoreId: name,
       defaultDatasetId: name, ...configOptions
     });
+    this.logger = log.child({ scraper: this.name })
+
   }
 
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
@@ -83,10 +90,30 @@ export abstract class BaseScraper implements Scraper {
     await saveToDb(this.name, data);
   }
 
+  async filterNewUrls(urls: string[]) {
+    const period = getTimePeriod();
+    if (!this.existingUrls) {
+      log.info('No existing urls found. Fetching from database')
+      this.existingUrls = await repo.getAllUrlsScrapedWithinHours(period) as string[];
+    }
+    const savedUrls = this.existingUrls
+    const filteredUrls = urls.filter(url => !savedUrls.includes(url));
+    log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`);
+    log.debug('Selected urls:', filteredUrls);
+    return filteredUrls;
+  }
+
+  async enqueueLinks(options: Omit<Parameters<typeof enqueueLinks>[0], "requestQueue">){
+    const requestQueue = await this.crawler.getRequestQueue();
+    await enqueueLinks({ ...options, requestQueue } );
+  }
+
   async enqueuNewLinks($: CheerioAPI, options: LinksOptions) {
-    const q = await this.crawler.getRequestQueue();
-    const urls = await selectNewLinks($, options);
-    await enqueueLinks({ label: options.label, urls: urls, requestQueue: q });
+    const requestQueue = await this.crawler.getRequestQueue();
+    const foundUrls = selectLinks($, options);
+    const filteredUrls = await this.filterNewUrls(foundUrls);
+    await enqueueLinks({ label: options.label, urls: filteredUrls, requestQueue: requestQueue });
+    return { found: foundUrls.length, enqueued: filteredUrls.length };
   }
 }
 
@@ -127,9 +154,71 @@ export class PlaywrightScraper extends BaseScraper {
   constructor(name: string, urls: string[], options?: Options, config?: ConfigurationOptions) {
     super(name, urls, options, config);
     this.router = createPlaywrightRouter();
-    this.crawler = new PlaywrightCrawler({ ...this.options, requestHandler: this.router }, this.config);
+    this.crawler = new PlaywrightCrawler({ ...this.options, requestHandler: this.router, requestHandlerTimeoutSecs: 180 }, this.config);
   }
 
+  async paginate(page: Page, locator: (page:Page) => Locator, options: LinksOptions) {
+    let pageCounter = 1;
+    log.info(`Starting on page: ${pageCounter}`);
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      try {
+        await sleep(1000)
+        const $ = await getCheerioFromPage(page)
+        const {found, } = await this.enqueuNewLinks($, options);
+        log.info(`Found ${found} new links on page ${pageCounter}`);
+        if (found === 0) {
+          log.info('No new links found. End pagination.');
+          break;
+        }
+        pageCounter++;
+        log.info(`Navigating to page: ${pageCounter}`);
+        const nextButton = await locator(page)
+        if (await nextButton.count() === 0 || ! await nextButton.isVisible()) {
+          log.info('No more "next" buttons found. End pagination.');
+          break;
+        }
+        await nextButton.first().click({ timeout: 2000 });
+      } catch (error) {
+        log.error(`An error occurred in ${this.name}: ${error}`);
+        break;
+      }
+    }
+  }
+
+  async expand(page: Page, locator: (page:Page) => Locator, options: LinksOptions) {
+    let clickedCounter = 1;
+    const urls: string[] = []
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      try {
+        const expandButton = locator(page)
+        if (await expandButton.count() === 0 || ! await expandButton.isVisible()) {
+          this.logger.info('No more expand buttons found. End pagination.');
+          break;
+        }
+        this.logger.info(`Clicking expand button: ${clickedCounter}`);
+        await expandButton.first().click({ timeout: 2000 });
+        await sleep(2000)
+        const $ = await getCheerioFromPage(page)
+        const linksOnPage = selectLinks($, options);
+        const newUrls = linksOnPage.filter(url => !urls.includes(url));
+        if (newUrls.length === 0) {
+          this.logger.info('No new links found. End pagination.');
+          break;
+        }
+        urls.push(...newUrls);
+        const filteredUrls = await this.filterNewUrls(newUrls);
+        await this.enqueueLinks({ urls: filteredUrls, label: options.label });
+        this.logger.info(`Enqueued ${newUrls.length} new links on page ${clickedCounter}`);
+        clickedCounter++;
+      } catch (error) {
+        this.logger.error(`Error in ${this.name}:  ${error}`);
+        break;
+      }
+    }
+    this.logger.info(`Finished expanding. Found ${urls.length} urls after ${clickedCounter} clicks`);
+  }
 
   override addHandler(...args: Parameters<typeof this.router.addHandler>) {
     const label = args[0];

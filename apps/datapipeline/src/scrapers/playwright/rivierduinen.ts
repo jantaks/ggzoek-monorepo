@@ -1,35 +1,21 @@
-import {  sleep } from 'crawlee';
 import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
 import {  PlaywrightScraper } from '../crawlers.js';
-import { CheerioAPI } from 'cheerio';
+import { Page } from 'playwright';
 
 
 const s = new PlaywrightScraper('Rivierduinen', ['https://rivierduinen.recruitee.com/vacatures'], {maxRequestsPerMinute: 10});
 export const Rivierduinen = s;
 
-s.addDefaultHandler(async ({ parseWithCheerio, log, page }) => {
+s.addDefaultHandler(async ({ page }) => {
   page.setDefaultTimeout(5000);
   await acceptCookies(page);
-
-  let pageCounter = 1;
-  while (pageCounter > 0  ) {
-    try {
-      log.info(`Next page: ${pageCounter}`);
-      await page.getByText("Toon meer vacatures").click({ timeout: 2000 });
-      await sleep(500)
-      pageCounter++;
-    } catch (error) {
-      log.info(`No more pages. ${error}`);
-      break;
-    }
-  }
-  const $ = await parseWithCheerio();
-  await s.enqueuNewLinks($ as CheerioAPI, {
+  const buttonLocator = (page: Page) => page.getByText('Toon meer vacatures')
+  await s.expand(page, buttonLocator, {
     baseUrl: "https://rivierduinen.recruitee.com",
     globs: ['**/o/*'],
     label: 'detail'
-  });
+  })
 });
 
 

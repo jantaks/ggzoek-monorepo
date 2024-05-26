@@ -1,35 +1,21 @@
-import { sleep } from 'crawlee';
 
-import { acceptCookies, cleanText, getCheerioFromPage } from '../../utils.js';
+import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
 import { PlaywrightScraper } from '../crawlers.js';
+import { Page } from 'playwright';
 
 const url = 'https://www.werkenbijlentis.nl/alle-vacatures/?q='
 const s = new PlaywrightScraper('Lentis', [url])
 
-s.addDefaultHandler(async ({ log, page }) => {
+s.addDefaultHandler(async ({  page }) => {
   page.setDefaultTimeout(5000);
   await acceptCookies(page);
-
-  let pageCounter = 1;
-  while (pageCounter > 0  ) {
-    try {
-      log.info(`Next page: ${pageCounter}`);
-      await page.locator('a').getByText("Volgende").click({ timeout: 2000 });
-      await sleep(500)
-      const $ = await getCheerioFromPage(page)
-      await s.enqueuNewLinks($, {
-        baseUrl: 'https://www.werkenbijlentis.nl/',
-        globs: ['**/alle-vacatures/vacature*'],
-        label: 'detail'
-      })
-      pageCounter++;
-    } catch (error) {
-      log.info(`No more pages. ${error}`);
-      break;
-    }
-  }
-
+  const buttonLocator = (page: Page) => page.locator('a').getByText('Volgende');
+  await s.paginate(page, buttonLocator, {
+    baseUrl: 'https://www.werkenbijlentis.nl/',
+    globs: ['**/alle-vacatures/vacature*'],
+    label: 'detail'
+  })
 });
 
 

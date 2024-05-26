@@ -1,33 +1,19 @@
-import { acceptCookies, cleanText, cleanTitle, getCheerioFromPage } from '../../utils.js';
+import { acceptCookies, cleanText, cleanTitle } from '../../utils.js';
 import { PlaywrightScraper } from '../crawlers.js';
-import { CheerioAPI } from 'cheerio';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { sleep } from 'crawlee';
+import { Page } from 'playwright';
 
 const s = new PlaywrightScraper('GGZ Breburg', ['https://www.werkenbijggzbreburg.nl/vacatures/']);
 
 s.addDefaultHandler(async ({ page,  request }) => {
   await acceptCookies(page);
   log.info(`${request.loadedUrl}`)
-  let pageCounter = 1;
-  while (pageCounter < 10  ) {
-    try {
-      await sleep(2000)
-      const $ = await getCheerioFromPage(page)
-      await s.enqueuNewLinks($ as CheerioAPI,{
-        baseUrl: 'https://www.werkenbijggzbreburg.nl/',
-        globs: ['**/vacatures/*'],
-        label: 'detail'
-      } )
-      log.info(`Next page: ${pageCounter}`);
-      await page.locator('a.paging-next').click({ timeout: 2000 });
-      await sleep(500)
-      pageCounter++;
-    } catch (error) {
-      log.info(`No more pages. ${error}`);
-      break;
-    }
-  }
+  const buttonLocator = (page: Page) => page.locator('a.paging-next');
+  await s.paginate(page, buttonLocator, {
+    baseUrl: 'https://www.werkenbijggzbreburg.nl/',
+    globs: ['**/vacatures/*'],
+    label: 'detail'
+  })
 });
 
 s.addHandler('detail', async ({ request, parseWithCheerio, log }) => {
