@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { log } from '@ggzoek/logging/src/logger.js';
+import 'dotenv/config';
 
 // import { Lentis } from './scrapers/playwright/lentis.js';
 // import { Mediant } from './scrapers/cheerio/mediant.js';
@@ -49,51 +50,56 @@ import { GGNet } from './scrapers/cheerio/ggnet.js';
 import { Emergis } from './scrapers/cheerio/emergis.js';
 import { Dimence } from './scrapers/cheerio/dimence.js';
 import { Delfland } from './scrapers/cheerio/delfland.js';
+import { Drenthe } from './scrapers/cheerio/ggz_drenthe.js';
+import repo from '../../../packages/ggz-drizzle/src/repo.js';
+
 // import { Altrecht } from './scrapers/cheerio/altrecht.js';
 
+log.info(process.env.LOG_LEVEL);
 
-function removeStorageFolder(){
+function removeStorageFolder() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const storageFolderPath = path.join(__dirname, '../storage');
   if (fs.existsSync(storageFolderPath)) {
-    log.info('Removing storage folder')
+    log.info('Removing storage folder');
     fs.rmSync(storageFolderPath, { recursive: true, force: true });
   }
 }
 
-removeStorageFolder()
+removeStorageFolder();
 
-async function runAll(){
+async function runAll() {
   await Promise.all(
-  [
-    OostBrabant.crawl(),
-    Propersona.crawl(),
-    Yulius.crawl(),
-    Lentis.crawl(),
-    Mediant.crawl(),
-    Mondriaan.crawl(),
-    GGZWNB.crawl(),
-    ARKIN.crawl(),
-    GGZCentraal.crawl(),
-    Parnassia.crawl(),
-    Pluryn.crawl(),
-    RVA.crawl(),
-    Rivierduinen.crawl(),
-    VIGO.crawl(),
-    GGZE.crawl(),
-    IHUB.crawl(),
-    GGZFriesland.crawl(),
-    GGZNHN.crawl(),
-    GGNet.crawl(),
-    Emergis.crawl(),
-    Dimence.crawl(),
-    Delfland.crawl(),
-    Breburg.crawl(),
-    Altrecht.crawl()
-  ]
-)
+    [
+      OostBrabant.crawl(),
+      Propersona.crawl(),
+      Yulius.crawl(),
+      Lentis.crawl(),
+      Mediant.crawl(),
+      Mondriaan.crawl(),
+      GGZWNB.crawl(),
+      ARKIN.crawl(),
+      GGZCentraal.crawl(),
+      Parnassia.crawl(),
+      Pluryn.crawl(),
+      RVA.crawl(),
+      Rivierduinen.crawl(),
+      VIGO.crawl(),
+      GGZE.crawl(),
+      IHUB.crawl(),
+      GGZFriesland.crawl(),
+      GGZNHN.crawl(),
+      GGNet.crawl(),
+      Emergis.crawl(),
+      Dimence.crawl(),
+      Delfland.crawl(),
+      Breburg.crawl(),
+      Altrecht.crawl(),
+      Drenthe.crawl()
+    ]
+  );
 }
 
 
-await runAll()
+await Rivierduinen.crawl();

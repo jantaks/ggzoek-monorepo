@@ -1,9 +1,19 @@
 import winston, { format, Logger } from 'winston';
 import * as path from 'node:path';
-import { startupSnapshot } from 'node:v8';
+
 
 
 const { combine, timestamp, colorize, align, printf, metadata, errors} = winston.format;
+
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  verbose: 4,
+  debug: 5,
+  silly: 6
+};
 
 
 const customFormat = format((info) => {
@@ -40,10 +50,13 @@ const customFormat = format((info) => {
   return info;
 })();
 
-function getFormatter(info){
+function getFormatter(info: any){
   let format = `${info.timestamp} ${info.level} ${info.file}:${info.line} ${info.message}`
   if (info.metadata.scraper){
     format = `${format} (Scraper: ${info.metadata.scraper})`
+  }
+  if (info.metadata.json){
+    format = `${format} ${JSON.stringify(info.metadata.json)}`
   }
   if (info.stack){
     format = `${format}\n\t${info.stack}`
@@ -52,7 +65,7 @@ function getFormatter(info){
 }
 
 export const log = winston.createLogger({
-    level: process.env.LOG_LEVEL || 'debug',
+    level: process.env.LOG_LEVEL || "info",
     format: combine(
       customFormat,
       errors({stack: true }),
@@ -68,4 +81,5 @@ export const log = winston.createLogger({
 });
 
 // it will print also the calling site
+log.info(process.env.LOG_LEVEL);
 export type MyLogger = Logger;

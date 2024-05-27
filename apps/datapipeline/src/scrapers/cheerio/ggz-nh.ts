@@ -1,5 +1,6 @@
 import { cleanText, filterNewUrls } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
+import { enqueueLinks } from 'crawlee';
 
 const baseUrl = 'https://www.ggz-nhn.nl';
 
@@ -48,12 +49,23 @@ async function getUrls(){
   return filterNewUrls(resultUrls);
 }
 
-const s = new CheerioScraper('GGZ Noord-Holland-Noord', await getUrls());
+const s = new CheerioScraper('GGZ Noord-Holland-Noord', ['https://www.ggz-nhn.nl']);
 
-s.addDefaultHandler(async ({ request, $, log }) => {
+s.addDefaultHandler(async ({ enqueueLinks}) => {
+  const urls = await getUrls();
+  await enqueueLinks({
+    urls: urls,
+    label: 'detail'
+  })
+
+});
+
+
+s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
-  let text = $('body').text();
+  $('.card').remove();
+  let text = $('section').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
   s.save({ title: title, body: text, request: request });

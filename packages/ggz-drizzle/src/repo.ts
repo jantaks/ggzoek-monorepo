@@ -30,7 +30,7 @@ function provideDb<T extends any[], R, D extends PostgresJsDatabase>(
 }
 
 async function allUrlsForOrganisation(organisation: string, db) {
-  const result =  await db.select({ url: vacatureTable.url }).from(vacatureTable).where(eq(vacatureTable.instelling, organisation)).execute();
+  const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).where(eq(vacatureTable.instelling, organisation)).execute();
   return result.map((x: { url: string }) => x.url) as string[];
 }
 
@@ -48,26 +48,28 @@ async function upsertVacature(vacature: z.infer<typeof insertSchema>, db) {
     return acc;
   }, {} as MinimumVacature);
 
-   const result =  await db.insert(vacatureTable)
-      .values(valuesToInsert)
-      .onConflictDoUpdate({
-        target: vacatureTable.urlHash,
-        set: valuesToUpdate
-      });
-    log.debug(`UPSERTED ${vacature.url}`)
+  const result = await db.insert(vacatureTable)
+    .values(valuesToInsert)
+    .onConflictDoUpdate({
+      target: vacatureTable.urlHash,
+      set: valuesToUpdate
+    });
+  log.debug(`UPSERTED ${vacature.url}`);
+  log.silly({ json: { ...vacature, body: undefined}});
+  log.silly(vacature.body);
 }
 
-async function allScreenshotUrls(db){
+async function allScreenshotUrls(db) {
   const result = await db.select({ screenshotUrl: vacatureTable.screenshotUrl }).from(vacatureTable).where(isNotNull(vacatureTable.screenshotUrl)).execute();
-  return  result.map((x: { screenshotUrl: string }) => x.screenshotUrl) as string[];
+  return result.map((x: { screenshotUrl: string }) => x.screenshotUrl) as string[];
 }
 
- async function getVacature(urlHash: string, db) {
+async function getVacature(urlHash: string, db) {
   const result = await db.select().from(vacatureTable).where(eq(vacatureTable.urlHash, urlHash)).limit(1).execute();
   if (result.length === 0) {
     return null;
   }
-  return result[0] as SelectVacature
+  return result[0] as SelectVacature;
 }
 
 async function getVacatureByUrl(url: string, db) {
@@ -75,7 +77,7 @@ async function getVacatureByUrl(url: string, db) {
   if (result.length === 0) {
     return undefined;
   }
-  return result[0] as SelectVacature
+  return result[0] as SelectVacature;
 }
 
 async function getUnsyncedVacatures(db) {
@@ -84,24 +86,24 @@ async function getUnsyncedVacatures(db) {
 }
 
 async function getVacaturesWithoutScreenshot(db) {
-  return await db.select().from(vacatureTable).where(isNull(vacatureTable.screenshotUrl)).execute() as SelectVacature[]
+  return await db.select().from(vacatureTable).where(isNull(vacatureTable.screenshotUrl)).execute() as SelectVacature[];
 }
 
 
 async function getUpdatedVacatures(vacatures: SelectVacature[], db) {
-  const updatedVacatures: SelectVacature[] = []
+  const updatedVacatures: SelectVacature[] = [];
   for (const vacature of vacatures) {
     const storedVacatures = await db.select().from(vacatureTable).where(eq(vacatureTable.urlHash, vacature.urlHash)).execute();
     if (storedVacatures.length === 0) {
-      updatedVacatures.push(vacature)
+      updatedVacatures.push(vacature);
     } else if (storedVacatures[0].bodyHash !== vacature.bodyHash) {
-      updatedVacatures.push(vacature)
+      updatedVacatures.push(vacature);
     }
   }
-  return updatedVacatures
+  return updatedVacatures;
 }
 
-async function allUrls(db): Promise<string[]>  {
+async function allUrls(db): Promise<string[]> {
   const result = await db.select({ url: vacatureTable.url }).from(vacatureTable).execute();
   return result.map((x: { url: string }) => x.url);
 }
@@ -114,15 +116,27 @@ async function getAllUrlsScrapedWithinHours(period, db): Promise<string[]> {
 /**
  * Retrieves all vacatures from the database.
  */
-async function getAll(db){
+async function getAll(db) {
   return await db.select().from(vacatureTable).execute() as SelectVacature[];
+}
+
+async function getAllForOrganisation(organisatie: string, db) {
+  return await db.select().from(vacatureTable).where(eq(vacatureTable.organisatie, organisatie)).execute() as SelectVacature[];
 }
 
 /**
  * Retrieves all vacatures that do not have a professie.
  */
-async function getAllWithoutProfessie(db){
-  return await db.select().from(vacatureTable).where(sql`array_length(${vacatureTable.professie}, 1) IS NULL OR array_length(${vacatureTable.professie}, 1) = 0`).execute() as SelectVacature[];
+async function getAllWithoutProfessie(db) {
+  return await db.select().from(vacatureTable).where(sql`array_length
+      (${vacatureTable.professie}, 1)
+      IS NULL OR array_length(
+      ${vacatureTable.professie}
+      ,
+      1
+      )
+      =
+      0`).execute() as SelectVacature[];
 
 }
 
@@ -130,7 +144,7 @@ async function getAllWithoutProfessie(db){
  * Retrieves all vacatures that have at least one of the provided professies.
  * @param professies
  */
- async function getAllWithProfessies(professies: string[], db){
+async function getAllWithProfessies(professies: string[], db) {
   return await db.select().from(vacatureTable).where(arrayOverlaps(vacatureTable.professie, professies)).execute() as SelectVacature[];
 }
 
@@ -138,8 +152,8 @@ async function getAllWithoutProfessie(db){
  * Retrieves all vacatures need to be summarized, based on professie = "Psychiater".
  * @param db
  */
-async function getVacaturesToSummarize(db){
-  const professies = ['Psychiater']
+async function getVacaturesToSummarize(db) {
+  const professies = ['Psychiater'];
   return await db.select()
     .from(vacatureTable)
     .where(
@@ -151,12 +165,13 @@ async function getVacaturesToSummarize(db){
     .execute() as SelectVacature[];
 }
 
-const repo  = {
+const repo = {
   // Retrieves a list of all screenshot urls
   allScreenshotUrls: provideDb(allScreenshotUrls),
   allUrls: provideDb(allUrls),
   allUrlsForOrganisation: provideDb(allUrlsForOrganisation),
   getAll: provideDb(getAll),
+  getAllForOrganisation: provideDb(getAllForOrganisation),
   // Retrieves a list of URLs that have been scraped within the given time period (@param timeperiodHours).
   getAllUrlsScrapedWithinHours: provideDb(getAllUrlsScrapedWithinHours),
   getAllWithProfessies: provideDb(getAllWithProfessies),
@@ -168,6 +183,6 @@ const repo  = {
   getVacaturesToSummarize: provideDb(getVacaturesToSummarize),
   getVacaturesWithoutScreenshot: provideDb(getVacaturesWithoutScreenshot),
   upsert: provideDb(upsertVacature)
-}
+};
 
 export default repo;

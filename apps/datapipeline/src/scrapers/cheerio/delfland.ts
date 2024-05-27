@@ -17,9 +17,17 @@ async function getURLs() {
   return filterNewUrls(urls);
 }
 
-const s = new CheerioScraper('Delfland', await getURLs());
+const s = new CheerioScraper('Delfland', ['https://www.werkenbijggzdelfland.nl/']);
 
-s.addDefaultHandler(async ({ $, request }) => {
+s.addDefaultHandler(async ({ enqueueLinks }) => {
+  const urls = await getURLs();
+  enqueueLinks({
+    urls: urls,
+    label: 'detail'
+  });
+});
+
+s.addHandler('detail', async ({ $, request }) => {
   const title = cleanText($('h1').text());
   $('script, style, noscript, iframe, header, nav, form, footer').remove();
   $('.vacancyintro__buttons').remove();

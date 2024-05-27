@@ -3,13 +3,13 @@ import {
   CheerioCrawler,
   CheerioCrawlingContext,
   Configuration, ConfigurationOptions, createCheerioRouter,
-  createPlaywrightRouter, enqueueLinks, PlaywrightCrawler,
-  PlaywrightCrawlingContext, RouterHandler, sleep
+  createPlaywrightRouter, Dictionary, enqueueLinks, PlaywrightCrawler,
+  PlaywrightCrawlingContext, Request, RouterHandler, sleep
 } from 'crawlee';
-import { Data, saveToDb } from '../services/storage.js';
 import { log, MyLogger } from '@ggzoek/logging/src/logger.js';
 import { CheerioAPI } from 'cheerio';
 import {
+  cleanTitle, createHash, formatDate,
   getCheerioFromPage,
   getTimePeriod,
   LinksOptions,
@@ -17,9 +17,17 @@ import {
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
 import repo from '../../../../packages/ggz-drizzle/src/repo.js';
+import { InsertVacature, SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { getBeroepen } from '../beroepen.js';
 
 interface Scraper {
   crawl(): Promise<void>;
+}
+
+type Data = {
+  request: Request<Dictionary>
+  body: string,
+  title: string,
 }
 
 type Options = Pick<BasicCrawlerOptions, "requestHandlerTimeoutSecs" | "statisticsOptions" | "maxRequestsPerCrawl" | "maxRequestsPerMinute">
@@ -57,6 +65,7 @@ export abstract class BaseScraper implements Scraper {
   protected abstract crawler: CheerioCrawler | PlaywrightCrawler;
   protected config: Configuration;
   private existingUrls: string[] | undefined = undefined;
+  private allVacatures: SelectVacature[] | undefined = undefined;
   protected logger: MyLogger
 
 
@@ -75,7 +84,7 @@ export abstract class BaseScraper implements Scraper {
       defaultDatasetId: name, ...configOptions
     });
     this.logger = log.child({ scraper: this.name })
-
+    repo.getAllForOrganisation(this.name).then(vacatures => this.allVacatures= vacatures);
   }
 
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
@@ -86,8 +95,37 @@ export abstract class BaseScraper implements Scraper {
     await this.crawler.run(this.urls);
   }
 
+  private async getAllVacatures(){
+    if (!this.allVacatures) {
+      this.logger.info('No existing vacatures found. Fetching from database')
+      this.allVacatures = await repo.getAllForOrganisation(this.name);
+    }
+    return this.allVacatures;
+  }
+
   async save(data: Data) {
-    await saveToDb(this.name, data);
+    const vacature: InsertVacature = {
+      organisatie: this.name,
+      title: cleanTitle(data.title),
+      body: data.body,
+      url: data.request.loadedUrl as string,
+      urlHash: createHash(data.request.uniqueKey),
+      bodyHash: createHash(data.body),
+      firstScraped: new Date(),
+      lastScraped: new Date(),
+      professie: getBeroepen(data.title),
+      summary: null
+    };
+
+    const allVacatures = await this.getAllVacatures()
+    const existing = allVacatures.find(v => v.urlHash === vacature.urlHash);
+    if (existing) {
+      this.logger.debug(`Vacature ${vacature.url} already exists, last scraped at ${formatDate(existing.lastScraped)})`);
+      vacature.firstScraped = existing.firstScraped;
+    } else {
+      this.logger.info(`New Vacature!!! ${vacature.url}`);
+    }
+    await repo.upsert(vacature);
   }
 
   async filterNewUrls(urls: string[]) {
@@ -220,9 +258,7 @@ export class PlaywrightScraper extends BaseScraper {
     this.logger.info(`Finished expanding. Found ${urls.length} urls after ${clickedCounter} clicks`);
   }
 
-  override addHandler(...args: Parameters<typeof this.router.addHandler>) {
-    const label = args[0];
-    const handler = args[1];
+  override addHandler(label: string, handler: Parameters<typeof this.router.addHandler>[1]) {
     this.router.addHandler(label, handler);
   }
 
