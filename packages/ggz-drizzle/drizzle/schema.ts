@@ -49,12 +49,43 @@ export const likes = pgTable('likes', {
     .references(() => vacatures.urlHash, { onDelete: 'cascade' })
 });
 
+export const scrapeResults = pgTable('scrape_results', {
+  scraperName: text('scraper').notNull(),
+  newUrls: bigint('new_urls', { mode: 'number' }).notNull(),
+  requestsFinished: bigint('requests_finished', { mode: 'number' }).notNull(),
+  requestsFailed: bigint('requests_failed', { mode: 'number' }).notNull(),
+  requestsRetries: bigint('requests_retries', { mode: 'number' }).notNull(),
+  requestsFailedPerMinute: bigint('requests_failed_per_minute', { mode: 'number' }).notNull(),
+  requestsFinishedPerMinute: bigint('requests_finished_per_minute', { mode: 'number' }).notNull(),
+  requestMinDurationMillis: bigint('request_min_duration_millis', { mode: 'number' }).notNull(),
+  requestMaxDurationMillis: bigint('request_max_duration_millis', { mode: 'number' }).notNull(),
+  requestTotalFailedDurationMillis: bigint('request_total_failed_duration_millis', {
+    mode: 'number'
+  }).notNull(),
+  requestTotalFinishedDurationMillis: bigint('request_total_finished_duration_millis', {
+    mode: 'number'
+  }).notNull(),
+  crawlerStartedAt: timestamp('crawler_started_at', { mode: 'date', withTimezone: true }).notNull(),
+  crawlerFinishedAt: timestamp('crawler_finished_at', {
+    mode: 'date',
+    withTimezone: true
+  }).notNull(),
+  statsPersistedAt: timestamp('stats_persisted_at', { mode: 'date', withTimezone: true }),
+  crawlerRuntimeMillis: bigint('crawler_runtime_millis', { mode: 'number' }).notNull(),
+  requestsWithStatusCode: json('requests_with_status_code').notNull(),
+  errors: json('errors').notNull(),
+  retryErrors: json('retry_errors').notNull()
+});
+
+export type InsertScrapeResult = typeof scrapeResults.$inferInsert;
+export type SelectScrapeResult = typeof scrapeResults.$inferSelect;
+
 export const vacatures = pgTable('vacatures', {
   urlHash: text('url_hash').primaryKey().notNull(),
-  organisatie: text('organisatie'),
+  organisatie: text('organisatie').notNull(),
   instelling: text('instelling'),
   organisatieOnderdeel: text('organisatie_onderdeel'),
-  title: text('title'),
+  title: text('title').notNull(),
   salarisMin: numeric('salaris_min'),
   salarisMax: numeric('salaris_max'),
   cao: text('CAO'),
@@ -65,14 +96,18 @@ export const vacatures = pgTable('vacatures', {
   opleidingsbudgetSize: numeric('opleidingsbudget_size'),
   body: text('body'),
   summary: text('summary'),
-  url: text('url'),
+  url: text('url').notNull(),
   bodyHash: text('body_hash'),
-  firstScraped: timestamp('first_scraped', { mode: 'date', withTimezone: true }),
-  lastScraped: timestamp('last_scraped', { mode: 'date', withTimezone: true }),
+  firstScraped: timestamp('first_scraped', { mode: 'date', withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  lastScraped: timestamp('last_scraped', { mode: 'date', withTimezone: true })
+    .notNull()
+    .defaultNow(),
   synced: boolean('synced').default(false),
   urenMin: numeric('uren_min'),
   urenMax: numeric('uren_max'),
-  professie: text('professie').array(),
+  professie: text('professie').array().notNull(),
   stoornissen: json('stoornissen'),
   behandelmethoden: json('behandelmethoden'),
   fwg: text('FWG'),

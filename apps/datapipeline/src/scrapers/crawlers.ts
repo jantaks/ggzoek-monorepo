@@ -25,7 +25,7 @@ import {
   selectLinks
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
-import repo, { getAllForOrganisationInPeriod } from '../../../../packages/ggz-drizzle/src/repo.js';
+import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
 import { InsertVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
 
@@ -56,15 +56,16 @@ export const DEFAULT_CONFIG: ConfigurationOptions = {
 };
 
 export abstract class BaseScraper implements Scraper {
+  logger: MyLogger;
   protected abstract router:
     | RouterHandler<PlaywrightCrawlingContext>
     | RouterHandler<CheerioCrawlingContext>;
   protected abstract crawler: CheerioCrawler | PlaywrightCrawler;
   protected config: Configuration;
-  protected logger: MyLogger;
-  private allVacatures: Awaited<ReturnType<typeof getAllForOrganisationInPeriod>> | undefined =
+  private allVacatures: Awaited<ReturnType<typeof vacatures.getAllForOrganisation>> | undefined =
     undefined;
-  private vacaturesPromise: ReturnType<typeof getAllForOrganisationInPeriod>;
+  private vacaturesPromise: ReturnType<typeof vacatures.getAllForOrganisation>;
+  private newUrls: string[] = [];
 
   protected constructor(
     readonly name: string,
@@ -82,7 +83,7 @@ export abstract class BaseScraper implements Scraper {
       ...configOptions
     });
     this.logger = log.child({ scraper: this.name });
-    this.vacaturesPromise = repo.getAllForOrganisationInPeriod(this.name, getTimePeriod());
+    this.vacaturesPromise = vacatures.getAllForOrganisation(this.name);
     this.logger.debug(`${this.name} scraper created.`);
   }
 
@@ -92,6 +93,11 @@ export abstract class BaseScraper implements Scraper {
 
   async crawl() {
     await this.crawler.run(this.urls);
+    this.logger.info({
+      newUrls: this.newUrls.length,
+      scraperName: this.name,
+      ...this.crawler.stats.state
+    });
   }
 
   async save(data: Data) {
@@ -117,17 +123,21 @@ export abstract class BaseScraper implements Scraper {
       vacature.firstScraped = existing.firstScraped;
     } else {
       this.logger.info(`New Vacature!!! ${vacature.url}`);
+      this.newUrls.push(vacature.url);
     }
-    await repo.upsert(vacature);
+    await vacatures.upsert(vacature);
   }
 
   async filterNewUrls(urls: string[]) {
-    const period = getTimePeriod();
-    const savedVacatures = await this.getAllVacatures();
-    const savedUrls = savedVacatures.map((v) => v.url);
-    const filteredUrls = urls.filter((url) => !savedUrls.includes(url));
+    const hours = getTimePeriod();
+    const allVacatures = await this.getAllVacatures();
+    const scrapedInPeriod = allVacatures.filter(
+      (v) => v.lastScraped > new Date(Date.now() - hours * 60 * 60 * 1000)
+    );
+    const urlsScrapedInPeriod = scrapedInPeriod.map((v) => v.url);
+    const filteredUrls = urls.filter((url) => !urlsScrapedInPeriod.includes(url));
     log.info(
-      `Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`
+      `Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${hours} hours`
     );
     log.debug('Selected urls:', filteredUrls);
     return filteredUrls;
@@ -217,18 +227,19 @@ export class PlaywrightScraper extends BaseScraper {
         await sleep(1000);
         const $ = await getCheerioFromPage(page);
         const { found } = await this.enqueuNewLinks($, options);
-        log.info(`Found ${found} new links on page ${pageCounter}`);
         if (found === 0) {
-          log.info('No new links found. End pagination.');
+          log.info(`No links found on page ${pageCounter}. End pagination.`);
           break;
         }
-        pageCounter++;
-        log.info(`Navigating to page: ${pageCounter}`);
-        const nextButton = await locator(page);
+        log.info(`Found ${found} links on page ${pageCounter}`);
+        const nextButton = locator(page);
+        // if ((await nextButton.count()) === 0 || !(await nextButton.isVisible())) {
         if ((await nextButton.count()) === 0 || !(await nextButton.isVisible())) {
           log.info('No more "next" buttons found. End pagination.');
           break;
         }
+        pageCounter++;
+        log.info(`Navigating to page: ${pageCounter}`);
         await nextButton.first().click({ timeout: 2000 });
       } catch (error) {
         log.error(`An error occurred in ${this.name}: ${error}`);

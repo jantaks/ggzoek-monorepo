@@ -3,7 +3,7 @@ import { log } from '@ggzoek/logging/src/logger.js';
 import { summarize as OpenAi } from './openAi.js';
 import { summarize as Antropic } from './anthropic.js';
 import { insertSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
-import repo from '../../../../packages/ggz-drizzle/src/repo.js';
+import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
 
 function getSummaryFunction(provider: Provider) {
   switch (provider) {
@@ -16,39 +16,37 @@ function getSummaryFunction(provider: Provider) {
   }
 }
 
-
 function createCompletionTask(vacature: Vacature, provider: Provider) {
   const summarize = getSummaryFunction(provider);
   return async () => {
     const json = await summarize(vacature);
-    if (!json) return
-    let maybeVacature = JSON.parse(json) as Vacature;
+    if (!json) return;
+    const maybeVacature = JSON.parse(json) as Vacature;
     maybeVacature.url = vacature.url;
     maybeVacature.urlHash = vacature.urlHash;
-    const completedVacature = insertSchema.parse(maybeVacature)
+    const completedVacature = insertSchema.parse(maybeVacature);
     log.info(`Upserting vacature ${completedVacature.url}`);
-    await repo.upsert(completedVacature);
+    await vacatures.upsert(completedVacature);
   };
 }
 
 export enum Provider {
   OPENAI = 'openai',
   ANTHROPIC = 'anthropic',
-  GEMINI = 'gemini',
+  GEMINI = 'gemini'
 }
-
 
 export async function summarizeVacatures(vacatures: Vacature[], provider: Provider) {
   function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  const tasks = vacatures.map(vacature => createCompletionTask(vacature, provider));
+  const tasks = vacatures.map((vacature) => createCompletionTask(vacature, provider));
   const results = [];
 
   while (tasks.length > 0) {
     const currentTasks = [];
-    let batchSize = 2;
+    const batchSize = 2;
     for (let i = 0; i < batchSize && tasks.length > 0; i++) {
       const task = tasks.pop();
       if (task) {
@@ -56,7 +54,7 @@ export async function summarizeVacatures(vacatures: Vacature[], provider: Provid
       }
     }
 
-    results.push(...await Promise.all(currentTasks));
+    results.push(...(await Promise.all(currentTasks)));
 
     if (tasks.length > 0) {
       log.info(`Waiting for 10 seconds before continuing...`);

@@ -1,63 +1,65 @@
-import "dotenv/config.js";
-import {chromium, devices} from 'playwright'
-import repo from '@ggzoek/ggz-drizzle/src/repo.js'
+import 'dotenv/config.js';
+import { chromium, devices } from 'playwright';
+import vacatures from 'packages/ggz-drizzle/src/vacatures.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-
-async function createScreenshots(vacatures: SelectVacature[]) {
-    const browser = await chromium.launch({headless:false});  // Or 'firefox' or 'webkit'.
-    const context = await browser.newContext(devices['iPhone 11']);
-
-    for (const vacature of vacatures) {
-        log.info(`Navigating to ${vacature.url}`)
-        const page = await context.newPage();
-        if (vacature.url) {
-            await page.goto(vacature.url);
-            await acceptCookies(page)
-            log.info(`Creating screenshot for ${vacature.url}`)
-            const file = `./screenshots/img_q50_${vacature.urlHash}.jpg`;
-            await page.screenshot({path: file, type: "jpeg", quality: 50});
-            const url = await uploadImage(file, vacature.organisatie || "unknown")
-            log.info(`uploaded screenshot to ${url}`)
-            if (url){
-                vacature.screenshotUrl = url
-                await repo.upsert(vacature)
-            }
-        }
-    }
-    await browser.close();
-}
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import { SelectVacature } from '../../../packages/ggz-drizzle/drizzle/schema.js';
 import { acceptCookies } from './utils.js';
 
+async function createScreenshots(vacatures: SelectVacature[]) {
+  const browser = await chromium.launch({ headless: false }); // Or 'firefox' or 'webkit'.
+  const context = await browser.newContext(devices['iPhone 11']);
+
+  for (const vacature of vacatures) {
+    log.info(`Navigating to ${vacature.url}`);
+    const page = await context.newPage();
+    if (vacature.url) {
+      await page.goto(vacature.url);
+      await acceptCookies(page);
+      log.info(`Creating screenshot for ${vacature.url}`);
+      const file = `./screenshots/img_q50_${vacature.urlHash}.jpg`;
+      await page.screenshot({ path: file, type: 'jpeg', quality: 50 });
+      const url = await uploadImage(file, vacature.organisatie || 'unknown');
+      log.info(`uploaded screenshot to ${url}`);
+      if (url) {
+        vacature.screenshotUrl = url;
+        await vacatures.upsert(vacature);
+      }
+    }
+  }
+  await browser.close();
+}
+
 // Return "https" URLs by setting secure: true
 cloudinary.config({
-    secure: true
+  secure: true
 });
 
 // Log the configuration
 log.info(cloudinary.config());
 
 const uploadImage = async (imagePath: string, folder: string) => {
-    const options = {
-        use_filename: true,
-        unique_filename: false,
-        overwrite: true,
-        folder: folder
-    };
+  const options = {
+    use_filename: true,
+    unique_filename: false,
+    overwrite: true,
+    folder: folder
+  };
 
-    try {
-        const result = await cloudinary.uploader.upload(imagePath, options)
-        log.debug(result, `Image uploaded to ${result.folder}`);
-        return result.url;
-    } catch (error) {
-        log.error(error);
-        return null
-    }
+  try {
+    const result = await cloudinary.uploader.upload(imagePath, options);
+    log.debug(result, `Image uploaded to ${result.folder}`);
+    return result.url;
+  } catch (error) {
+    log.error(error);
+    return null;
+  }
 };
 
-const vacature = await repo.getVacatureByUrl("https://www.pluryn.nl/werken-bij/vacature/persoonlijk-begeleider-jeugd-oosterbeek")
-if (vacature){
-    const vacatures = [vacature]
-    await createScreenshots(vacatures.slice(0, 5))
+const vacature = await vacatures.getVacatureByUrl(
+  'https://www.pluryn.nl/werken-bij/vacature/persoonlijk-begeleider-jeugd-oosterbeek'
+);
+if (vacature) {
+  const vacatures = [vacature];
+  await createScreenshots(vacatures.slice(0, 5));
 }

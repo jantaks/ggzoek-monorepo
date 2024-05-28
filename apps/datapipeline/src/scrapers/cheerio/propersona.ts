@@ -1,24 +1,20 @@
-import { createCheerioRouter } from 'crawlee';
-import { storage } from '../../services/storage.js';
 import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 
-const url ='https://www.werkenbijpropersona.nl/vacature-overzicht/'
-
+const url = 'https://www.werkenbijpropersona.nl/vacature-overzicht/';
 
 const s = new CheerioScraper('Propersona', [url]);
 
 s.addDefaultHandler(async ({ enqueueLinks }) => {
-    await enqueueLinks({
-      globs: ['https://www.werkenbijpropersona.nl/vacature/**'],
-      label: 'detail',
-    });
-    await enqueueLinks({
-      baseUrl: url,
-      selector: 'a.page-link',
-    });
+  await enqueueLinks({
+    globs: ['https://www.werkenbijpropersona.nl/vacature/**'],
+    label: 'detail'
+  });
+  await enqueueLinks({
+    baseUrl: url,
+    selector: 'a.page-link'
+  });
 });
-
 
 s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
@@ -27,8 +23,7 @@ s.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('propersona', { title: title, body: text, request: request });
-  storage.saveToDb('Propersona', {title: title, body: text, request: request})
+  await s.save({ title: title, body: text, request: request });
 });
 
 export const Propersona = s;

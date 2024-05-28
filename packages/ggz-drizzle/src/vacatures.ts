@@ -1,34 +1,7 @@
-import _ from 'lodash';
-import { getDb } from './client.js';
+import { DB, getDb, provideDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import {
-  insertSchema,
-  MinimumVacature,
-  SelectVacature,
-  vacatures as vacatureTable
-} from '../drizzle/schema.js';
+import { SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
 import { and, arrayOverlaps, eq, gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
-import { z } from 'zod';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-
-type DB = PostgresJsDatabase<Record<string, never>>;
-
-function provideDb<T extends any[], R, D extends PostgresJsDatabase>(
-  fn: (...args: [...T, D]) => Promise<R> | R
-): (...args: T) => Promise<R> {
-  return async (...args: T): Promise<R> => {
-    const { client, db } = getDb();
-    const partiallyAppliedFunction = _.partialRight(fn, db);
-    try {
-      return await partiallyAppliedFunction(...args);
-    } catch (e) {
-      log.error(e, `Error in ${fn.name}`); // Adjusted for generic logging
-    } finally {
-      // log.debug(`Closing connection: ${client.name}`);
-      // await client.end();
-    }
-  };
-}
 
 async function allUrlsForOrganisation(organisation: string, db) {
   const result = await db
@@ -39,21 +12,28 @@ async function allUrlsForOrganisation(organisation: string, db) {
   return result.map((x: { url: string }) => x.url) as string[];
 }
 
-async function upsertVacature(vacature: z.infer<typeof insertSchema>, db) {
+export async function upsert(vacature: typeof vacatureTable.$inferInsert) {
+  const { db: db } = getDb();
   const columns = Object.keys(vacatureTable);
-  const valuesToInsert = columns.reduce((acc, col) => {
-    acc[col] = vacature[col];
-    return acc;
-  }, {} as MinimumVacature);
-
-  const valuesToUpdate = columns.reduce((acc, col) => {
-    if (vacature[col] !== undefined) {
+  const valuesToInsert = columns.reduce(
+    (acc, col) => {
       acc[col] = vacature[col];
-    }
-    return acc;
-  }, {} as MinimumVacature);
+      return acc;
+    },
+    {} as typeof vacatureTable.$inferInsert
+  );
 
-  const result = await db.insert(vacatureTable).values(valuesToInsert).onConflictDoUpdate({
+  const valuesToUpdate = columns.reduce(
+    (acc, col) => {
+      if (vacature[col] !== undefined) {
+        acc[col] = vacature[col];
+      }
+      return acc;
+    },
+    {} as typeof vacatureTable.$inferInsert
+  );
+
+  await db.insert(vacatureTable).values(valuesToInsert).onConflictDoUpdate({
     target: vacatureTable.urlHash,
     set: valuesToUpdate
   });
@@ -152,12 +132,13 @@ async function getAll(db) {
   return (await db.select().from(vacatureTable).execute()) as SelectVacature[];
 }
 
-async function getAllForOrganisation(organisatie: string, db) {
-  return (await db
+async function getAllForOrganisation(organisatie: string) {
+  const { db: db } = getDb();
+  return await db
     .select()
     .from(vacatureTable)
     .where(eq(vacatureTable.organisatie, organisatie))
-    .execute()) as SelectVacature[];
+    .execute();
 }
 
 export async function getAllForOrganisationInPeriod(organisatie: string, hours: number, db: DB) {
@@ -224,16 +205,15 @@ async function getVacaturesToSummarize(db) {
     .execute()) as SelectVacature[];
 }
 
-const repo = {
+const vacatures = {
   // Retrieves a list of all screenshot urls
   allScreenshotUrls: provideDb(allScreenshotUrls),
   allUrls: provideDb(allUrls),
   allUrlsForOrganisation: provideDb(allUrlsForOrganisation),
   getAll: provideDb(getAll),
-  getAllForOrganisation: provideDb(getAllForOrganisation),
   getAllForOrganisationInPeriod: provideDb(getAllForOrganisationInPeriod),
-  // Retrieves a list of URLs that have been scraped within the given time period (@param timeperiodHours).
   getAllUrlsScrapedWithinHours: provideDb(getAllUrlsScrapedWithinHours),
+  // Retrieves a list of URLs that have been scraped within the given time period (@param timeperiodHours).
   getAllWithProfessies: provideDb(getAllWithProfessies),
   getAllWithoutProfessie: provideDb(getAllWithoutProfessie),
   getUnsyncedVacatures: provideDb(getUnsyncedVacatures),
@@ -242,7 +222,8 @@ const repo = {
   getVacatureByUrl: provideDb(getVacatureByUrl),
   getVacaturesToSummarize: provideDb(getVacaturesToSummarize),
   getVacaturesWithoutScreenshot: provideDb(getVacaturesWithoutScreenshot),
-  upsert: provideDb(upsertVacature)
+  getAllForOrganisation,
+  upsert
 };
 
-export default repo;
+export default vacatures;

@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 import { CheerioAPI } from 'cheerio';
 import { minimatch } from 'minimatch';
 import { log } from '@ggzoek/logging/src/logger.js';
-import repo from '../../../packages/ggz-drizzle/src/repo.js';
+import vacatures from '../../../packages/ggz-drizzle/src/vacatures.js';
 import { sleep } from 'crawlee';
 
 export async function getCheerioFromPage(page: Page) {
@@ -13,28 +13,29 @@ export async function getCheerioFromPage(page: Page) {
   return cheerio.load(bodyHtml);
 }
 
-
 export function cleanText(text: string) {
   let cleanedText = text.replace(/\t/g, ''); // Remove all tabs
   cleanedText = cleanedText.replace(/\n\s*\n/g, '\n'); // Replace \n followed by any number of whitespaces and another \n with a single \n// Remove all double or more newlines
-  cleanedText = cleanedText.replace(/  +/g, ' ');// Replace double or more spaces with a single space// Replace double or more newlines with a single newline
+  cleanedText = cleanedText.replace(/  +/g, ' '); // Replace double or more spaces with a single space// Replace double or more newlines with a single newline
   return cleanedText;
 }
 
 export function cleanTitle(text: string) {
   let cleanedText = text.replace(/\t/g, ''); // Remove all tabs
-  cleanedText = cleanedText.trim()
+  cleanedText = cleanedText.trim();
   cleanedText = cleanedText.replace(/\n/g, ''); // Replace \n followed by any number of whitespaces and another \n with a single \n// Remove all double or more newlines
   cleanedText = cleanedText.replace(/\r/g, ''); // Replace \n followed by any number of whitespaces and another \n with a single \n// Remove all double or more newlines
-  cleanedText = cleanedText.replace(/  +/g, ' ');// Replace double or more spaces with a single space// Replace double or more newlines with a single newline
+  cleanedText = cleanedText.replace(/  +/g, ' '); // Replace double or more spaces with a single space// Replace double or more newlines with a single newline
   return cleanedText;
 }
 
-export function formatDate(date: Date | string | number | null){
-  if (!date) return undefined
+export function formatDate(date: Date | string | number | null) {
+  if (!date) return undefined;
+
   function isDate(date: Date | string | number): date is Date {
     return date instanceof Date;
   }
+
   if (!isDate(date)) {
     date = new Date(date);
   }
@@ -46,8 +47,8 @@ export function formatDate(date: Date | string | number | null){
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
-  if (isNaN(year)){
-    return undefined
+  if (isNaN(year)) {
+    return undefined;
   }
 
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
@@ -70,15 +71,20 @@ export function randomItems<T>(items: T[], count: number) {
   return result;
 }
 
-
 export async function acceptCookies(page: Page) {
-  const cookieButtonLabels = ['Alles toestaan', 'Cookies toestaan', 'Alle cookies toestaan', 'Accepteren', 'Ik ga akkoord'];
+  const cookieButtonLabels = [
+    'Alles toestaan',
+    'Cookies toestaan',
+    'Alle cookies toestaan',
+    'Accepteren',
+    'Ik ga akkoord'
+  ];
   let cookieButtonFound = false;
   for (const label of cookieButtonLabels) {
     try {
-      const matches =  page.getByText(label);
+      const matches = page.getByText(label);
       for (const match of await matches.all()) {
-        await match.click({timeout: 1000});
+        await match.click({ timeout: 1000 });
         log.info(`Clicked cookie button with label "${label}"`);
         cookieButtonFound = true;
         await sleep(1000);
@@ -93,7 +99,10 @@ export async function acceptCookies(page: Page) {
   }
 }
 
-export function removeParent(elementWithText: cheerio.Cheerio<cheerio.Element>, parentSelector: string = 'div') {
+export function removeParent(
+  elementWithText: cheerio.Cheerio<cheerio.Element>,
+  parentSelector: string = 'div'
+) {
   const parentDiv = elementWithText.closest(parentSelector);
   if (parentDiv.length) {
     parentDiv.remove();
@@ -101,26 +110,23 @@ export function removeParent(elementWithText: cheerio.Cheerio<cheerio.Element>, 
 }
 
 export type LinksOptions = {
-  urls? : string[]
-  baseUrl?: string
-  globs?: string[]
-  selector?: string
-  label?: string
-}
-
-
-
+  urls?: string[];
+  baseUrl?: string;
+  globs?: string[];
+  selector?: string;
+  label?: string;
+};
 
 export function combineUrl(urlFragment: string, baseUrl: string) {
   if (urlFragment.startsWith(baseUrl!)) {
     return urlFragment;
   }
-  if (baseUrl.endsWith(urlFragment)){
+  if (baseUrl.endsWith(urlFragment)) {
     return baseUrl;
   }
   if (baseUrl?.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
   if (urlFragment.startsWith('/')) urlFragment = urlFragment.slice(1);
-  return baseUrl + '/' + urlFragment
+  return baseUrl + '/' + urlFragment;
 }
 
 export function getTimePeriod() {
@@ -136,20 +142,26 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   let urls = [];
 
   if (options.selector) {
-    const selectedUrls = $(`a${options.selector}`).map((_, el) => $(el).attr('href')).get();
+    const selectedUrls = $(`a${options.selector}`)
+      .map((_, el) => $(el).attr('href'))
+      .get();
     urls.push(...selectedUrls);
   } else {
-    const allUrls = $('a').map((_, el) => $(el).attr('href')).get();
+    const allUrls = $('a')
+      .map((_, el) => $(el).attr('href'))
+      .get();
     urls.push(...allUrls);
   }
 
   if (options.globs) {
-    urls = urls.filter(url => options.globs && options.globs.some((glob) => minimatch(url, glob)));
+    urls = urls.filter(
+      (url) => options.globs && options.globs.some((glob) => minimatch(url, glob))
+    );
   }
 
   if (options.baseUrl) {
     const baseUrl = options.baseUrl;
-    urls = urls.map(url => {
+    urls = urls.map((url) => {
       return combineUrl(url, baseUrl);
     });
   }
@@ -161,14 +173,14 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   return urls;
 }
 
-
-
 //Removes urls that have been scraoer in the (optionally) provided timeperiod.
 export async function filterNewUrls(urls: string[]) {
   const period = getTimePeriod();
-  const skipUrls = await repo.getAllUrlsScrapedWithinHours(period);
-  const filteredUrls = urls.filter(url => !skipUrls.includes(url));
-  log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`);
+  const skipUrls = await vacatures.getAllUrlsScrapedWithinHours(period);
+  const filteredUrls = urls.filter((url) => !skipUrls.includes(url));
+  log.info(
+    `Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`
+  );
   log.debug(filteredUrls, 'Selected urls:');
   return filteredUrls;
 }
@@ -182,5 +194,3 @@ export async function selectNewLinks($: CheerioAPI, options: LinksOptions) {
   const urls = selectLinks($, options);
   return await filterNewUrls(urls);
 }
-
-

@@ -28,7 +28,8 @@ import { Emergis } from './scrapers/cheerio/emergis.js';
 import { Dimence } from './scrapers/cheerio/dimence.js';
 import { Delfland } from './scrapers/cheerio/delfland.js';
 import { Drenthe } from './scrapers/cheerio/ggz_drenthe.js';
-import { DFZS } from './scrapers/cheerio/dfzs.js';
+import { DFZS } from './scrapers/playwright/dfzs.js';
+import { Tactus } from './scrapers/playwright/tactus.js';
 
 log.info(process.env.LOG_LEVEL);
 
@@ -75,4 +76,4 @@ async function runAll() {
   ]);
 }
 
-await VIGO.crawl();
+await Tactus.crawl();
