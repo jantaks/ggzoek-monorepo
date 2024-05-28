@@ -1,53 +1,46 @@
-import { createPlaywrightRouter, PlaywrightCrawler, sleep } from 'crawlee';
-import { storage } from '../../services/storage.js';
-import { acceptCookies, cleanText, getCheerioFromPage, removeParent, selectNewLinks } from '../../utils.js';
+import { acceptCookies, cleanText } from '../../utils.js';
 import * as cheerio from 'cheerio';
-import { defaultConfig, defaultOptions, PlaywrightScraper } from '../crawlers.js';
+import { DEFAULT_OPTIONS, PlaywrightScraper } from '../crawlers.js';
+import { Page } from 'playwright';
 
-const url = 'https://werkenbijvigogroep.recruitee.com/'
-const options = {...defaultOptions(), maxRequestsPerMinute: 10}
-const s = new PlaywrightScraper('Vincent van Gogh GGZ', [url], options)
+const url = 'https://werkenbijvigogroep.recruitee.com/';
+const options = { ...DEFAULT_OPTIONS, maxRequestsPerMinute: 10 };
+const s = new PlaywrightScraper('Vincent van Gogh GGZ', [url], options);
 
-s.addDefaultHandler(async ({ log, page }) => {
+s.addDefaultHandler(async ({ page }) => {
   page.setDefaultTimeout(5000);
   await acceptCookies(page);
-
-  let pageCounter = 1;
-  while (pageCounter > 0  ) {
-    try {
-      log.info(`Next page: ${pageCounter}`);
-      await page.getByText("Toon meer vacatures").click({ timeout: 2000 });
-      await sleep(500)
-      pageCounter++;
-    } catch (error) {
-      log.info(`No more pages. ${error}`);
-      break;
-    }
-  }
-  const $ = await getCheerioFromPage(page)
-  const urls = await s.enqueuNewLinks($ , {
+  const btnLocator = (page: Page) => page.getByText('Toon meer vacatures');
+  await s.expand(page, btnLocator, {
     baseUrl: url,
     globs: ['**/o/*'],
     label: 'detail'
-  })
+  });
 });
-
 
 s.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
   const title = $('h1').text();
-  $('script, style, noscript, iframe, header, footer, form').remove();
-  $('.rnBreadcrumb, .elementSticky, .rowRelated, #CybotCookiebotDialog, .rnCarousel').remove()
   const targetDiv = $('div[role="dialog"]');
   if (targetDiv.length) {
     targetDiv.remove();
   }
-  let text = $('body').text();
+  $("div[data-scroll-point|='section-offer-headline']").remove();
+  $('div[data-scroll-point="section-navigation"]').remove();
+  $('script, style, noscript, iframe, header, footer, form').remove();
+  $('.rnBreadcrumb, .elementSticky, .rowRelated, #CybotCookiebotDialog, .rnCarousel').remove();
+  $('strong:contains("Solliciteren")').parent().nextAll().addBack().remove();
+  $('a[data-reach-skip-link]').remove();
+  $('button').remove();
+  const panels = $("div[role='tabpanel']");
+  panels.each((i, el) => {
+    if (i > 0) $(el).remove();
+  });
+  let text = $('#offer-section').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
   s.save({ title: title, request: request, body: text });
 });
 
 export const VIGO = s;
-

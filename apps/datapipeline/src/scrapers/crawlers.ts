@@ -2,22 +2,31 @@ import {
   BasicCrawlerOptions,
   CheerioCrawler,
   CheerioCrawlingContext,
-  Configuration, ConfigurationOptions, createCheerioRouter,
-  createPlaywrightRouter, Dictionary, enqueueLinks, PlaywrightCrawler,
-  PlaywrightCrawlingContext, Request, RouterHandler, sleep
+  Configuration,
+  ConfigurationOptions,
+  createCheerioRouter,
+  createPlaywrightRouter,
+  enqueueLinks,
+  PlaywrightCrawler,
+  PlaywrightCrawlingContext,
+  Request,
+  RouterHandler,
+  sleep
 } from 'crawlee';
 import { log, MyLogger } from '@ggzoek/logging/src/logger.js';
 import { CheerioAPI } from 'cheerio';
 import {
-  cleanTitle, createHash, formatDate,
+  cleanTitle,
+  createHash,
+  formatDate,
   getCheerioFromPage,
   getTimePeriod,
   LinksOptions,
   selectLinks
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
-import repo from '../../../../packages/ggz-drizzle/src/repo.js';
-import { InsertVacature, SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import repo, { getAllForOrganisationInPeriod } from '../../../../packages/ggz-drizzle/src/repo.js';
+import { InsertVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
 
 interface Scraper {
@@ -25,49 +34,37 @@ interface Scraper {
 }
 
 type Data = {
-  request: Request<Dictionary>
-  body: string,
-  title: string,
-}
+  request: Request;
+  body: string;
+  title: string;
+};
 
-type Options = Pick<BasicCrawlerOptions, "requestHandlerTimeoutSecs" | "statisticsOptions" | "maxRequestsPerCrawl" | "maxRequestsPerMinute">
+type Options = Pick<
+  BasicCrawlerOptions,
+  'requestHandlerTimeoutSecs' | 'statisticsOptions' | 'maxRequestsPerCrawl' | 'maxRequestsPerMinute'
+>;
 
-export function defaultConfig(name: string) {
-  return new Configuration({
-    persistStateIntervalMillis: 5_000,
-    purgeOnStart: true,
-    defaultKeyValueStoreId: name,
-    defaultDatasetId: name
-  });
-}
-
-export function defaultOptions(): BasicCrawlerOptions {
-  return {
-    statisticsOptions: {
-      logIntervalSecs: 10
-    }
-  };
-}
-
-const DEFAULT_OPTIONS: BasicCrawlerOptions = {
+export const DEFAULT_OPTIONS: BasicCrawlerOptions = {
   statisticsOptions: {
     logIntervalSecs: 10
   }
 };
 
-const DEFAULT_CONFIG: ConfigurationOptions = {
+export const DEFAULT_CONFIG: ConfigurationOptions = {
   persistStateIntervalMillis: 5_000,
   purgeOnStart: true
 };
 
 export abstract class BaseScraper implements Scraper {
-  protected abstract router: RouterHandler<PlaywrightCrawlingContext> | RouterHandler<CheerioCrawlingContext>;
+  protected abstract router:
+    | RouterHandler<PlaywrightCrawlingContext>
+    | RouterHandler<CheerioCrawlingContext>;
   protected abstract crawler: CheerioCrawler | PlaywrightCrawler;
   protected config: Configuration;
-  private existingUrls: string[] | undefined = undefined;
-  private allVacatures: SelectVacature[] | undefined = undefined;
-  protected logger: MyLogger
-
+  protected logger: MyLogger;
+  private allVacatures: Awaited<ReturnType<typeof getAllForOrganisationInPeriod>> | undefined =
+    undefined;
+  private vacaturesPromise: ReturnType<typeof getAllForOrganisationInPeriod>;
 
   protected constructor(
     readonly name: string,
@@ -81,10 +78,12 @@ export abstract class BaseScraper implements Scraper {
     this.config = new Configuration({
       ...DEFAULT_CONFIG,
       defaultKeyValueStoreId: name,
-      defaultDatasetId: name, ...configOptions
+      defaultDatasetId: name,
+      ...configOptions
     });
-    this.logger = log.child({ scraper: this.name })
-    repo.getAllForOrganisation(this.name).then(vacatures => this.allVacatures= vacatures);
+    this.logger = log.child({ scraper: this.name });
+    this.vacaturesPromise = repo.getAllForOrganisationInPeriod(this.name, getTimePeriod());
+    this.logger.debug(`${this.name} scraper created.`);
   }
 
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
@@ -93,14 +92,6 @@ export abstract class BaseScraper implements Scraper {
 
   async crawl() {
     await this.crawler.run(this.urls);
-  }
-
-  private async getAllVacatures(){
-    if (!this.allVacatures) {
-      this.logger.info('No existing vacatures found. Fetching from database')
-      this.allVacatures = await repo.getAllForOrganisation(this.name);
-    }
-    return this.allVacatures;
   }
 
   async save(data: Data) {
@@ -117,10 +108,12 @@ export abstract class BaseScraper implements Scraper {
       summary: null
     };
 
-    const allVacatures = await this.getAllVacatures()
-    const existing = allVacatures.find(v => v.urlHash === vacature.urlHash);
+    const allVacatures = await this.getAllVacatures();
+    const existing = allVacatures.find((v) => v.urlHash === vacature.urlHash);
     if (existing) {
-      this.logger.debug(`Vacature ${vacature.url} already exists, last scraped at ${formatDate(existing.lastScraped)})`);
+      this.logger.debug(
+        `Vacature ${vacature.url} already exists, last scraped at ${formatDate(existing.lastScraped)})`
+      );
       vacature.firstScraped = existing.firstScraped;
     } else {
       this.logger.info(`New Vacature!!! ${vacature.url}`);
@@ -130,20 +123,19 @@ export abstract class BaseScraper implements Scraper {
 
   async filterNewUrls(urls: string[]) {
     const period = getTimePeriod();
-    if (!this.existingUrls) {
-      log.info('No existing urls found. Fetching from database')
-      this.existingUrls = await repo.getAllUrlsScrapedWithinHours(period) as string[];
-    }
-    const savedUrls = this.existingUrls
-    const filteredUrls = urls.filter(url => !savedUrls.includes(url));
-    log.info(`Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`);
+    const savedVacatures = await this.getAllVacatures();
+    const savedUrls = savedVacatures.map((v) => v.url);
+    const filteredUrls = urls.filter((url) => !savedUrls.includes(url));
+    log.info(
+      `Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`
+    );
     log.debug('Selected urls:', filteredUrls);
     return filteredUrls;
   }
 
-  async enqueueLinks(options: Omit<Parameters<typeof enqueueLinks>[0], "requestQueue">){
+  async enqueueLinks(options: Omit<Parameters<typeof enqueueLinks>[0], 'requestQueue'>) {
     const requestQueue = await this.crawler.getRequestQueue();
-    await enqueueLinks({ ...options, requestQueue } );
+    await enqueueLinks({ ...options, requestQueue });
   }
 
   async enqueuNewLinks($: CheerioAPI, options: LinksOptions) {
@@ -152,6 +144,16 @@ export abstract class BaseScraper implements Scraper {
     const filteredUrls = await this.filterNewUrls(foundUrls);
     await enqueueLinks({ label: options.label, urls: filteredUrls, requestQueue: requestQueue });
     return { found: foundUrls.length, enqueued: filteredUrls.length };
+  }
+
+  private async getAllVacatures() {
+    if (!this.allVacatures) {
+      this.allVacatures = await this.vacaturesPromise;
+      this.logger.debug(
+        `Fetched ${this.allVacatures.length} existing vacatures for organisation from database`
+      );
+    }
+    return this.allVacatures;
   }
 }
 
@@ -162,9 +164,11 @@ export class CheerioScraper extends BaseScraper {
   constructor(name: string, urls: string[], options?: Options, config?: ConfigurationOptions) {
     super(name, urls, options, config);
     this.router = createCheerioRouter();
-    this.crawler = new CheerioCrawler({ ...this.options, requestHandler: this.router }, this.config);
+    this.crawler = new CheerioCrawler(
+      { ...this.options, requestHandler: this.router },
+      this.config
+    );
   }
-
 
   override addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>) {
     this.router.addDefaultHandler(...args);
@@ -176,7 +180,9 @@ export class CheerioScraper extends BaseScraper {
     const updatedHandler = async (...args: Parameters<typeof handler>) => {
       const context = args[0];
       if (context.response.statusCode > 210) {
-        log.error(`Error code when loading ${context.request.loadedUrl}. Statuscode: ${context.response.statusCode}`);
+        log.error(
+          `Error code when loading ${context.request.loadedUrl}. Statuscode: ${context.response.statusCode}`
+        );
         return;
       }
       await handler(context);
@@ -192,18 +198,25 @@ export class PlaywrightScraper extends BaseScraper {
   constructor(name: string, urls: string[], options?: Options, config?: ConfigurationOptions) {
     super(name, urls, options, config);
     this.router = createPlaywrightRouter();
-    this.crawler = new PlaywrightCrawler({ ...this.options, requestHandler: this.router, requestHandlerTimeoutSecs: 180 }, this.config);
+    this.crawler = new PlaywrightCrawler(
+      {
+        ...this.options,
+        requestHandler: this.router,
+        requestHandlerTimeoutSecs: 180
+      },
+      this.config
+    );
   }
 
-  async paginate(page: Page, locator: (page:Page) => Locator, options: LinksOptions) {
+  async paginate(page: Page, locator: (page: Page) => Locator, options: LinksOptions) {
     let pageCounter = 1;
     log.info(`Starting on page: ${pageCounter}`);
     // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
-        await sleep(1000)
-        const $ = await getCheerioFromPage(page)
-        const {found, } = await this.enqueuNewLinks($, options);
+        await sleep(1000);
+        const $ = await getCheerioFromPage(page);
+        const { found } = await this.enqueuNewLinks($, options);
         log.info(`Found ${found} new links on page ${pageCounter}`);
         if (found === 0) {
           log.info('No new links found. End pagination.');
@@ -211,8 +224,8 @@ export class PlaywrightScraper extends BaseScraper {
         }
         pageCounter++;
         log.info(`Navigating to page: ${pageCounter}`);
-        const nextButton = await locator(page)
-        if (await nextButton.count() === 0 || ! await nextButton.isVisible()) {
+        const nextButton = await locator(page);
+        if ((await nextButton.count()) === 0 || !(await nextButton.isVisible())) {
           log.info('No more "next" buttons found. End pagination.');
           break;
         }
@@ -224,23 +237,23 @@ export class PlaywrightScraper extends BaseScraper {
     }
   }
 
-  async expand(page: Page, locator: (page:Page) => Locator, options: LinksOptions) {
+  async expand(page: Page, locator: (page: Page) => Locator, options: LinksOptions) {
     let clickedCounter = 1;
-    const urls: string[] = []
+    const urls: string[] = [];
     // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
-        const expandButton = locator(page)
-        if (await expandButton.count() === 0 || ! await expandButton.isVisible()) {
+        const expandButton = locator(page);
+        if ((await expandButton.count()) === 0 || !(await expandButton.isVisible())) {
           this.logger.info('No more expand buttons found. End pagination.');
           break;
         }
         this.logger.info(`Clicking expand button: ${clickedCounter}`);
         await expandButton.first().click({ timeout: 2000 });
-        await sleep(2000)
-        const $ = await getCheerioFromPage(page)
+        await sleep(2000);
+        const $ = await getCheerioFromPage(page);
         const linksOnPage = selectLinks($, options);
-        const newUrls = linksOnPage.filter(url => !urls.includes(url));
+        const newUrls = linksOnPage.filter((url) => !urls.includes(url));
         if (newUrls.length === 0) {
           this.logger.info('No new links found. End pagination.');
           break;
@@ -255,7 +268,9 @@ export class PlaywrightScraper extends BaseScraper {
         break;
       }
     }
-    this.logger.info(`Finished expanding. Found ${urls.length} urls after ${clickedCounter} clicks`);
+    this.logger.info(
+      `Finished expanding. Found ${urls.length} urls after ${clickedCounter} clicks`
+    );
   }
 
   override addHandler(label: string, handler: Parameters<typeof this.router.addHandler>[1]) {

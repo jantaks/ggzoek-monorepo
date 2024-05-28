@@ -1,8 +1,8 @@
-# Crawlee + PlaywrightCrawler + TypeScript project
+Insert javascript in the browser console to load jQuery for testing purposes:
 
-This template is a production ready boilerplate for developing with `PlaywrightCrawler`. Use this to bootstrap your projects using the most up-to-date code.
-
-If you're looking for examples or want to learn more visit:
-
-- [Documentation](https://crawlee.dev/api/playwright-crawler/class/PlaywrightCrawler)
-- [Examples](https://crawlee.dev/docs/examples/playwright-crawler)
+```javascript
+var jq = document.createElement('script');
+jq.src = "//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js";
+document.getElementsByTagName('head')[0].appendChild(jq);
+jQuery.noConflict();
+```

@@ -1,28 +1,23 @@
-import { storage } from '../../services/storage.js';
 import { cleanText, selectNewLinks } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
-
 
 const baseUrl = 'https://werkenbijemergis.nl/vacatures';
 
 const s = new CheerioScraper('Emergis', [baseUrl]);
 
 s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
-  const urls = await selectNewLinks($ as CheerioAPI,
-    {
-      baseUrl: "https://werkenbijemergis.nl",
-      selector: '.teaser__link',
-      globs: ['**/vacatures/**']
-    }
-  );
+  const urls = await selectNewLinks($ as CheerioAPI, {
+    baseUrl: 'https://werkenbijemergis.nl',
+    selector: '.teaser__link',
+    globs: ['**/vacatures/**']
+  });
 
   await enqueueLinks({
     urls: urls,
-    label: 'detail',
+    label: 'detail'
   });
 });
-
 
 s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();
@@ -31,8 +26,7 @@ s.addHandler('detail', async ({ request, $, log }) => {
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
-  await storage.saveData('emergis', { title: title, body: text, request: request });
-  storage.saveToDb('Emergis', { title: title, body: text, request: request });
+  await s.save({ title: title, body: text, request: request });
 });
 
 export const Emergis = s;

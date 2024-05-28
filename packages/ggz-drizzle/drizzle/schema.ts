@@ -1,21 +1,32 @@
 import {
-  pgTable,
-  pgEnum,
   bigint,
-  uuid,
-  text,
-  numeric,
   boolean,
   json,
+  numeric,
+  pgEnum,
   pgSchema,
-  date,
-  timestamp
+  pgTable,
+  text,
+  timestamp,
+  uuid
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 export const keyStatus = pgEnum('key_status', ['default', 'valid', 'invalid', 'expired']);
-export const keyType = pgEnum('key_type', ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20']);
+export const keyType = pgEnum('key_type', [
+  'aead-ietf',
+  'aead-det',
+  'hmacsha512',
+  'hmacsha256',
+  'auth',
+  'shorthash',
+  'generichash',
+  'kdf',
+  'secretbox',
+  'secretstream',
+  'stream_xchacha20'
+]);
 export const factorType = pgEnum('factor_type', ['totp', 'webauthn']);
 export const factorStatus = pgEnum('factor_status', ['unverified', 'verified']);
 export const aalLevel = pgEnum('aal_level', ['aal1', 'aal2', 'aal3']);
@@ -30,8 +41,12 @@ export const users = auth.table('users', {
 export const likes = pgTable('likes', {
   // You can use { mode: "bigint" } if numbers are exceeding js number limitations
   id: bigint('id', { mode: 'number' }).primaryKey().notNull(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  vacature: text('vacature').notNull().references(() => vacatures.urlHash, { onDelete: 'cascade' })
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  vacature: text('vacature')
+    .notNull()
+    .references(() => vacatures.urlHash, { onDelete: 'cascade' })
 });
 
 export const vacatures = pgTable('vacatures', {
@@ -57,7 +72,6 @@ export const vacatures = pgTable('vacatures', {
   synced: boolean('synced').default(false),
   urenMin: numeric('uren_min'),
   urenMax: numeric('uren_max'),
-  beroepen: json('beroepen'),
   professie: text('professie').array(),
   stoornissen: json('stoornissen'),
   behandelmethoden: json('behandelmethoden'),
@@ -68,22 +82,33 @@ export const vacatures = pgTable('vacatures', {
   screenshotUrl: text('screenshot_url')
 });
 
-const selectSchema = createSelectSchema(vacatures)
-
-
+const selectSchema = createSelectSchema(vacatures);
 
 export const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),
   summary: (schema) => schema.summary.min(100).nullable(),
   title: (schema) => schema.title.min(5),
-  professie: (schema) => schema.professie.array(),
-}).required({
-  title: true,
-  summary: true,
-  urlHash: true
-}).omit({opleidingsbudgetSize: true });
+  professie: (schema) => schema.professie.array()
+})
+  .required({
+    title: true,
+    summary: true,
+    urlHash: true
+  })
+  .omit({ opleidingsbudgetSize: true });
 
 export type InsertVacature = z.infer<typeof insertSchema>;
 export type SelectVacature = z.infer<typeof selectSchema>;
 
-export type MinimumVacature = Pick<InsertVacature, 'urlHash' | 'organisatie' | 'title' | 'body' | 'url' | 'bodyHash' | 'firstScraped' | 'lastScraped' | 'professie'>
+export type MinimumVacature = Pick<
+  InsertVacature,
+  | 'urlHash'
+  | 'organisatie'
+  | 'title'
+  | 'body'
+  | 'url'
+  | 'bodyHash'
+  | 'firstScraped'
+  | 'lastScraped'
+  | 'professie'
+>;
