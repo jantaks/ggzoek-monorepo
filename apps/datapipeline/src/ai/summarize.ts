@@ -2,7 +2,11 @@ import { Vacature } from './types.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { summarize as OpenAi } from './openAi.js';
 import { summarize as Antropic } from './anthropic.js';
-import { insertSchema } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import {
+  insertSchema,
+  InsertVacature,
+  SelectVacature
+} from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
 
 function getSummaryFunction(provider: Provider) {
@@ -16,7 +20,7 @@ function getSummaryFunction(provider: Provider) {
   }
 }
 
-function createCompletionTask(vacature: Vacature, provider: Provider) {
+function createCompletionTask(vacature: SelectVacature, provider: Provider) {
   const summarize = getSummaryFunction(provider);
   return async () => {
     const json = await summarize(vacature);
@@ -24,9 +28,11 @@ function createCompletionTask(vacature: Vacature, provider: Provider) {
     const maybeVacature = JSON.parse(json) as Vacature;
     maybeVacature.url = vacature.url;
     maybeVacature.urlHash = vacature.urlHash;
+    maybeVacature.organisatie = vacature.organisatie;
+    maybeVacature.professie = vacature.professie;
     const completedVacature = insertSchema.parse(maybeVacature);
     log.info(`Upserting vacature ${completedVacature.url}`);
-    await vacatures.upsert(completedVacature);
+    await vacatures.upsert(completedVacature as unknown as InsertVacature);
   };
 }
 
@@ -36,7 +42,7 @@ export enum Provider {
   GEMINI = 'gemini'
 }
 
-export async function summarizeVacatures(vacatures: Vacature[], provider: Provider) {
+export async function summarizeVacatures(vacatures: SelectVacature[], provider: Provider) {
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }

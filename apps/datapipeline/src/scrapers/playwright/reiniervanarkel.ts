@@ -9,7 +9,7 @@ const s = new PlaywrightScraper('Reinier van Arkel', [
 
 s.addDefaultHandler(async ({ enqueueLinks, parseWithCheerio }) => {
   const $ = await parseWithCheerio();
-  await s.enqueuNewLinks($ as CheerioAPI, {
+  await s.enqueueNewLinks($ as CheerioAPI, {
     globs: ['**/vacature/**'],
     label: 'detail',
     selector: '.card-link'

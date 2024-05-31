@@ -1,16 +1,15 @@
-import { cleanText, selectNewLinks } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import { CheerioAPI } from 'cheerio';
 import { CheerioScraper } from '../crawlers.js';
 
 const s = new CheerioScraper('Mediant', ['https://werkenbijmediant.nl/vacatures']);
 
 s.addDefaultHandler(async ({ $ }) => {
-  await s.enqueuNewLinks($ as CheerioAPI,
-    {
-      baseUrl: 'https://werkenbijmediant.nl',
-      selector: '.vacancy-index-item-title',
-      label: 'detail'
-    });
+  await s.enqueueNewLinks($ as CheerioAPI, {
+    baseUrl: 'https://werkenbijmediant.nl',
+    selector: '.vacancy-index-item-title',
+    label: 'detail'
+  });
 });
 
 s.addHandler('detail', async ({ request, $, log }) => {

@@ -2,7 +2,6 @@ import { runCrawlers } from './scrape.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { indexVacatures } from './services/meilisearch.js';
 import { correctSpelling } from './synonyms.js';
-import { Vacature } from './ai/types.js';
 import { Provider, summarizeVacatures } from './ai/summarize.js';
 import vacatures from '../../../packages/ggz-drizzle/src/vacatures.js';
 
@@ -13,9 +12,11 @@ async function step_1() {
 
 const step_3 = async () => {
   log.info('Summarizing vacatures');
-  const vacaturesToSummarize = (await vacatures.getVacaturesToSummarize()) as Vacature[];
+  const vacaturesToSummarize = await vacatures.getVacaturesToSummarize({
+    organisaties: ['Lentis']
+  });
   log.info(`Found ${vacaturesToSummarize.length} vacatures to summarize`);
-  await summarizeVacatures(vacaturesToSummarize, Provider.ANTHROPIC);
+  await summarizeVacatures(vacaturesToSummarize, Provider.OPENAI);
 };
 
 const step_4 = async () => {

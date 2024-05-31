@@ -2,22 +2,20 @@ import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 
-
-const url = 'https://www.werkenbijmondriaan.nl/vacatures'
+const url = 'https://www.werkenbijmondriaan.nl/vacatures';
 
 const s = new CheerioScraper('Mondriaan', [url]);
 
-
 s.addDefaultHandler(async ({ enqueueLinks, log, $ }) => {
-  log.info('enqueueing new URLs')
-  await s.enqueuNewLinks($ as CheerioAPI, {
+  log.info('enqueueing new URLs');
+  await s.enqueueNewLinks($ as CheerioAPI, {
     baseUrl: 'https://www.werkenbijmondriaan.nl',
     globs: ['**/vacatures/**'],
-    label: 'detail',
+    label: 'detail'
   });
   await enqueueLinks({
     baseUrl: url,
-    selector: 'li.pager__item a',
+    selector: 'li.pager__item a'
   });
 });
 

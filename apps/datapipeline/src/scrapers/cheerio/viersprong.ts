@@ -3,14 +3,12 @@ import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 import { log } from '@ggzoek/logging/src/logger.js';
 
-const s = new CheerioScraper('GGZ Drenthe', ['https://ggzdrenthe.nl/werken-bij/vacatures']);
-
-const baseUrl = 'https://ggzdrenthe.nl/';
+const s = new CheerioScraper('De Viersprong', ['https://www.werkenbijdeviersprong.nl/vacatures/']);
 
 s.addDefaultHandler(async ({ $ }) => {
   await s.enqueueNewLinks($ as CheerioAPI, {
-    baseUrl: baseUrl,
-    globs: ['**/vacatures/**'],
+    baseUrl: 'https://www.werkenbijdeviersprong.nl',
+    selector: '.plain',
     label: 'detail'
   });
 });
@@ -18,13 +16,13 @@ s.addDefaultHandler(async ({ $ }) => {
 s.addHandler('detail', async ({ request, $ }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
-  $('.slick-cards, #navbar, .footer, .breadcrumbs').remove();
-  $('#navbar').remove();
-  $('.breadcrumbs, .vacancy-job-apply, .social-share').remove();
-  let text = $('.layout').text();
+  $('.post-sidebar').remove();
+  $('.button').remove();
+  $("h2:contains('Meer informatie')").parent().nextAll().addBack().remove();
+  let text = $('main').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
   s.save({ title: title, body: text, request: request });
 });
 
-export const Drenthe = s;
+export const Viersprong = s;

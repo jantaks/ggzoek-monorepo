@@ -3,36 +3,36 @@ import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 import { log } from '@ggzoek/logging/src/logger.js';
 
-const s = new CheerioScraper('Dimence', ['https://www.werkenbijdimence.nl/vacatures']);
-
-const baseUrl = 'https://www.werkenbijdimence.nl/vacatures';
+const s = new CheerioScraper('Karakter', [
+  'https://werkenbij.karakter.com/vacatures/behandelaren',
+  'https://werkenbij.karakter.com/vacatures/management-en-ondersteuning'
+]);
 
 s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
   await s.enqueueNewLinks($ as CheerioAPI, {
-    baseUrl: 'https://www.werkenbijdimence.nl/',
+    baseUrl: 'https://werkenbij.karakter.com/',
     globs: ['**/vacatures/**'],
+    selector: '.headline__link',
     label: 'detail'
   });
   await enqueueLinks({
-    baseUrl: baseUrl,
-    selector: '.pagination a'
+    baseUrl: 'https://werkenbij.karakter.com',
+    selector: '.pagination__item'
   });
 });
 
 s.addHandler('detail', async ({ request, $ }) => {
   const title = $('h1').text();
   $('script, style, noscript, iframe, header, nav').remove();
-  $('.offcanvas').remove();
-  $('.btn').remove();
+  $('.button').remove();
   $('.footer').remove();
-  $("h2:contains('Gerelateerde vacatures')").siblings().addBack().remove();
-  $("h2:contains('Deze vacature delen')").siblings().addBack().remove();
-  $("h2:contains('Geen passende vacature gevonden')").siblings().addBack().remove();
-  $('.visually-hidden-focusable').remove();
+  $('.hero').remove();
+  $('a').remove();
+  $("h2:contains('Meer informatie')").parent().nextAll().addBack().remove();
   let text = $('body').text();
   text = cleanText(text);
   log.info(`${title}`, { url: request.loadedUrl });
   s.save({ title: title, body: text, request: request });
 });
 
-export const Dimence = s;
+export const Karakter = s;

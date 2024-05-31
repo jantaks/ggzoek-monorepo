@@ -109,13 +109,13 @@ export function removeParent(
   }
 }
 
-export type LinksOptions = {
+export type LinksOptions = Readonly<{
   urls?: string[];
   baseUrl?: string;
   globs?: string[];
   selector?: string;
   label?: string;
-};
+}>;
 
 export function combineUrl(urlFragment: string, baseUrl: string) {
   if (urlFragment.startsWith(baseUrl!)) {
@@ -142,10 +142,17 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
   let urls = [];
 
   if (options.selector) {
-    const selectedUrls = $(`a${options.selector}`)
-      .map((_, el) => $(el).attr('href'))
-      .get();
-    urls.push(...selectedUrls);
+    if (!options.selector.startsWith('.')) {
+      const selectedUrls = $(options.selector)
+        .map((_, el) => $(el).attr('href'))
+        .get();
+      urls.push(...selectedUrls);
+    } else {
+      const selectedUrls = $(`a${options.selector}`)
+        .map((_, el) => $(el).attr('href'))
+        .get();
+      urls.push(...selectedUrls);
+    }
   } else {
     const allUrls = $('a')
       .map((_, el) => $(el).attr('href'))
@@ -168,7 +175,7 @@ export function selectLinks($: CheerioAPI, options: LinksOptions) {
 
   urls = Array.from(new Set(urls));
   if (urls.length === 0) {
-    log.warn(options, 'No urls found');
+    log.warn(`No urls found ${JSON.stringify(options)}`);
   }
   return urls;
 }
@@ -181,7 +188,7 @@ export async function filterNewUrls(urls: string[]) {
   log.info(
     `Found ${urls.length} urls. Selected ${filteredUrls.length} urls that have not been scraped in the last ${period} hours`
   );
-  log.debug(filteredUrls, 'Selected urls:');
+  log.debug(`Selected urls: ${JSON.stringify(filteredUrls)}`);
   return filteredUrls;
 }
 

@@ -11,7 +11,6 @@ import {
   uuid
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
 export const keyStatus = pgEnum('key_status', ['default', 'valid', 'invalid', 'expired']);
 export const keyType = pgEnum('key_type', [
@@ -51,30 +50,32 @@ export const likes = pgTable('likes', {
 
 export const scrapeResults = pgTable('scrape_results', {
   scraperName: text('scraper').notNull(),
-  newUrls: bigint('new_urls', { mode: 'number' }).notNull(),
+  vacaturesFound: bigint('vacatures_found', { mode: 'number' }).notNull(),
+  vacaturesUpdated: bigint('vacatures_updated', { mode: 'number' }).notNull(),
+  newUrls: bigint('new_urls', { mode: 'number' }),
   requestsFinished: bigint('requests_finished', { mode: 'number' }).notNull(),
-  requestsFailed: bigint('requests_failed', { mode: 'number' }).notNull(),
-  requestsRetries: bigint('requests_retries', { mode: 'number' }).notNull(),
-  requestsFailedPerMinute: bigint('requests_failed_per_minute', { mode: 'number' }).notNull(),
-  requestsFinishedPerMinute: bigint('requests_finished_per_minute', { mode: 'number' }).notNull(),
-  requestMinDurationMillis: bigint('request_min_duration_millis', { mode: 'number' }).notNull(),
-  requestMaxDurationMillis: bigint('request_max_duration_millis', { mode: 'number' }).notNull(),
+  requestsFailed: bigint('requests_failed', { mode: 'number' }),
+  requestsRetries: bigint('requests_retries', { mode: 'number' }),
+  requestsFailedPerMinute: bigint('requests_failed_per_minute', { mode: 'number' }),
+  requestsFinishedPerMinute: bigint('requests_finished_per_minute', { mode: 'number' }),
+  requestMinDurationMillis: bigint('request_min_duration_millis', { mode: 'number' }),
+  requestMaxDurationMillis: bigint('request_max_duration_millis', { mode: 'number' }),
   requestTotalFailedDurationMillis: bigint('request_total_failed_duration_millis', {
     mode: 'number'
-  }).notNull(),
+  }),
   requestTotalFinishedDurationMillis: bigint('request_total_finished_duration_millis', {
     mode: 'number'
-  }).notNull(),
-  crawlerStartedAt: timestamp('crawler_started_at', { mode: 'date', withTimezone: true }).notNull(),
+  }),
+  crawlerStartedAt: timestamp('crawler_started_at', { mode: 'date', withTimezone: true }),
   crawlerFinishedAt: timestamp('crawler_finished_at', {
     mode: 'date',
     withTimezone: true
-  }).notNull(),
+  }),
   statsPersistedAt: timestamp('stats_persisted_at', { mode: 'date', withTimezone: true }),
-  crawlerRuntimeMillis: bigint('crawler_runtime_millis', { mode: 'number' }).notNull(),
-  requestsWithStatusCode: json('requests_with_status_code').notNull(),
-  errors: json('errors').notNull(),
-  retryErrors: json('retry_errors').notNull()
+  crawlerRuntimeMillis: bigint('crawler_runtime_millis', { mode: 'number' }),
+  requestsWithStatusCode: json('requests_with_status_code'),
+  errors: json('errors'),
+  retryErrors: json('retry_errors')
 });
 
 export type InsertScrapeResult = typeof scrapeResults.$inferInsert;
@@ -123,7 +124,7 @@ export const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),
   summary: (schema) => schema.summary.min(100).nullable(),
   title: (schema) => schema.title.min(5),
-  professie: (schema) => schema.professie.array()
+  professie: (schema) => schema.professie
 })
   .required({
     title: true,
@@ -132,8 +133,8 @@ export const insertSchema = createInsertSchema(vacatures, {
   })
   .omit({ opleidingsbudgetSize: true });
 
-export type InsertVacature = z.infer<typeof insertSchema>;
-export type SelectVacature = z.infer<typeof selectSchema>;
+export type InsertVacature = typeof vacatures.$inferInsert;
+export type SelectVacature = typeof vacatures.$inferSelect;
 
 export type MinimumVacature = Pick<
   InsertVacature,

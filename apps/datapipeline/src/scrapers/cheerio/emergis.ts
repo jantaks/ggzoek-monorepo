@@ -1,4 +1,4 @@
-import { cleanText, selectNewLinks } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 
@@ -6,15 +6,11 @@ const baseUrl = 'https://werkenbijemergis.nl/vacatures';
 
 const s = new CheerioScraper('Emergis', [baseUrl]);
 
-s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
-  const urls = await selectNewLinks($ as CheerioAPI, {
+s.addDefaultHandler(async ({ $ }) => {
+  const urls = await s.enqueueNewLinks($ as CheerioAPI, {
     baseUrl: 'https://werkenbijemergis.nl',
     selector: '.teaser__link',
-    globs: ['**/vacatures/**']
-  });
-
-  await enqueueLinks({
-    urls: urls,
+    globs: ['**/vacatures/**'],
     label: 'detail'
   });
 });

@@ -4,8 +4,6 @@ import { Page } from 'playwright';
 
 const s = new PlaywrightScraper('Tactus verslavingszorg', ['https://www.tactus.nl/vacatures/']);
 
-const baseUrl = 'https://www.tactus.nl';
-
 s.addDefaultHandler(async ({ page }) => {
   await acceptCookies(page);
   const btnLocator = (page: Page) => page.locator('a').getByText('Volgende');

@@ -1,4 +1,4 @@
-import { cleanText, selectNewLinks } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 
@@ -6,14 +6,10 @@ const url = 'https://werkenbijggnet.nl/vacatures/alle';
 
 const s = new CheerioScraper('GGNet', [url]);
 
-s.addDefaultHandler(async ({ enqueueLinks, log, $ }) => {
-  const urls = await selectNewLinks($ as CheerioAPI, {
+s.addDefaultHandler(async ({ $ }) => {
+  await s.enqueueNewLinks($ as CheerioAPI, {
     baseUrl: 'https://werkenbijggnet.nl/',
-    globs: ['**/vacatures/*']
-  });
-  log.info('enqueueing new URLs');
-  await enqueueLinks({
-    urls: urls,
+    globs: ['**/vacatures/*'],
     label: 'detail'
   });
 });

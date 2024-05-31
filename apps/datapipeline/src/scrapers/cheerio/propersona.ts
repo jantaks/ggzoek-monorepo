@@ -1,12 +1,13 @@
 import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
+import { CheerioAPI } from 'cheerio';
 
 const url = 'https://www.werkenbijpropersona.nl/vacature-overzicht/';
 
 const s = new CheerioScraper('Propersona', [url]);
 
-s.addDefaultHandler(async ({ enqueueLinks }) => {
-  await enqueueLinks({
+s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
+  await s.enqueueNewLinks($ as CheerioAPI, {
     globs: ['https://www.werkenbijpropersona.nl/vacature/**'],
     label: 'detail'
   });

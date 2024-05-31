@@ -26,8 +26,12 @@ import {
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
 import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
-import { InsertVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import {
+  InsertScrapeResult,
+  InsertVacature
+} from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 import { getBeroepen } from '../beroepen.js';
+import { getLatest, insert } from '@ggzoek/ggz-drizzle/src/scrapeResults.js';
 
 interface Scraper {
   crawl(): Promise<void>;
@@ -66,6 +70,8 @@ export abstract class BaseScraper implements Scraper {
     undefined;
   private vacaturesPromise: ReturnType<typeof vacatures.getAllForOrganisation>;
   private newUrls: string[] = [];
+  private allUrls: string[] = [];
+  private vacaturesUpdated: number = 0;
 
   protected constructor(
     readonly name: string,
@@ -92,12 +98,39 @@ export abstract class BaseScraper implements Scraper {
   abstract addHandler(...args: Parameters<typeof this.router.addHandler>): void;
 
   async crawl() {
+    function toDate(date: unknown): Date | null {
+      if (typeof date === 'string') {
+        return new Date(date);
+      }
+      if (date instanceof Date) {
+        return date;
+      }
+      return null;
+    }
+
     await this.crawler.run(this.urls);
-    this.logger.info({
+    const previousResults = await getLatest();
+    const results: InsertScrapeResult = {
+      ...this.crawler.stats.state,
       newUrls: this.newUrls.length,
+      vacaturesUpdated: this.vacaturesUpdated,
+      vacaturesFound: new Set(this.allUrls).size,
       scraperName: this.name,
-      ...this.crawler.stats.state
-    });
+      crawlerStartedAt: toDate(this.crawler.stats.state.crawlerStartedAt),
+      crawlerFinishedAt: toDate(this.crawler.stats.state.crawlerFinishedAt),
+      statsPersistedAt: toDate(this.crawler.stats.state.statsPersistedAt)
+    };
+    if (previousResults) {
+      const diff = Math.abs(previousResults.vacaturesFound - results.vacaturesFound);
+      const diffPercentage = (diff / results.vacaturesFound) * 100;
+      if (diffPercentage > 10) {
+        this.logger.warn(
+          `Difference in requests finished is more than 10%. Previous: ${previousResults.vacaturesFound}, current: ${results.vacaturesFound}`
+        );
+      }
+    }
+    this.logger.info(results);
+    await insert(results);
   }
 
   async save(data: Data) {
@@ -126,6 +159,7 @@ export abstract class BaseScraper implements Scraper {
       this.newUrls.push(vacature.url);
     }
     await vacatures.upsert(vacature);
+    this.vacaturesUpdated++;
   }
 
   async filterNewUrls(urls: string[]) {
@@ -143,17 +177,13 @@ export abstract class BaseScraper implements Scraper {
     return filteredUrls;
   }
 
-  async enqueueLinks(options: Omit<Parameters<typeof enqueueLinks>[0], 'requestQueue'>) {
+  async enqueueNewLinks($: CheerioAPI, options: LinksOptions) {
     const requestQueue = await this.crawler.getRequestQueue();
-    await enqueueLinks({ ...options, requestQueue });
-  }
-
-  async enqueuNewLinks($: CheerioAPI, options: LinksOptions) {
-    const requestQueue = await this.crawler.getRequestQueue();
-    const foundUrls = selectLinks($, options);
-    const filteredUrls = await this.filterNewUrls(foundUrls);
+    const urls = options.urls ? options.urls : selectLinks($, options);
+    this.allUrls.push(...urls);
+    const filteredUrls = await this.filterNewUrls(urls);
     await enqueueLinks({ label: options.label, urls: filteredUrls, requestQueue: requestQueue });
-    return { found: foundUrls.length, enqueued: filteredUrls.length };
+    return { found: urls.length, enqueued: filteredUrls.length };
   }
 
   private async getAllVacatures() {
@@ -224,9 +254,9 @@ export class PlaywrightScraper extends BaseScraper {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
-        await sleep(1000);
+        await sleep(2000);
         const $ = await getCheerioFromPage(page);
-        const { found } = await this.enqueuNewLinks($, options);
+        const { found } = await this.enqueueNewLinks($, options);
         if (found === 0) {
           log.info(`No links found on page ${pageCounter}. End pagination.`);
           break;
@@ -234,7 +264,11 @@ export class PlaywrightScraper extends BaseScraper {
         log.info(`Found ${found} links on page ${pageCounter}`);
         const nextButton = locator(page);
         // if ((await nextButton.count()) === 0 || !(await nextButton.isVisible())) {
-        if ((await nextButton.count()) === 0 || !(await nextButton.isVisible())) {
+        if (
+          (await nextButton.count()) === 0 ||
+          !(await nextButton.isVisible()) ||
+          !(await nextButton.isEnabled())
+        ) {
           log.info('No more "next" buttons found. End pagination.');
           break;
         }
@@ -260,8 +294,8 @@ export class PlaywrightScraper extends BaseScraper {
           break;
         }
         this.logger.info(`Clicking expand button: ${clickedCounter}`);
-        await expandButton.first().click({ timeout: 2000 });
-        await sleep(2000);
+        await expandButton.first().click({ timeout: 5000 });
+        await sleep(1000);
         const $ = await getCheerioFromPage(page);
         const linksOnPage = selectLinks($, options);
         const newUrls = linksOnPage.filter((url) => !urls.includes(url));
@@ -270,12 +304,17 @@ export class PlaywrightScraper extends BaseScraper {
           break;
         }
         urls.push(...newUrls);
-        const filteredUrls = await this.filterNewUrls(newUrls);
-        await this.enqueueLinks({ urls: filteredUrls, label: options.label });
-        this.logger.info(`Enqueued ${newUrls.length} new links on page ${clickedCounter}`);
+        // const filteredUrls = await this.filterNewUrls(newUrls);
+        const { enqueued: e } = await this.enqueueNewLinks($, {
+          urls: newUrls,
+          label: options.label
+        });
+        this.logger.info(
+          `Found ${newUrls.length} vacatures on page ${clickedCounter}. Enqueued (not scraped in previous period): ${e}`
+        );
         clickedCounter++;
       } catch (error) {
-        this.logger.error(`Error in ${this.name}:  ${error}`);
+        this.logger.error(error);
         break;
       }
     }

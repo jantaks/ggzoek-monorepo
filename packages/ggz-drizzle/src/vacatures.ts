@@ -1,7 +1,18 @@
 import { DB, getDb, provideDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
-import { and, arrayOverlaps, eq, gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
+import { InsertVacature, SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
+import {
+  and,
+  arrayOverlaps,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+  sql,
+  SQLWrapper
+} from 'drizzle-orm';
 
 async function allUrlsForOrganisation(organisation: string, db) {
   const result = await db
@@ -12,7 +23,7 @@ async function allUrlsForOrganisation(organisation: string, db) {
   return result.map((x: { url: string }) => x.url) as string[];
 }
 
-export async function upsert(vacature: typeof vacatureTable.$inferInsert) {
+export async function upsert(vacature: InsertVacature) {
   const { db: db } = getDb();
   const columns = Object.keys(vacatureTable);
   const valuesToInsert = columns.reduce(
@@ -187,22 +198,35 @@ async function getAllWithProfessies(professies: string[], db) {
     .execute()) as SelectVacature[];
 }
 
+type SummarizeOptions = {
+  professies?: string[];
+  organisaties?: string[];
+};
+
 /**
- * Retrieves all vacatures need to be summarized, based on professie = "Psychiater".
- * @param db
+ * Retrieves all vacatures that need to be summarized / have no summary. Can be filtered on Professies and Organisations.
+ * Default is all Psychiater vacatures.
+ * @param options
  */
-async function getVacaturesToSummarize(db) {
-  const professies = ['Psychiater'];
-  return (await db
+export async function getVacaturesToSummarize(
+  options: SummarizeOptions = { professies: ['Psychiater'], organisaties: [] }
+) {
+  const db = getDb().db;
+  if (options.professies === undefined || options.professies.length === 0) {
+    options.professies = ['Psychiater'];
+  }
+  const clauses: SQLWrapper[] = [];
+  if (options.professies && options.professies.length > 0) {
+    clauses.push(arrayOverlaps(vacatureTable.professie, options.professies));
+  }
+  if (options.organisaties && options.organisaties.length > 0) {
+    clauses.push(inArray(vacatureTable.organisatie, options.organisaties));
+  }
+  return await db
     .select()
     .from(vacatureTable)
-    .where(
-      and(
-        arrayOverlaps(vacatureTable.professie, professies),
-        or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary))
-      )
-    )
-    .execute()) as SelectVacature[];
+    .where(and(...clauses, or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary))))
+    .execute();
 }
 
 const vacatures = {
@@ -220,7 +244,7 @@ const vacatures = {
   getUpdatedVacatures: provideDb(getUpdatedVacatures),
   getVacature: provideDb(getVacature),
   getVacatureByUrl: provideDb(getVacatureByUrl),
-  getVacaturesToSummarize: provideDb(getVacaturesToSummarize),
+  getVacaturesToSummarize,
   getVacaturesWithoutScreenshot: provideDb(getVacaturesWithoutScreenshot),
   getAllForOrganisation,
   upsert

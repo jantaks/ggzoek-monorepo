@@ -1,4 +1,4 @@
-import { cleanText, selectNewLinks } from '../../utils.js';
+import { cleanText } from '../../utils.js';
 import { CheerioScraper } from '../crawlers.js';
 import { CheerioAPI } from 'cheerio';
 
@@ -7,16 +7,15 @@ const url = 'https://www.werkenbijihub.nl/vacatures';
 const s = new CheerioScraper('iHub', [url]);
 
 s.addDefaultHandler(async ({ enqueueLinks, $ }) => {
-  await s.enqueuNewLinks($ as CheerioAPI, {
+  await s.enqueueNewLinks($ as CheerioAPI, {
     baseUrl: url,
-    selector: ".card--vacature",
+    selector: '.card--vacature',
     label: 'detail'
   });
   await enqueueLinks({
-    selector: ".pagination__page",
-  })
+    selector: '.pagination__page'
+  });
 });
-
 
 s.addHandler('detail', async ({ request, $, log }) => {
   const title = $('h1').text();

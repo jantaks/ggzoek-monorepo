@@ -30,7 +30,7 @@ s.addHandler('detail', async ({ request, page, log }) => {
   $('div[data-scroll-point="section-navigation"]').remove();
   $('script, style, noscript, iframe, header, footer, form').remove();
   $('.rnBreadcrumb, .elementSticky, .rowRelated, #CybotCookiebotDialog, .rnCarousel').remove();
-  $('strong:contains("Solliciteren")').parent().nextAll().addBack().remove();
+  $('strong:contains("Solliciteren")').nextAll().addBack().remove();
   $('a[data-reach-skip-link]').remove();
   $('button').remove();
   const panels = $("div[role='tabpanel']");
