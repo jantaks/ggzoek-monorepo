@@ -87,8 +87,8 @@ export const vacatures = pgTable('vacatures', {
   instelling: text('instelling'),
   organisatieOnderdeel: text('organisatie_onderdeel'),
   title: text('title').notNull(),
-  salarisMin: numeric('salaris_min'),
-  salarisMax: numeric('salaris_max'),
+  salarisMin: bigint('salaris_min', { mode: 'number' }),
+  salarisMax: bigint('salaris_max', { mode: 'number' }),
   cao: text('CAO'),
   contract: text('contract'),
   reiskostenvergoeding: text('reiskostenvergoeding'),
@@ -106,9 +106,10 @@ export const vacatures = pgTable('vacatures', {
     .notNull()
     .defaultNow(),
   synced: boolean('synced').default(false),
-  urenMin: numeric('uren_min'),
-  urenMax: numeric('uren_max'),
+  urenMin: bigint('uren_min', { mode: 'number' }),
+  urenMax: bigint('uren_max', { mode: 'number' }),
   professie: text('professie').array().notNull(),
+  beroepen: text('beroepen').array().notNull(),
   stoornissen: json('stoornissen'),
   behandelmethoden: json('behandelmethoden'),
   fwg: text('FWG'),
@@ -122,9 +123,11 @@ const selectSchema = createSelectSchema(vacatures);
 
 export const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),
-  summary: (schema) => schema.summary.min(100).nullable(),
+  summary: (schema) => schema.summary,
   title: (schema) => schema.title.min(5),
-  professie: (schema) => schema.professie
+  professie: (schema) => schema.professie,
+  urenMin: (schema) => schema.urenMin,
+  urenMax: (schema) => schema.urenMax
 })
   .required({
     title: true,

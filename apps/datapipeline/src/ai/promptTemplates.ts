@@ -31,24 +31,23 @@ Schrijf op een zakelijke, professionele manier:
 - Gebruik de naam van de werkgever ipv 'wij'. Dus 'Parnassia biedt' ipv 'Wij bieden'. 
 
 Hieronder volgt de vacaturetekst: 
-{user_input}
-`;
+{user_input}`;
 
 export const templateJson = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke GezondheidsZorg (GGZ).
 Je taak is om gestructureerd data uit vacature teksten te halen. Maak een JSON en gebruik onderstaande velden, volg de instructies nauwgezet. 
 Bij een keuzelijst mag je alleen uit geboden keuzes kiezen!!! Dus niet "Psychotische stoornis" maar "Psychose" ook al wordt in de tekst alleen gesproken over "Psychotische stoornis". Numbers mogen alleen hele getallen zijn, dus geen strings!!!
 
+"salarisMin": number  // minimum salaris
+"salarisMax": number  // maximum salaris
+"urenMin": number  // minimum aantal uren per week
+"urenMax": number  // maximum aantal uren per week
 "title": string  // Een titel voor de vacature. Maximaal 5 woorden
 "instelling": string  // De instelling en/of organisatie / bedrijf waar de vacature betrekking op heeft
 "organisatieOnderdeel": string  // het onderdeel of de afdeling binnen de organisatie
 "beroepen": array of strings  // Welk beroep oefent de kandidaat uit? Kies alleen uit: [Klinisch Psycholoog, GZ-Psycholoog, Psychiater, Kinder/Jeugd Psychiater, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Overig] 
 "stoornissen": array of strings  // Welke (max. 3) stoornissen zal de kandidaat het meest tegenkomen in zijn functie? Bijvoorbeeld ADHD, Autisme, Persoonlijkheidsstoornissen, Angststoornissen, Depressie, Trauma, Psychose, Verslaving, Eetstoornissen, Bipolaire stoornis, Overig. 
 "behandelmethoden": array of strings  // Welke behandelmethoden worden het meest toegepast (maximaal 3)? Alleen de volgende keuzes zijn geldig: [Cognitieve Gedragstherapie, Schematherapie, EMDR, Systeemtherapie, Oplossingsgerichte therapie, ACT, MBT, IPT, CGT, PMT, ECT, Vaktherapie, Farmacotherapie, Overig]
-"minSalaris": number  // minimum salaris
-"maxSalaris": number  // maximum salaris
-"minUren": number  // minimum aantal uren per week
-"maxUren": number  // maximum aantal uren per week
 "locaties": array of strings  // in welke plaatsen of regios is de vacature
 "locatieDetails": string  // bijvoorbeeld de naam van de wijk, de straat of het gebouw
 "CAO": string  // Type CAO
@@ -61,15 +60,16 @@ Bij een keuzelijst mag je alleen uit geboden keuzes kiezen!!! Dus niet "Psychoti
 "werkvorm": string  // Op locatie, thuis, hybride of onbekend
 "opleidingsbudget": string  // Ja, Nee of onbekend
 "opleidingsbudgetSize": number  // Hoogte van het opleidingsbudget. 0 indiend onbekend
+Hieronder volgt de vacaturetekst: 
 {user_input}
 `;
 
-export function buildPrompt(vacature: SelectVacature) {
+function buildPrompt(vacature: SelectVacature, template: string) {
   if (!vacature.body) {
     throw new Error('Vacature body is missing');
   }
   const bodyWordCount = vacature.body.split(' ').length;
-  const prompt = templateJson.replace('{user_input}', vacature.body);
+  const prompt = template.replace('{user_input}', vacature.body);
   const promptWordCount = prompt.split(' ').length;
   log.info(
     `Body word count: ${bodyWordCount}. Word count for prompt: ${promptWordCount} (${vacature.url})`
@@ -77,4 +77,12 @@ export function buildPrompt(vacature: SelectVacature) {
   const timestamp = new Date().toISOString().replace(/:/g, '-');
   fs.writeFileSync(`promptlog/${timestamp}.txt`, prompt);
   return prompt;
+}
+
+export function summarizePrompt(vacature: SelectVacature) {
+  return buildPrompt(vacature, templateSummary);
+}
+
+export function extractDataPrompt(vacature: SelectVacature) {
+  return buildPrompt(vacature, templateJson);
 }

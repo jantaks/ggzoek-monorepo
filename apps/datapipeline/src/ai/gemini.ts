@@ -1,5 +1,5 @@
 import { Vacature } from './types.js';
-import { buildPrompt } from './promptTemplates.js';
+import { summarizePrompt } from './promptTemplates.js';
 import { GoogleGenerativeAI, RequestOptions } from '@google/generative-ai';
 import { getVacature } from '@ggzoek/ggz-drizzle/src/vacatureRepo.js';
 import { log } from '@ggzoek/logging/src/logger.js';
@@ -25,7 +25,7 @@ export async function summarize(vacature: Vacature) {
   if (!vacature.body) {
     throw new Error('Vacature body is missing');
   }
-  const prompt = buildPrompt(vacature);
+  const prompt = summarizePrompt(vacature);
   // For text-only input, use the gemini-pro model
   const result = await model.generateContent(prompt);
   const text = result.response.text();

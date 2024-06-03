@@ -4,8 +4,6 @@ import 'dotenv/config';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { ChatCompletion } from 'openai/resources/index';
 import { Cost, Model, Pricing } from './types.js';
-import { buildPrompt } from './promptTemplates.js';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 
 dotenv.config();
 
@@ -41,9 +39,7 @@ function calculateCost(model: Model, completion: OpenAI.Chat.ChatCompletion): Co
 const MODEL = Model.GPT4o;
 const openai = new OpenAI();
 
-export async function summarize(vacature: SelectVacature) {
-  const prompt = buildPrompt(vacature);
-  log.info(`Requesting completion for ${vacature.url}`);
+async function sendRequest(prompt: string) {
   let completion: ChatCompletion | undefined = undefined;
   try {
     completion = await openai.chat.completions.create({
@@ -52,7 +48,7 @@ export async function summarize(vacature: SelectVacature) {
       response_format: { type: 'json_object' }
     });
   } catch (error) {
-    log.error(error, `Error in completion for ${vacature.url}`);
+    log.error(error);
     return undefined;
   }
   const result = completion.choices[0].message.content;
@@ -63,3 +59,5 @@ export async function summarize(vacature: SelectVacature) {
   }
   return undefined;
 }
+
+export default sendRequest;

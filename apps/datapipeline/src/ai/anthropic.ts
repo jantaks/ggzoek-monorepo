@@ -1,8 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
-import { buildPrompt } from './promptTemplates.js';
-import { log } from '@ggzoek/logging/src/logger.js';
-import { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
 
 const anthropic = new Anthropic({
   apiKey: process.env['ANTHROPIC_API_KEY'] // This is the default and can be omitted
@@ -14,15 +11,15 @@ enum Model {
   HAIKU = 'claude-3-haiku-20240307' //BRONZE
 }
 
-export async function summarize(vacature: SelectVacature) {
-  log.info(`Requesting completion for ${vacature.url} with Anthropic`);
-  const prompt = buildPrompt(vacature);
+async function sendRequest(prompt: string) {
   const message = await anthropic.messages.create({
     max_tokens: 2048,
     messages: [{ role: 'user', content: prompt }],
-    model: Model.SONNET
+    model: Model.HAIKU
   });
   const result = message.content[0].text;
   const json = result.substring(result.indexOf('{'), result.lastIndexOf('}') + 1);
   return json;
 }
+
+export default sendRequest;
