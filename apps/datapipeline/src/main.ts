@@ -1,14 +1,15 @@
 import { log } from '@ggzoek/logging/src/logger.js';
 import vacatures from '@ggzoek/ggz-drizzle/src/vacatures.js';
-import { extractData, Provider } from './ai/summarizeNew.js';
+import { summarize } from './ai/openAIV2.js';
 
-const step_3 = async () => {
-  log.info('Summarizing vacatures');
-  const vacaturesToSummarize = (
-    await vacatures.getVacaturesToSummarize({ organisaties: ['Parnassia'] })
-  ).slice(0, 10);
-  log.info(`Found ${vacaturesToSummarize.length} vacatures to summarize`);
-  await extractData(vacaturesToSummarize, Provider.ANTHROPIC);
+const summarizeStep = async () => {
+  const vacature = await vacatures.getVacature(
+    '2286ff5241e5c86c502846ee9efdcfaeb1106333c528f29206ae8ea4c1dbdbfcer'
+  );
+  if (vacature) {
+    const result = await summarize(vacature);
+    log.info(result!);
+  }
 };
 
-step_3();
+await summarizeStep();

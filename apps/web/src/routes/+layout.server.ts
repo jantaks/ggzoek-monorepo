@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import type { MyLocals } from '$lib/types';
-import vacatures from '../../../../packages/ggz-drizzle/src/vacatures';
+import vacatures from '@ggzoek/ggz-drizzle/src/vacatures.js';
 
 // async function imgUrls() {
 // 	const data = await allScreenshotUrls()

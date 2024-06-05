@@ -28,6 +28,7 @@
   },
   "scripts": {
     "main": "tsx src/main.ts",
+    "scrape": "tsx src/scrape.ts",
     "complete": "tsx src/ai/openAi.ts",
     "pipeline": "tsx src/pipeline.ts",
     "supabase": "tsx src//services/supabase.ts",

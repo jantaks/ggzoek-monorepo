@@ -21,11 +21,12 @@ Maak een samenvatting van de vacature van ongeveer 500 woorden. Geef informatie 
 
 Schrijf op een zakelijke, professionele manier: 
 
+- De lezer hoeft niet te weten dat het een samenvatting betreft. 
 - Schrijf in een actieve vorm. Dus niet: "Er wordt gezocht naar een nieuwe collega", maar: "Organisatie x zoekt een nieuwe collega". Niet: "Humor en relativeringsvermogen zijn gewenste eigenschappen". Maar: "De kandidaat heeft humor en relativeringsvermogen.
 - Schrijf in de 3e persoon. Dus niet: "je doet beoordelingen" maar "De kandidaat doet beoordelingen".
 - Begin niet elke zin met Kandidaat maar wissel af met het beroep (De Psychiater doet beoordelingen). 
 - Schrijf op een feitelijke manier, zonder overdrijving. 
-- Gebruik korte zinnen met masimaal 2 comma's per zin. 
+- Gebruik korte zinnen, bijvoorkeur maximaal 2 comma's per zin. 
 - Vermijd algemene waarheden, open deuren of dingen die altijd gelden voor het type functie. 
 - Vermijd superlatieven en beperk bijvoeglijke naamwoorden. 
 - Gebruik de naam van de werkgever ipv 'wij'. Dus 'Parnassia biedt' ipv 'Wij bieden'. 
@@ -35,7 +36,7 @@ Hieronder volgt de vacaturetekst:
 
 export const templateJson = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke GezondheidsZorg (GGZ).
-Je taak is om gestructureerd data uit vacature teksten te halen. Maak een JSON en gebruik onderstaande velden, volg de instructies nauwgezet. 
+Je taak is om gestructureerde data uit vacature teksten te halen. Maak een JSON met de onderstaande velden. 
 Bij een keuzelijst mag je alleen uit geboden keuzes kiezen!!! Dus niet "Psychotische stoornis" maar "Psychose" ook al wordt in de tekst alleen gesproken over "Psychotische stoornis". Numbers mogen alleen hele getallen zijn, dus geen strings!!!
 
 "salarisMin": number  // minimum salaris
@@ -46,8 +47,8 @@ Bij een keuzelijst mag je alleen uit geboden keuzes kiezen!!! Dus niet "Psychoti
 "instelling": string  // De instelling en/of organisatie / bedrijf waar de vacature betrekking op heeft
 "organisatieOnderdeel": string  // het onderdeel of de afdeling binnen de organisatie
 "beroepen": array of strings  // Welk beroep oefent de kandidaat uit? Kies alleen uit: [Klinisch Psycholoog, GZ-Psycholoog, Psychiater, Kinder/Jeugd Psychiater, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Overig] 
-"stoornissen": array of strings  // Welke (max. 3) stoornissen zal de kandidaat het meest tegenkomen in zijn functie? Bijvoorbeeld ADHD, Autisme, Persoonlijkheidsstoornissen, Angststoornissen, Depressie, Trauma, Psychose, Verslaving, Eetstoornissen, Bipolaire stoornis, Overig. 
-"behandelmethoden": array of strings  // Welke behandelmethoden worden het meest toegepast (maximaal 3)? Alleen de volgende keuzes zijn geldig: [Cognitieve Gedragstherapie, Schematherapie, EMDR, Systeemtherapie, Oplossingsgerichte therapie, ACT, MBT, IPT, CGT, PMT, ECT, Vaktherapie, Farmacotherapie, Overig]
+"stoornissen": array of strings  // Welke stoornissen worden in de tekst expliciet genoemd?  
+"behandelmethoden": array of strings  // Welke behandelmethoden worden expliciet genoemd (maximaal 3)? 
 "locaties": array of strings  // in welke plaatsen of regios is de vacature
 "locatieDetails": string  // bijvoorbeeld de naam van de wijk, de straat of het gebouw
 "CAO": string  // Type CAO

@@ -6,6 +6,7 @@ import { ChatCompletion } from 'openai/resources/index';
 import { OpenAIModels } from './summarizeNew.js';
 import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
 import fs from 'fs';
+import { synonyms } from '../synonyms.js';
 
 dotenv.config();
 
@@ -80,6 +81,30 @@ function appendToFile(data: {
   fs.appendFileSync(fileName, dataToAppend);
 }
 
+const behandelmethoden = Object.keys(synonyms.behandelmethoden);
+const stoornissen = [
+  'Depressieve stoornissen',
+  'Bipolaire en gerelateerde stoornissen',
+  'Angststoornissen',
+  'Obsessieve-compulsieve en gerelateerde stoornissen',
+  'Trauma- en stressorgerelateerde stoornissen',
+  'Schizofreniespectrum en andere psychotische stoornissen',
+  'Eetstoornissen',
+  'Neurocognitieve stoornissen',
+  'Neurodevelopmental stoornissen',
+  'Persoonlijkheidsstoornissen',
+  'Somatische symptoomstoornis en verwante stoornissen',
+  'Disruptieve, impulsbeheersings- en gedragsstoornissen',
+  'Verslavingsstoornissen',
+  'Genderdysforie',
+  'Parafiele stoornissen',
+  'Slaap-waakstoornissen',
+  'Dissociatieve stoornissen',
+  'Stoornissen in de controle over impulsen',
+  'Eliminatiestoornissen',
+  'Voedings- en eetstoornissen'
+];
+
 const systemPrompt = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke GezondheidsZorg (GGZ). Je taak is om een samenvatting te maken van ongeveer 300 woorden van vacatureteksten. 
 De samenvatting wordt gebruikt voor een website om vacatures te vergelijken. Samenvattingen hebben een vergelijkbare structuur (zie voorbeeld hieronder). 
@@ -96,28 +121,38 @@ De samenvatting heeft een zakelijke, professionele stijl, dat wil zeggen:
 - Vermijd superlatieven en beperk bijvoeglijke naamwoorden. 
 - Gebruik de naam van de werkgever ipv 'wij'. Dus 'Werkgever X biedt' ipv 'Wij bieden'.
 
-De samenvatting bestaat bevat informatie die kandidaten een goed beeld geeft van de inhoudelijke werkzaamheden en de bijzonderheden van deze specifieke vacature. 
-Deel de samenvatting op in de volgende 3 paragrafen: 
-1. Functieomschrijving:
-Beschrijf de belangrijkste taken en verantwoordelijkheden van de functie. Geef bijvoorbeeld en indien mogelijk antwoord op de volgende vragen: 
-- Welke ziektebeelden en stoornissen worden het meest behandeld. B.v. eetstoornissen, psychoses, depressie, persoonlijkheidsstoornissen, etc.
-- Wat zijn de belangrijkste doelgroepen / type clienten?
-- Welke behandelmethodieken en -vormen worden het meest gebruikt? B.v. EMDR, CGT, systeemtherapie, medicatie, etc.
-- Wat zijn de belangrijkste taken
-2. Team en organisatie:
-Beschrijf de samenstelling van het team en de organisatie. Geef bijvoorbeeld en indien mogelijk antwoord op de volgende vragen:
-- Hoe groot is het team?
-- Wat is de samenstelling van het team, welke disciplines zijn vertegenwoordigd?
-- Wat is de missie / visie van de organisatie?
-- Wat zijn de kernwaarden van de organisatie?
-3. Arbeidsvoorwaarden:
-Beschrijf de belangrijkste arbeidsvoorwaarden. Geef bijvoorbeeld antwoord op de volgende vragen:
-- Wat is het minimum en maximum salaris?
-- Hoeveel uren moet er gewerkt worden
-- Wat zijn eventuele bijzondere (niet standaard) arbeidsvoorwaarden?
-- Wat zijn de werktijden, moet de kandidaat ook avonden of weekenden werken? 
-- Is er sprake van (bereikbaarheids) diensten? Worden deze vergoed en hoe?
-- Welke mogelijkheden zijn er voor studie en persoonlijke ontwikkeling? Wat is het eventuele budget?
-- Is er ruimte voor (wetenschappelijk) onderzoek?
-- Is er een mogelijkheid tot thuiswerken, hybride weken of flexibele werktijden?
+De lezer van de samenvatting is waarschijnlijk een hoogopgeleide GGZ professional. 
+Hij of zij wil meer informatie over de vakinhoudelijke aspecten van de vacature en de onderscheidende kenmerken.
+Voor standaard arbeidsvoorwaarden wordt verwezen naar de URL van de originele vacature, deze hoeven niet in de samenvatting te worden opgenomen.
+
+Maak, naast de samenvatting een JSON met de volgende velden: 
+
+"salarisMin": number  // minimum salaris
+"salarisMax": number  // maximum salaris
+"urenMin": number  // minimum aantal uren per week
+"urenMax": number  // maximum aantal uren per week
+"title": string  // Een titel voor de vacature. Maximaal 5 woorden
+"instelling": string  // De instelling en/of organisatie / bedrijf waar de vacature betrekking op heeft
+"organisatieOnderdeel": string  // het onderdeel of de afdeling binnen de organisatie
+"beroepen": array of strings  // Welk beroep oefent de kandidaat uit? 
+Kies alleen uit:  
+"stoornissen": array of strings  // Welke stoornissen worden in de tekst expliciet genoemd? Kies uit onderstaande lijst. 
+"behandelmethoden": array of strings  // Welke behandelmethoden worden expliciet genoemd (maximaal 3). Kies uit onderstaande lijst? 
+"locaties": array of strings  // in welke plaatsen of regios is de vacature
+"locatieDetails": string  // bijvoorbeeld de naam van de wijk, de straat of het gebouw
+"CAO": string  // Type CAO
+"FWG": string  // Functie waarderingsschaal
+"minSchaal": string  // minimum schaal (FWG)
+"maxSchaal": string  // maximum schaal (FWG)
+"contract": string  // Kies uit een van de volgende opties: [Onbepaalde tijd, Bepaalde tijd, Oproepkracht, Overig]
+"eindejaarsuitkering": string  // Ja, Nee of onbekend
+"reiskostenvergoeding": string  // Ja, Nee of onbekend
+"werkvorm": string  // Op locatie, thuis, hybride of onbekend
+"opleidingsbudget": string  // Ja, Nee of onbekend
+"opleidingsbudgetSize": number  // Hoogte van het opleidingsbudget. 0 indiend onbekend
+
+Keuzemogelijkheden: 
+Beroepen: [Klinisch Psycholoog, GZ-Psycholoog, Psychiater, Kinder/Jeugd Psychiater, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Verpleegkundig Specialist, Verpleegkundige, Sociaal Psychiatrisch Verpleegkundige, Psychomotorisch Therapeut, Vaktherapeut, Maatschappelijk Werker, Ervaringsdeskundige, Psycholoog, Orthopedagoog, Arts, Overig]
+Behandelmethoden: ${behandelmethoden.join(', ')}
+Stoornissen: ${stoornissen.join(', ')}
 `;

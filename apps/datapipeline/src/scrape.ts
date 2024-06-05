@@ -41,8 +41,6 @@ import { Eleos } from './scrapers/cheerio/eleos.js';
 import { DeHoop } from './scrapers/cheerio/dehoop.js';
 import { Iriszorg } from './scrapers/playwright/iriszorg.js';
 import { Molemann } from './scrapers/playwright/molemann.js';
-import vacatures from '../../../packages/ggz-drizzle/src/vacatures.js';
-import { Vacature } from './ai/types.js';
 
 log.info(process.env.LOG_LEVEL);
 
@@ -101,11 +99,4 @@ async function runAll() {
   ]);
 }
 
-const step_3 = async () => {
-  log.info('Summarizing vacatures');
-  const vacaturesToSummarize = (await vacatures.getVacaturesToSummarize({
-    organisaties: ['Lentis']
-  })) as Vacature[];
-  log.info(`Found ${vacaturesToSummarize.length} vacatures to summarize`);
-  // await summarizeVacatures(vacaturesToSummarize, Provider.ANTHROPIC);
-};
+await runAll();

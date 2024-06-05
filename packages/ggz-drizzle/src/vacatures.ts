@@ -62,7 +62,8 @@ async function allScreenshotUrls(db) {
   return result.map((x: { screenshotUrl: string }) => x.screenshotUrl) as string[];
 }
 
-async function getVacature(urlHash: string, db) {
+export async function getVacature(urlHash: string) {
+  const db = getDb().db;
   const result = await db
     .select()
     .from(vacatureTable)
@@ -72,7 +73,7 @@ async function getVacature(urlHash: string, db) {
   if (result.length === 0) {
     return null;
   }
-  return result[0] as SelectVacature;
+  return result[0];
 }
 
 async function getVacatureByUrl(url: string, db: DB) {
@@ -199,8 +200,8 @@ async function getAllWithProfessies(professies: string[], db) {
 }
 
 type SummarizeOptions = {
-  professies?: string[];
-  organisaties?: string[];
+  professies: string[] | 'all';
+  organisaties: string[] | 'all';
 };
 
 /**
@@ -212,14 +213,14 @@ export async function getVacaturesToSummarize(
   options: SummarizeOptions = { professies: ['Psychiater'], organisaties: [] }
 ) {
   const db = getDb().db;
-  if (options.professies === undefined || options.professies.length === 0) {
+  if (options.professies.length === 0 && options.professies !== 'all') {
     options.professies = ['Psychiater'];
   }
   const clauses: SQLWrapper[] = [];
-  if (options.professies && options.professies.length > 0) {
+  if (options.professies && options.professies.length > 0 && options.professies !== 'all') {
     clauses.push(arrayOverlaps(vacatureTable.professie, options.professies));
   }
-  if (options.organisaties && options.organisaties.length > 0) {
+  if (options.organisaties && options.organisaties.length > 0 && options.organisaties !== 'all') {
     clauses.push(inArray(vacatureTable.organisatie, options.organisaties));
   }
   return await db
@@ -242,7 +243,7 @@ const vacatures = {
   getAllWithoutProfessie: provideDb(getAllWithoutProfessie),
   getUnsyncedVacatures: provideDb(getUnsyncedVacatures),
   getUpdatedVacatures: provideDb(getUpdatedVacatures),
-  getVacature: provideDb(getVacature),
+  getVacature,
   getVacatureByUrl: provideDb(getVacatureByUrl),
   getVacaturesToSummarize,
   getVacaturesWithoutScreenshot: provideDb(getVacaturesWithoutScreenshot),

@@ -97,6 +97,10 @@ export const vacatures = pgTable('vacatures', {
   opleidingsbudgetSize: numeric('opleidingsbudget_size'),
   body: text('body'),
   summary: text('summary'),
+  summaryModel: text('summary_model'),
+  summaryCost: numeric('summary_cost', { scale: 6 }),
+  extractionModel: text('extraction_model'),
+  extractionCost: numeric('extraction_cost', { scale: 6 }),
   url: text('url').notNull(),
   bodyHash: text('body_hash'),
   firstScraped: timestamp('first_scraped', { mode: 'date', withTimezone: true })
@@ -105,6 +109,8 @@ export const vacatures = pgTable('vacatures', {
   lastScraped: timestamp('last_scraped', { mode: 'date', withTimezone: true })
     .notNull()
     .defaultNow(),
+  summaryTimestamp: timestamp('summary_timestamp', { mode: 'date', withTimezone: true }),
+  extractionTimestamp: timestamp('extraction_timestamp', { mode: 'date', withTimezone: true }),
   synced: boolean('synced').default(false),
   urenMin: bigint('uren_min', { mode: 'number' }),
   urenMax: bigint('uren_max', { mode: 'number' }),

@@ -64,7 +64,7 @@ export const synonyms: SynonymsDictionary = {
       'guideline-informed treatment for personality disorders'
     ]
   }
-};
+} as const;
 
 type Synonyms = {
   [key: string]: string[];
