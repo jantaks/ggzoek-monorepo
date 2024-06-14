@@ -3,20 +3,22 @@ import { query } from '$lib/components/searchform/search';
 import { log } from '@ggzoek/logging/src/logger.js';
 import type { PageServerLoadEvent } from './$types';
 import type { SearchResponse } from 'meilisearch';
+import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
+
+type facet = keyof SelectVacature;
+
+const facets: facet[] = ['beroepen', 'behandelmethoden', 'organisatie', 'stoornissen'];
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const q = event.url.searchParams.get('fullText');
-	const selectedBeroepen = event.url.searchParams.get('beroepen');
-	log.info(selectedBeroepen);
-	const selectedStoornissen = event.url.searchParams.get('stoornissen');
-	log.info(selectedStoornissen);
-	let queryResult: SearchResponse | null = null;
+	facets.forEach((facet) => {
+		const facetValue = event.url.searchParams.get(facet);
+		log.info(`${facet}: ${facetValue}`);
+	});
+	let queryResult: SearchResponse | undefined = undefined;
 	if (q != undefined) {
 		queryResult = await query(q, 1);
 		log.info('query', q);
 	}
-	const beroepen = queryResult?.facetDistribution?.beroepen;
-	const stoornissen = queryResult?.facetDistribution?.stoornissen;
-	log.info(beroepen);
-	return { beroepen: beroepen, stoornissen: stoornissen };
+	return { result: queryResult };
 };
