@@ -9,6 +9,7 @@
   }
 
   let { result }: Props = $props();
+  let form: HTMLFormElement;
 
   let showFilters = $state(true);
 
@@ -16,17 +17,23 @@
     console.log('rendererd');
   });
 
+  function onFiltersChanged() {
+    console.log('filters changed');
+    form.requestSubmit();
+  }
+
 
 </script>
 
-<form class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full">
+<form bind:this={form} class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full">
   <Input class="max-w-xs" name="fullText" placeholder="Zoek een vacature" />
   <Button
     onclick={()=> showFilters = !showFilters}>{showFilters ? 'Filters verbergen' : 'Filters weergeven'}</Button>
   <div class="{showFilters? 'display': 'hidden'} space-y-4">
     {#if result?.facetDistribution}
       {#each Object.keys(result.facetDistribution) as facet}
-        <FacetSelectFilter categoryDistribution={result.facetDistribution[facet]} facet={facet}></FacetSelectFilter>
+        <FacetSelectFilter onChanged={onFiltersChanged} categoryDistribution={result.facetDistribution[facet]}
+                           facet={facet}></FacetSelectFilter>
       {/each}
     {/if}
   </div>
