@@ -12,6 +12,10 @@
 
   let showFilters = $state(true);
 
+  $effect(() => {
+    console.log('rendererd');
+  });
+
 
 </script>
 
@@ -19,11 +23,14 @@
   <Input class="max-w-xs" name="fullText" placeholder="Zoek een vacature" />
   <Button
     onclick={()=> showFilters = !showFilters}>{showFilters ? 'Filters verbergen' : 'Filters weergeven'}</Button>
-  {#if showFilters && result?.facetDistribution}
-    {#each Object.keys(result.facetDistribution) as facet}
-      <FacetSelectFilter categoryDistribution={result.facetDistribution[facet]} facet={facet}></FacetSelectFilter>
-    {/each}
-  {/if}
+  <div class="{showFilters? 'display': 'hidden'} space-y-4">
+    {#if result?.facetDistribution}
+      {#each Object.keys(result.facetDistribution) as facet}
+        <FacetSelectFilter categoryDistribution={result.facetDistribution[facet]} facet={facet}></FacetSelectFilter>
+      {/each}
+    {/if}
+  </div>
+
 
   <Button type="submit">Zoek</Button>
 </form>

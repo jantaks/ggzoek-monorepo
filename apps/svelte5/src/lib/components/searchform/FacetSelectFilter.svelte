@@ -18,6 +18,10 @@
     }
   }
 
+  $effect(() => {
+    console.log('rendererd');
+  });
+
 </script>
 
 <Select multiple onSelectedChange={updateSelection} typeahead>
