@@ -1,9 +1,7 @@
 import winston, { format, Logger } from 'winston';
 import * as path from 'node:path';
 
-
-
-const { combine, timestamp, colorize, align, printf, metadata, errors} = winston.format;
+const { combine, timestamp, colorize, align, printf, metadata, errors } = winston.format;
 
 const levels = {
   error: 0,
@@ -15,17 +13,16 @@ const levels = {
   silly: 6
 };
 
-
 const customFormat = format((info) => {
-  const obj: {stack?: string} = {};
-  Error.stackTraceLimit = 20
+  const obj: { stack?: string } = {};
+  Error.stackTraceLimit = 20;
   Error.captureStackTrace(obj);
   const stack = obj.stack!.split('\n');
 
   // Find the first call site outside the logger module
-  let caller = stack[11]
-  if (caller.includes("process.processTicksAndRejections")) {
-    caller = stack[10]
+  let caller = stack[11];
+  if (caller.includes('process.processTicksAndRejections')) {
+    caller = stack[10];
   }
 
   const match = caller.match(/\(([^)]+)\)/);
@@ -50,34 +47,34 @@ const customFormat = format((info) => {
   return info;
 })();
 
-function getFormatter(info: any){
-  let format = `${info.timestamp} ${info.level} ${info.file}:${info.line} ${info.message}`
-  if (info.metadata.scraper){
-    format = `${format} (Scraper: ${info.metadata.scraper})`
+function getFormatter(info: any) {
+  let format = `${info.timestamp} ${info.level} ${info.file}:${info.line} ${info.message}`;
+  if (info.metadata.scraper) {
+    format = `${format} (Scraper: ${info.metadata.scraper})`;
   }
-  if (info.metadata.json){
-    format = `${format} ${JSON.stringify(info.metadata.json)}`
+  if (info.metadata.json) {
+    format = `${format} ${JSON.stringify(info.metadata.json)}`;
   }
-  if (info.stack){
-    format = `${format}\n\t${info.stack}`
+  if (info.stack) {
+    format = `${format}\n\t${info.stack}`;
   }
-  return format
+  return format;
 }
 
 export const log = winston.createLogger({
-    level: process.env.LOG_LEVEL || "info",
-    format: combine(
-      customFormat,
-      errors({stack: true }),
-      colorize({ all: true}),
-      timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss.SSS',
-      }),
-      align(),
-      metadata({ fillWith: ['scraper']}),
-      printf((info) => getFormatter(info))
-    ),
-    transports: [new winston.transports.Console()],
+  level: process.env.LOG_LEVEL || 'debug',
+  format: combine(
+    customFormat,
+    errors({ stack: true }),
+    colorize({ all: true }),
+    timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss.SSS'
+    }),
+    align(),
+    metadata({ fillWith: ['scraper'] }),
+    printf((info) => getFormatter(info))
+  ),
+  transports: [new winston.transports.Console()]
 });
 
 // it will print also the calling site

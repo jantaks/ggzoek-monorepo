@@ -1,7 +1,8 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 import { vacatures } from '../drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
+import { getAllProfessies } from '../src/vacatures';
 
 const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),
@@ -17,16 +18,9 @@ const insertSchema = createInsertSchema(vacatures, {
   .omit({ opleidingsbudgetSize: true });
 
 describe('repotest', () => {
-  it('should parse a vacature', async () => {
-    const vacature = {
-      title: 'Test vacature',
-      summary: null,
-      organisatie: 'Lentis',
-      urlHash: '123',
-      url: 'http://example.com',
-      professie: ['Verpleegkundige'],
-      body: 'This is a test vacature'
-    };
-    insertSchema.parse(vacature);
+  it('should return professies', async () => {
+    const result = await getAllProfessies();
+    expect(result).toBeDefined();
+    console.log(result);
   });
 });

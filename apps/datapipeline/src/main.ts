@@ -4,7 +4,7 @@ import { summarize } from './ai/openAIV2.js';
 
 const summarizeStep = async () => {
   const vacature = await vacatures.getVacature(
-    '2286ff5241e5c86c502846ee9efdcfaeb1106333c528f29206ae8ea4c1dbdbfcer'
+    '497cf144928a98078b7e62d8ee654a648c95330b0ffc8e1f4d3d67275b3ba5d4'
   );
   if (vacature) {
     const result = await summarize(vacature);

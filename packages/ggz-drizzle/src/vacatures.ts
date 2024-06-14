@@ -1,4 +1,4 @@
-import { DB, getDb, provideDb } from './client.js';
+import { db, DB, getDb, provideDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { InsertVacature, SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
 import {
@@ -228,6 +228,15 @@ export async function getVacaturesToSummarize(
     .from(vacatureTable)
     .where(and(...clauses, or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary))))
     .execute();
+}
+
+export async function getAllProfessies() {
+  const db = getDb().db;
+  const result = await db
+    .select({ professie: vacatureTable.professie })
+    .from(vacatureTable)
+    .execute();
+  return Array.from(new Set(result.map((x: { professie: string[] }) => x.professie).flat()));
 }
 
 const vacatures = {
