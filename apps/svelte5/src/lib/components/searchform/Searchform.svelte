@@ -13,12 +13,7 @@
 
   let showFilters = $state(true);
 
-  $effect(() => {
-    console.log('rendererd');
-  });
-
   function onFiltersChanged() {
-    console.log('filters changed');
     form.requestSubmit();
   }
 
