@@ -9,14 +9,14 @@
 
   let selectedValues = $state<string[]>([]);
 
-  let s = $derived.by(() => {
+  let selections = $derived.by(() => {
     return selectedValues.map(s => {
       return { 'value': s };
     });
   });
 
   type Props = {
-    onChanged: () => void,
+    onChanged: (facet: string, selectedValues: string[]) => void,
     facet: string,
     categoryDistribution: CategoriesDistribution
   }
@@ -38,7 +38,7 @@
 
   function openChange(open: boolean) {
     if (!open) {
-      tick().then(() => onChanged());
+      tick().then(() => onChanged(facet, selectedValues));
     }
   }
 
@@ -48,7 +48,7 @@
   multiple
   onOpenChange={openChange}
   onSelectedChange={updateSelection}
-  selected={s}
+  selected={selections}
   typeahead>
   <Trigger class="w-full">
     {selectedValues.length ? `${facet}: ${selectedValues.length}  geselecteerd` : `Selecteer ${facet}`}

@@ -13,14 +13,20 @@
 
   let showFilters = $state(true);
 
-  function onFiltersChanged() {
+  function onFiltersChanged(facet: string, selectedValues: string[]) {
+    if (!filterTags[facet]) filterTags[facet] = [];
+    filterTags[facet].splice(0, 1000);
+    filterTags[facet].push(...selectedValues);
     form.requestSubmit();
   }
+
+  let filterTags = $state<Record<string, string[]>>({});
 
 
 </script>
 
 <form bind:this={form} class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full">
+  <div>Tags: {JSON.stringify(filterTags)}</div>
   <Input class="max-w-xs" name="fullText" placeholder="Zoek een vacature" />
   <Button
     onclick={()=> showFilters = !showFilters}>{showFilters ? 'Filters verbergen' : 'Filters weergeven'}</Button>
