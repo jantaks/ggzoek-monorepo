@@ -4,30 +4,25 @@
   import type { Selected } from 'bits-ui';
   import type { CategoriesDistribution } from 'meilisearch';
   import { tick } from 'svelte';
-  import { page } from '$app/stores';
 
-
-  let selectedValues = $state<string[]>([]);
-
-  let selections = $derived.by(() => {
-    return selectedValues.map(s => {
-      return { 'value': s };
-    });
-  });
 
   type Props = {
+    selectedValues: string[],
     onChanged: (facet: string, selectedValues: string[]) => void,
     facet: string,
     categoryDistribution: CategoriesDistribution
   }
 
-  let { categoryDistribution, facet, onChanged }: Props = $props();
+  let { categoryDistribution, facet, onChanged, selectedValues }: Props = $props();
 
-  // eslint-disable-next-line svelte/valid-compile
-  $page.url.searchParams.forEach((value, key) => {
-    if (key === facet) {
-      selectedValues = JSON.parse(value);
-    }
+  if (selectedValues === undefined) {
+    selectedValues = [];
+  }
+
+  let selections = $derived.by(() => {
+    return selectedValues.map(s => {
+      return { 'value': s };
+    });
   });
 
   function updateSelection(event: Selected<string>[] | undefined) {

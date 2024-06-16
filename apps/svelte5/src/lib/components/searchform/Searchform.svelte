@@ -17,9 +17,16 @@
 
   function onFiltersChanged(facet: string, selectedValues: string[]) {
     if (!filterTags[facet]) filterTags[facet] = [];
-    filterTags[facet].splice(0, 1000);
+    filterTags[facet].splice(0, filterTags[facet].length);
     filterTags[facet].push(...selectedValues);
     form.requestSubmit();
+  }
+
+  function removeFilter(facet: string, value: string) {
+    return () => {
+      filterTags[facet] = filterTags[facet].filter((v) => v !== value);
+      form.requestSubmit();
+    };
   }
 
   let filterTags = $state<Record<string, string[]>>({});
@@ -34,7 +41,14 @@
 </script>
 
 <form bind:this={form} class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full">
-  <div>Tags: {JSON.stringify(filterTags)}</div>
+  {#each Object.keys(filterTags) as tag}
+    {#each filterTags[tag] as value}
+      <Button class='p-4 flex flex-row justify-between'>
+        {value}
+        <button onclick={removeFilter(tag, value)}>X</button>
+      </Button>
+    {/each}
+  {/each}
   <Input class="max-w-xs" name="fullText" placeholder="Zoek een vacature" />
   <Button
     onclick={()=> showFilters = !showFilters}>{showFilters ? 'Filters verbergen' : 'Filters weergeven'}</Button>
@@ -42,7 +56,7 @@
     {#if result?.facetDistribution}
       {#each Object.keys(result.facetDistribution) as facet}
         <FacetSelectFilter onChanged={onFiltersChanged} categoryDistribution={result.facetDistribution[facet]}
-                           facet={facet}></FacetSelectFilter>
+                           facet={facet} selectedValues={filterTags[facet]}></FacetSelectFilter>
       {/each}
     {/if}
   </div>
