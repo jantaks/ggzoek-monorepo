@@ -3,6 +3,8 @@
   import { Button } from '$lib/components/ui/button';
   import type { SearchResponse } from 'meilisearch';
   import FacetSelectFilter from '$lib/components/searchform/FacetSelectFilter.svelte';
+  import { page } from '$app/stores';
+  import { type facet, facets } from '$lib/types';
 
   type Props = {
     result?: SearchResponse
@@ -21,6 +23,12 @@
   }
 
   let filterTags = $state<Record<string, string[]>>({});
+
+  $page.url.searchParams.forEach((value, key) => {
+    if (facets.includes(key as facet)) {
+      filterTags[key] = JSON.parse(value) as string[];
+    }
+  });
 
 
 </script>
