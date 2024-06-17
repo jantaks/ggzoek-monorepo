@@ -17,17 +17,16 @@
 
   filterStore.filters[facet] = [];
 
-  let selections = $derived.by(() => {
-    return filterStore.filters[facet].map((s, i) => {
-      return { 'value': s, 'label': i };
-    });
-  });
-
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
-      filterStore.filters[facet] = event.map((item) => item.value);
+      filterStore.filters[facet] = event;
       tick().then(onChanged);
     }
+  }
+
+
+  function serialiseSelected(selected: Selected<string>[]) {
+    return JSON.stringify(selected.map((s) => s.value));
   }
 
 
@@ -36,7 +35,7 @@
 <Select
   multiple
   onSelectedChange={updateSelection}
-  selected={selections}
+  selected={filterStore.filters[facet]}
   typeahead>
   <Trigger class="w-full">
     {filterStore.filters[facet].length ? `${facet}: ${filterStore.filters[facet].length}  geselecteerd` : `Selecteer ${facet}`}
@@ -49,4 +48,4 @@
     {/each}
   </Content>
 </Select>
-<Input name={facet} type="hidden" value={JSON.stringify(filterStore.filters[facet])} />
+<Input name={facet} type="hidden" value={serialiseSelected(filterStore.filters[facet])} />

@@ -1,31 +1,30 @@
 import { facets } from '$lib/types';
+import type { Selected } from 'bits-ui';
 
 function createFilterStore() {
-	const initialState: Record<string, string[]> = {};
+	const initialState: Record<string, Selected<string>[]> = {};
 	facets.forEach((facet) => {
 		initialState[facet] = [];
 	});
 
-	const filters = $state<Record<string, string[]>>(initialState);
+	const filters = $state<Record<string, Selected<string>[]>>(initialState);
 
 	const add = (facet: string, value: string) => {
-		if (!filters[facet]) filters[facet] = [];
-		filters[facet].push(value);
+		filters[facet].push({ value, label: value });
 	};
 
-	const addAll = (facet: string, values: string[]) => {
-		if (!filters[facet]) filters[facet] = [];
-		filters[facet].push(...values);
+	const addAll = (facet: string, selected: Selected<string>[]) => {
+		filters[facet].push(...selected);
 		filters[facet] = Array.from(new Set(filters[facet]));
 	};
 
-	const remove = (facet: string, value: string) => {
-		if (filters[facet]) filters[facet] = filters[facet].filter((v) => v !== value);
+	const remove = (facet: string, value: Selected<string>) => {
+		filters[facet] = filters[facet].filter((v) => v !== value);
 	};
 
 	const removeAll = () => {
 		Object.keys(filters).forEach((key) => {
-			delete filters[key];
+			filters[key] = [];
 		});
 	};
 

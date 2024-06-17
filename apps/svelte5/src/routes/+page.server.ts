@@ -10,8 +10,8 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 		filters: createFilters(event.url.searchParams)
 	};
 	console.log(searchParams);
-	const queryResult = await query(searchParams);
-	return { result: queryResult };
+	const searchResponse = await query(searchParams);
+	return { searchResponse: searchResponse };
 };
 
 function createFilters(params: URLSearchParams) {
