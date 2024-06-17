@@ -3,12 +3,11 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import type { Selected } from 'bits-ui';
   import type { CategoriesDistribution } from 'meilisearch';
-  import { tick } from 'svelte';
   import { filterStore } from '$lib/components/searchform/filters.svelte';
 
 
   type Props = {
-    onChanged: (facet: string, selectedValues: string[]) => void,
+    onChanged: () => void,
     facet: string,
     categoryDistribution: CategoriesDistribution
   }
@@ -28,20 +27,15 @@
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
       filterStore.filters[facet] = event.map((item) => item.value);
+      onChanged();
     }
   }
 
-  function openChange(open: boolean) {
-    if (!open) {
-      tick().then(() => onChanged(facet, filterStore.filters[facet]));
-    }
-  }
 
 </script>
 
 <Select
   multiple
-  onOpenChange={openChange}
   onSelectedChange={updateSelection}
   selected={selections}
   typeahead>
