@@ -3,9 +3,12 @@
   import { Button } from '$lib/components/ui/button';
   import type { SearchResponse } from 'meilisearch';
   import FacetSelectFilter from '$lib/components/searchform/FacetSelectFilter.svelte';
+  import { filterStore } from '$lib/components/searchform/filters.svelte';
   import { page } from '$app/stores';
   import { type facet, facets } from '$lib/types';
-  import { filterStore } from '$lib/components/searchform/filters.svelte';
+  import { tick } from 'svelte';
+
+  // filterStore.removeAll();
 
   type Props = {
     result?: SearchResponse
@@ -17,20 +20,18 @@
 
   let showFilters = $state(true);
 
-  function onFiltersChanged() {
+  function submit() {
     form.requestSubmit();
   }
 
   function removeFilter(facet: string, value: string) {
     return () => {
       filterStore.remove(facet, value);
-      form.requestSubmit();
+      tick().then(submit);
     };
-
   }
 
-  filterStore.removeAll();
-
+  // eslint-disable-next-line svelte/valid-compile
   $page.url.searchParams.forEach((value, key) => {
     if (facets.includes(key as facet)) {
       filterStore.filters[key] = JSON.parse(value) as string[];
@@ -55,7 +56,7 @@
   <div class="{showFilters? 'display': 'hidden'} space-y-4">
     {#if result?.facetDistribution}
       {#each Object.keys(result.facetDistribution) as facet}
-        <FacetSelectFilter onChanged={onFiltersChanged} categoryDistribution={result.facetDistribution[facet]}
+        <FacetSelectFilter onChanged={submit} categoryDistribution={result.facetDistribution[facet]}
                            facet={facet}></FacetSelectFilter>
       {/each}
     {/if}

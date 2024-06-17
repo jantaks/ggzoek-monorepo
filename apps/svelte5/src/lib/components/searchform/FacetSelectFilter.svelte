@@ -4,6 +4,7 @@
   import type { Selected } from 'bits-ui';
   import type { CategoriesDistribution } from 'meilisearch';
   import { filterStore } from '$lib/components/searchform/filters.svelte';
+  import { tick } from 'svelte';
 
 
   type Props = {
@@ -14,9 +15,7 @@
 
   let { categoryDistribution, facet, onChanged }: Props = $props();
 
-  if (filterStore.filters[facet] === undefined) {
-    filterStore.filters[facet] = [];
-  }
+  filterStore.filters[facet] = [];
 
   let selections = $derived.by(() => {
     return filterStore.filters[facet].map(s => {
@@ -27,7 +26,7 @@
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
       filterStore.filters[facet] = event.map((item) => item.value);
-      onChanged();
+      tick().then(onChanged);
     }
   }
 

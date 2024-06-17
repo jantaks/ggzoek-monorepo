@@ -1,5 +1,13 @@
+import { facets } from '$lib/types';
+
 function createFilterStore() {
-	const filters = $state<Record<string, string[]>>({});
+	const initialState: Record<string, string[]> = {};
+	facets.forEach((facet) => {
+		initialState[facet] = [];
+	});
+
+	const filters = $state<Record<string, string[]>>(initialState);
+
 	const add = (facet: string, value: string) => {
 		if (!filters[facet]) filters[facet] = [];
 		filters[facet].push(value);
