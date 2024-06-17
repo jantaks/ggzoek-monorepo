@@ -18,8 +18,8 @@
   filterStore.filters[facet] = [];
 
   let selections = $derived.by(() => {
-    return filterStore.filters[facet].map(s => {
-      return { 'value': s };
+    return filterStore.filters[facet].map((s, i) => {
+      return { 'value': s, 'label': i };
     });
   });
 
