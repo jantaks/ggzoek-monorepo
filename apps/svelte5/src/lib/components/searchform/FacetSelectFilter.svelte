@@ -3,17 +3,16 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import type { Selected } from 'bits-ui';
   import type { CategoriesDistribution } from 'meilisearch';
-  import { filterStore } from '$lib/components/searchform/filters.svelte';
+  import { filterStore, formStore } from '$lib/stores/stores.svelte.js';
   import { tick } from 'svelte';
 
 
   type Props = {
-    onChanged: () => void,
     facet: string,
     categoryDistribution: CategoriesDistribution
   }
 
-  let { categoryDistribution, facet, onChanged }: Props = $props();
+  let { categoryDistribution, facet }: Props = $props();
 
   let open = $state(false);
 
@@ -21,7 +20,7 @@
     if (event) {
       filterStore.filters[facet] = event;
       open = false;
-      tick().then(onChanged);
+      tick().then(formStore.submit);
     }
   }
 

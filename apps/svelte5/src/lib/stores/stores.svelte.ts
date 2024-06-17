@@ -34,3 +34,25 @@ function createFilterStore() {
 }
 
 export const filterStore = createFilterStore();
+
+function createFormStore() {
+	let form = $state<HTMLFormElement>();
+
+	const submit = () => {
+		if (form) {
+			console.log('submitting form');
+			form.requestSubmit();
+		} else {
+			console.warn('form not set');
+		}
+	};
+
+	return {
+		set(value: HTMLFormElement) {
+			form = value;
+		},
+		submit
+	};
+}
+
+export const formStore = createFormStore();

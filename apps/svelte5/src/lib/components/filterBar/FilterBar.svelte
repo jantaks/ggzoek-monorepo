@@ -1,25 +1,20 @@
 <script lang="ts">
 
-  import { filterStore } from '$lib/components/searchform/filters.svelte';
+  import { filterStore, formStore } from '$lib/stores/stores.svelte.js';
   import { Button } from '$lib/components/ui/form';
   import type { Selected } from 'bits-ui';
   import { tick } from 'svelte';
   import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
 
-  type Props = {
-    onChanged: () => void,
-  }
-
-  const { onChanged }: Props = $props();
-
   function removeFilter(facet: string, value: Selected<string>) {
     filterStore.remove(facet, value);
-    tick().then(onChanged);
+    tick().then(formStore.submit);
   }
 
   function removeAllFilters() {
     filterStore.removeAll();
-    tick().then(onChanged);
+    console.log('Remove all filters');
+    tick().then(formStore.submit);
   }
 
 </script>
