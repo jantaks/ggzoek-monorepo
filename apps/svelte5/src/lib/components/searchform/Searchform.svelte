@@ -5,35 +5,35 @@
   import FacetSelectFilter from '$lib/components/searchform/FacetSelectFilter.svelte';
   import { page } from '$app/stores';
   import { type facet, facets } from '$lib/types';
+  import { filterStore } from '$lib/components/searchform/filters.svelte';
 
   type Props = {
     result?: SearchResponse
   }
 
   let { result }: Props = $props();
+
   let form: HTMLFormElement;
 
   let showFilters = $state(true);
 
-  function onFiltersChanged(facet: string, selectedValues: string[]) {
-    if (!filterTags[facet]) filterTags[facet] = [];
-    filterTags[facet].splice(0, filterTags[facet].length);
-    filterTags[facet].push(...selectedValues);
+  function onFiltersChanged() {
     form.requestSubmit();
   }
 
   function removeFilter(facet: string, value: string) {
     return () => {
-      filterTags[facet] = filterTags[facet].filter((v) => v !== value);
+      filterStore.remove(facet, value);
       form.requestSubmit();
     };
+
   }
 
-  let filterTags = $state<Record<string, string[]>>({});
+  filterStore.removeAll();
 
   $page.url.searchParams.forEach((value, key) => {
     if (facets.includes(key as facet)) {
-      filterTags[key] = JSON.parse(value) as string[];
+      filterStore.filters[key] = JSON.parse(value) as string[];
     }
   });
 
@@ -41,8 +41,8 @@
 </script>
 
 <form bind:this={form} class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full">
-  {#each Object.keys(filterTags) as tag}
-    {#each filterTags[tag] as value}
+  {#each Object.keys(filterStore.filters) as tag}
+    {#each filterStore.filters[tag] as value}
       <Button class='p-4 flex flex-row justify-between'>
         {value}
         <button onclick={removeFilter(tag, value)}>X</button>
@@ -56,7 +56,7 @@
     {#if result?.facetDistribution}
       {#each Object.keys(result.facetDistribution) as facet}
         <FacetSelectFilter onChanged={onFiltersChanged} categoryDistribution={result.facetDistribution[facet]}
-                           facet={facet} selectedValues={filterTags[facet]}></FacetSelectFilter>
+                           facet={facet}></FacetSelectFilter>
       {/each}
     {/if}
   </div>
