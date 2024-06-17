@@ -8,6 +8,7 @@
   import { type facet, facets } from '$lib/types';
   import { tick } from 'svelte';
   import type { Selected } from 'bits-ui';
+  import CloseIcon from '$lib/components/icons/CloseIcon.svelte';
 
   // filterStore.removeAll();
 
@@ -51,7 +52,9 @@
     {#each filterStore.filters[tag] as selected}
       <Button class='p-4 flex flex-row justify-between'>
         {selected.value}
-        <button onclick={() => removeFilter(tag, selected)}>X</button>
+        <button onclick={() => removeFilter(tag, selected)}>
+          <CloseIcon class="w-4 h-4" />
+        </button>
       </Button>
     {/each}
   {/each}

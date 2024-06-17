@@ -17,13 +17,15 @@
 
   filterStore.filters[facet] = [];
 
+  let open = $state(false);
+
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
       filterStore.filters[facet] = event;
+      open = false;
       tick().then(onChanged);
     }
   }
-
 
   function serialiseSelected(selected: Selected<string>[]) {
     return JSON.stringify(selected.map((s) => s.value));
@@ -33,9 +35,10 @@
 </script>
 
 <Select
+  bind:open={open}
+  bind:selected={filterStore.filters[facet]}
   multiple
   onSelectedChange={updateSelection}
-  selected={filterStore.filters[facet]}
   typeahead>
   <Trigger class="w-full">
     {filterStore.filters[facet].length ? `${facet}: ${filterStore.filters[facet].length}  geselecteerd` : `Selecteer ${facet}`}

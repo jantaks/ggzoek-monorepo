@@ -13,11 +13,6 @@ function createFilterStore() {
 		filters[facet].push({ value, label: value });
 	};
 
-	const addAll = (facet: string, selected: Selected<string>[]) => {
-		filters[facet].push(...selected);
-		filters[facet] = Array.from(new Set(filters[facet]));
-	};
-
 	const remove = (facet: string, value: Selected<string>) => {
 		filters[facet] = filters[facet].filter((v) => v !== value);
 	};
@@ -33,7 +28,6 @@ function createFilterStore() {
 			return filters;
 		},
 		add,
-		addAll,
 		remove,
 		removeAll
 	};
