@@ -15,8 +15,6 @@
 
   let { categoryDistribution, facet, onChanged }: Props = $props();
 
-  filterStore.filters[facet] = [];
-
   let open = $state(false);
 
   function updateSelection(event: Selected<string>[] | undefined) {

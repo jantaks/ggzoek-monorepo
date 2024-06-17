@@ -20,10 +20,14 @@ function createFilters(params: URLSearchParams) {
 	params.forEach((value, key) => {
 		if (facets.includes(key as facet)) {
 			hasFilters = true;
-			const values: string[] = JSON.parse(value);
-			if (values.length > 0) {
-				const predicate = `(${key} = "` + values.join(`" OR ${key}="`) + '")';
-				filters.push(predicate);
+			try {
+				const values: string[] = JSON.parse(value);
+				if (values.length > 0) {
+					const predicate = `(${key} = "` + values.join(`" OR ${key}="`) + '")';
+					filters.push(predicate);
+				}
+			} catch (e) {
+				console.error('Could not parse searchParameters', e);
 			}
 		}
 	});

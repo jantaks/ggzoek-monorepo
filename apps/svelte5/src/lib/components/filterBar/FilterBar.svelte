@@ -16,6 +16,12 @@
     filterStore.remove(facet, value);
     tick().then(onChanged);
   }
+
+  function removeAllFilters() {
+    filterStore.removeAll();
+    tick().then(onChanged);
+  }
+
 </script>
 
 {#each Object.keys(filterStore.filters) as tag}
@@ -28,3 +34,4 @@
     </Button>
   {/each}
 {/each}
+<Button onclick={removeAllFilters}>Verwijder alle filters</Button>
