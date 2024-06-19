@@ -77,9 +77,7 @@
         @apply bg-background text-foreground;
     }
 
-    .tab-active {
-        @apply bg-primary text-primary-foreground border-b-2;
-    }
+
 }
 
 em {
@@ -87,5 +85,17 @@ em {
     @apply decoration-2;
     @apply underline-offset-4;
     @apply decoration-wavy
+}
+
+[data-tabs-trigger] {
+    @apply capitalize py-1 border border-pink-200
+}
+
+[data-tabs-trigger][data-state='active'] {
+    @apply border-t-2 border-t-pink-500 border-b-white bg-white;
+}
+
+[data-tabs-trigger][data-state='inactive'] {
+    @apply text-opacity-50 border-0;
 }
 
