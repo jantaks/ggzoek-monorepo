@@ -4,9 +4,16 @@ import {
 	MEILISEARCH_KEY,
 	MEILISEARCH_URL
 } from '$env/static/private';
-import { type Hit, MeiliSearch, type SearchParams, type SearchResponse } from 'meilisearch';
+import {
+	type FacetHit,
+	type Hit,
+	MeiliSearch,
+	type SearchForFacetValuesResponse,
+	type SearchParams,
+	type SearchResponse
+} from 'meilisearch';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { facets } from '$lib/types';
+import { type facet, facets } from '$lib/types';
 import { createClient } from '@vercel/kv';
 import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
 import * as crypto from 'crypto';
@@ -53,4 +60,16 @@ function cleanResponse(response: SearchResponse<SelectVacature>) {
 			return hit;
 		})
 	};
+}
+
+export async function getFacets() {
+	const facets: facet[] = ['organisatie', 'beroepen', 'stoornissen', 'behandelmethoden'];
+	const facetMap: Record<string, FacetHit[]> = {};
+	for (const facet of facets) {
+		const facetValues: SearchForFacetValuesResponse = await index.searchForFacetValues({
+			facetName: facet
+		});
+		facetMap[facet] = facetValues.facetHits;
+	}
+	return facetMap;
 }

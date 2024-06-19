@@ -48,10 +48,26 @@ export const filterStore = createFilterStore();
 function createFormStore() {
 	let form = $state<HTMLFormElement>();
 
+	const values: string[] = $state([]);
+
 	const submit = () => {
 		if (form) {
-			console.log('submitting form');
 			form.requestSubmit();
+		} else {
+			console.warn('form not set');
+		}
+	};
+
+	const addInput = (name: string, value: string) => {
+		if (form) {
+			let element = form.querySelector(`input[name="${name}"]`) as HTMLInputElement;
+			if (!element) {
+				element = document.createElement('input');
+			}
+			element.name = name;
+			element.value = value;
+			element.type = 'hidden';
+			form.appendChild(element);
 		} else {
 			console.warn('form not set');
 		}
@@ -61,7 +77,8 @@ function createFormStore() {
 		set(value: HTMLFormElement) {
 			form = value;
 		},
-		submit
+		submit,
+		addInput
 	};
 }
 

@@ -1,30 +1,45 @@
 <script lang="ts">
   import Searchform from '$lib/components/searchform/Searchform.svelte';
-  import FilterBar from '$lib/components/filterBar/FilterBar.svelte';
+  import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
   import NavBar from '$lib/components/navbar/NavBar.svelte';
   import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
-
+  import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
+  import { formStore } from '$lib/stores/stores.svelte';
+  import { Input } from '$lib/components/ui/input';
+  import { tick } from 'svelte';
 
   let { data } = $props();
 
+  const onchange = (event) => {
+    if (event.target) {
+      console.log(event.target.value);
+      formStore.addInput(event.target.name, event.target.value);
+      tick().then(formStore.submit);
+    }
+  };
 
 </script>
 
 
-<NavBar></NavBar>
-<div class="flex flex-row">
+<NavBar class="mb-4 sticky top-0 bg-gray-300"></NavBar>
+<div class="flex flex-row mx-auto max-w-7xl">
   <div class="w-2/5 min-w-fit">
-    <Searchform searchResponse={data.searchResponse}></Searchform>
+    <Searchform facets={data.facets} searchResponse={data.searchResponse}></Searchform>
   </div>
-  <div class="w-full">
+  <div class="ml-4 w-full">
+    <Input class="mb-4 border-2 border-pink-500 h-14" id="name" name="fullText" onchange={onchange}
+           placeHolder="Zoekcriteria invoeren"
+           required
+           type="text"
+           value={data.query}
+    />
     <FilterBar />
+    <ResultsBar count={data.searchResponse.estimatedTotalHits} />
     <!--    SEARCHRESULTS-->
 
-    <div class="p-4">
-      {#each data.searchResponse.hits as hit}
-        <VacatureCard hit={hit}></VacatureCard>
-      {/each}
-    </div>
+    {#each data.searchResponse.hits as hit}
+      <VacatureCard hit={hit}></VacatureCard>
+    {/each}
     <!--   SEARCHRESULTS-->
   </div>
 </div>

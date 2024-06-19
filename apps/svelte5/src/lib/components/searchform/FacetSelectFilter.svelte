@@ -2,23 +2,24 @@
   import { Content, Select, SelectItem, Trigger } from '$lib/components/ui/select/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import type { Selected } from 'bits-ui';
-  import type { CategoriesDistribution } from 'meilisearch';
+  import type { CategoriesDistribution, FacetHit } from 'meilisearch';
   import { filterStore, formStore } from '$lib/stores/stores.svelte.js';
   import { tick } from 'svelte';
 
 
   type Props = {
-    facet: string,
+    facets: FacetHit[]
+    filterLabel: string,
     categoryDistribution: CategoriesDistribution
   }
 
-  let { categoryDistribution, facet }: Props = $props();
+  let { categoryDistribution, filterLabel, facets }: Props = $props();
 
   let open = $state(false);
 
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
-      filterStore.filters[facet] = event;
+      filterStore.filters[filterLabel] = event;
       open = false;
       tick().then(formStore.submit);
     }
@@ -32,20 +33,19 @@
 </script>
 
 <Select
-  bind:open={open}
-  bind:selected={filterStore.filters[facet]}
+  bind:selected={filterStore.filters[filterLabel]}
   multiple
   onSelectedChange={updateSelection}
   typeahead>
   <Trigger class="w-full">
-    {filterStore.filters[facet].length ? `${facet}: ${filterStore.filters[facet].length}  geselecteerd` : `Selecteer ${facet}`}
+    {filterStore.filters[filterLabel].length ? `${filterLabel}: ${filterStore.filters[filterLabel].length}  geselecteerd` : `Selecteer ${filterLabel}`}
   </Trigger>
   <Content>
-    {#each Object.keys(categoryDistribution) as category}
-      <SelectItem value={category}>
-        {`${category} (${categoryDistribution[category]})`}
+    {#each facets as facet}
+      <SelectItem value={facet.value}>
+        {`${facet.value} (${categoryDistribution[facet.value] || '0'})`}
       </SelectItem>
     {/each}
   </Content>
 </Select>
-<Input name={facet} type="hidden" value={serialiseSelected(filterStore.filters[facet])} />
+<Input name={filterLabel} type="hidden" value={serialiseSelected(filterStore.filters[filterLabel])} />

@@ -1,9 +1,10 @@
 import type { PageServerLoad } from './$types.js';
-import { query } from '$lib/components/searchform/search';
+import { getFacets, query } from '$lib/components/searchform/search';
 import type { PageServerLoadEvent } from './$types';
 import { type facet, facets } from '$lib/types';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
+	console.log(event.url.searchParams.values());
 	const searchParams = {
 		query: event.url.searchParams.get('fullText') || '',
 		offset: 1,
@@ -11,7 +12,12 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	};
 	console.log(searchParams);
 	const searchResponse = await query(searchParams);
-	return { searchResponse: searchResponse };
+	const facets = await getFacets();
+	return {
+		searchResponse: searchResponse,
+		facets: facets,
+		query: event.url.searchParams.get('fullText') || ''
+	};
 };
 
 function createFilters(params: URLSearchParams) {
