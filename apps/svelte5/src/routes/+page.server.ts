@@ -32,7 +32,7 @@ function createFilters(params: URLSearchParams) {
 		}
 	});
 	if (!hasFilters) {
-		return undefined;
+		return '';
 	}
 	return filters.join(' AND ');
 }

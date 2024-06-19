@@ -23,13 +23,23 @@ function createFilterStore() {
 		});
 	};
 
+	const hasFilters = () => {
+		return Object.keys(filters).some((key) => filters[key].length > 0);
+	};
+
+	const filterCount = () => {
+		return Object.keys(filters).reduce((acc, key) => acc + filters[key].length, 0);
+	};
+
 	return {
 		get filters() {
 			return filters;
 		},
 		add,
 		remove,
-		removeAll
+		removeAll,
+		hasFilters,
+		filterCount
 	};
 }
 

@@ -125,7 +125,7 @@ export const vacatures = pgTable('vacatures', {
   screenshotUrl: text('screenshot_url')
 });
 
-const selectSchema = createSelectSchema(vacatures);
+export const selectSchema = createSelectSchema(vacatures);
 
 export const insertSchema = createInsertSchema(vacatures, {
   url: (schema) => schema.url.url(),

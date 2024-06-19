@@ -8,10 +8,11 @@
   import { type facet, facets } from '$lib/types';
 
   type Props = {
-    searchResponse?: SearchResponse
+    searchResponse?: SearchResponse,
+    class?: string
   }
 
-  let { searchResponse }: Props = $props();
+  let { searchResponse, class: className }: Props = $props();
 
   let showFilters = $state(true);
 
@@ -30,7 +31,7 @@
 
 </script>
 
-<form class="bg-yellow-300 p-4 space-y-4 max-w-xs flex flex-col  justify-left w-full" use:formStore.set>
+<form class={"bg-yellow-300 p-4 space-y-4 justify-left " + className} use:formStore.set>
 
   <Input class="max-w-xs" name="fullText" placeholder="Zoek een vacature" />
   <Button
