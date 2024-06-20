@@ -7,6 +7,7 @@
   import { formStore } from '$lib/stores/stores.svelte';
   import { Input } from '$lib/components/ui/input';
   import { tick } from 'svelte';
+  import Paginator from '$lib/components/pagination/Paginator.svelte';
 
   let { data } = $props();
 
@@ -36,10 +37,13 @@
     <FilterBar />
     <ResultsBar count={data.searchResponse.estimatedTotalHits} />
     <!--    SEARCHRESULTS-->
+    <div>
+      {#each data.searchResponse.hits as hit}
+        <VacatureCard hit={hit}></VacatureCard>
+      {/each}
+    </div>
+    <Paginator searchResponse={data.searchResponse}></Paginator>
 
-    {#each data.searchResponse.hits as hit}
-      <VacatureCard hit={hit}></VacatureCard>
-    {/each}
     <!--   SEARCHRESULTS-->
   </div>
 </div>

@@ -1,14 +1,14 @@
 import type { PageServerLoad } from './$types.js';
 import { getFacets, query } from '$lib/components/searchform/search';
 import type { PageServerLoadEvent } from './$types';
-import { type facet, facets } from '$lib/types';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	console.log(event.url.searchParams.values());
+	const offset = event.url.searchParams.get('offset') || 0;
 	const searchParams = {
 		query: event.url.searchParams.get('fullText') || '',
-		offset: 1,
-		filters: createFilters(event.url.searchParams)
+		offset: Number(offset),
+		filters: event.url.searchParams.get('filters') || ''
 	};
 	console.log(searchParams);
 	const searchResponse = await query(searchParams);
@@ -19,26 +19,3 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 		query: event.url.searchParams.get('fullText') || ''
 	};
 };
-
-function createFilters(params: URLSearchParams) {
-	const filters: string[] = [];
-	let hasFilters = false;
-	params.forEach((value, key) => {
-		if (facets.includes(key as facet)) {
-			hasFilters = true;
-			try {
-				const values: string[] = JSON.parse(value);
-				if (values.length > 0) {
-					const predicate = `(${key} = "` + values.join(`" OR ${key}="`) + '")';
-					filters.push(predicate);
-				}
-			} catch (e) {
-				console.error('Could not parse searchParameters', e);
-			}
-		}
-	});
-	if (!hasFilters) {
-		return '';
-	}
-	return filters.join(' AND ');
-}

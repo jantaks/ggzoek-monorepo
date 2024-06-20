@@ -1,26 +1,23 @@
 <script lang="ts">
   import { Content, Select, SelectItem, Trigger } from '$lib/components/ui/select/index.js';
-  import { Input } from '$lib/components/ui/input/index.js';
   import type { Selected } from 'bits-ui';
   import type { CategoriesDistribution, FacetHit } from 'meilisearch';
   import { filterStore, formStore } from '$lib/stores/stores.svelte.js';
   import { tick } from 'svelte';
+  import { type facet } from '$lib/types';
 
 
   type Props = {
     facets: FacetHit[]
-    filterLabel: string,
+    filterLabel: facet,
     categoryDistribution: CategoriesDistribution
   }
 
   let { categoryDistribution, filterLabel, facets }: Props = $props();
 
-  let open = $state(false);
-
   function updateSelection(event: Selected<string>[] | undefined) {
     if (event) {
-      filterStore.filters[filterLabel] = event;
-      open = false;
+      filterStore.addAll(filterLabel, event);
       tick().then(formStore.submit);
     }
   }
@@ -48,4 +45,3 @@
     {/each}
   </Content>
 </Select>
-<Input name={filterLabel} type="hidden" value={serialiseSelected(filterStore.filters[filterLabel])} />

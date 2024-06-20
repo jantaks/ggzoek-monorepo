@@ -1,24 +1,65 @@
-import { facets } from '$lib/types';
+import { type facet, facets } from '$lib/types';
 import type { Selected } from 'bits-ui';
 
+type Operator = 'AND' | 'OR';
+
 function createFilterStore() {
-	const initialState: Record<string, Selected<string>[]> = {};
+	const initialFilters: Record<string, Selected<string>[]> = {};
+	const initialOperators: Record<string, Operator> = {};
+
 	facets.forEach((facet) => {
-		initialState[facet] = [];
+		initialFilters[facet] = [];
+		initialOperators[facet] = 'OR';
 	});
 
-	const filters = $state<Record<string, Selected<string>[]>>(initialState);
+	const filters = $state<Record<facet, Selected<string>[]>>(initialFilters);
+	const operators = $state<Record<string, Operator>>(initialOperators);
 
-	const add = (facet: string, value: string) => {
+	function setOperator(facet: facet, operator: Operator) {
+		operators[facet] = operator;
+	}
+
+	function getOperator(facet: facet) {
+		return operators[facet];
+	}
+
+	function nonEmptyFilters() {
+		const facets = Object.keys(filters) as facet[];
+		return facets.filter((key) => filters[key].length > 0);
+	}
+
+	function getFilterExpression(facet: facet) {
+		const values = filters[facet].map((v) => v.value);
+		return `(${facet} = "` + values.join(`" ${operators[facet]} ${facet}="`) + '")';
+	}
+
+	function getAllFilterExpressions() {
+		const facets = Object.keys(filters) as facet[];
+		return facets
+			.map((facet) => {
+				if (filters[facet].length === 0) {
+					return null;
+				}
+				return getFilterExpression(facet);
+			})
+			.filter((v) => v !== null)
+			.join(' AND ');
+	}
+
+	const add = (facet: facet, value: string) => {
+		if (!filters[facet]) {
+			filters[facet] = [];
+		}
 		filters[facet].push({ value, label: value });
 	};
 
-	const remove = (facet: string, value: Selected<string>) => {
+	const remove = (facet: facet, value: Selected<string>) => {
 		filters[facet] = filters[facet].filter((v) => v !== value);
 	};
 
 	const removeAll = () => {
-		Object.keys(filters).forEach((key) => {
+		const facets = Object.keys(filters) as facet[];
+		facets.forEach((key) => {
 			filters[key] = [];
 		});
 	};
@@ -28,18 +69,38 @@ function createFilterStore() {
 	};
 
 	const filterCount = () => {
-		return Object.keys(filters).reduce((acc, key) => acc + filters[key].length, 0);
+		const facets = Object.keys(filters) as facet[];
+		return facets.reduce((acc, key) => acc + filters[key].length, 0);
 	};
+
+	function get(facet: facet) {
+		return filters[facet] || [];
+	}
+
+	function addAll(facet: facet, values: Selected<string>[]) {
+		filters[facet] = values;
+	}
+
+	function toggleOperator(facet: facet) {
+		operators[facet] = operators[facet] === 'AND' ? 'OR' : 'AND';
+	}
 
 	return {
 		get filters() {
 			return filters;
 		},
+		get,
 		add,
 		remove,
 		removeAll,
 		hasFilters,
-		filterCount
+		filterCount,
+		getAllFilterExpressions,
+		setOperator,
+		addAll,
+		getOperator,
+		toggleOperator,
+		nonEmptyFilters
 	};
 }
 
