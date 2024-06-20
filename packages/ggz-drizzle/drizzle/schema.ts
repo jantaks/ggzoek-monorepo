@@ -1,6 +1,7 @@
 import {
   bigint,
   boolean,
+  integer,
   json,
   numeric,
   pgEnum,
@@ -39,13 +40,22 @@ export const users = auth.table('users', {
 
 export const likes = pgTable('likes', {
   // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-  id: bigint('id', { mode: 'number' }).primaryKey().notNull(),
+  // id: bigint('id', { mode: 'number' }).primaryKey().notNull(),
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   vacature: text('vacature')
     .notNull()
     .references(() => vacatures.urlHash, { onDelete: 'cascade' })
+});
+
+export const savedSearches = pgTable('saved_searches', {
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  search: text('search').notNull(),
+  lastResults: text('last_results').array(),
+  timestamp: timestamp('timestamp', { mode: 'date', withTimezone: true })
 });
 
 export const scrapeResults = pgTable('scrape_results', {
@@ -87,9 +97,9 @@ export const vacatures = pgTable('vacatures', {
   instelling: text('instelling'),
   organisatieOnderdeel: text('organisatie_onderdeel'),
   title: text('title').notNull(),
+  ai_title: text('ai_title'),
   salarisMin: bigint('salaris_min', { mode: 'number' }),
   salarisMax: bigint('salaris_max', { mode: 'number' }),
-  cao: text('CAO'),
   contract: text('contract'),
   reiskostenvergoeding: text('reiskostenvergoeding'),
   werkvorm: text('werkvorm'),
@@ -98,7 +108,9 @@ export const vacatures = pgTable('vacatures', {
   body: text('body'),
   summary: text('summary'),
   summaryModel: text('summary_model'),
+  summaryBatchId: integer('summary_batch_id'),
   summaryCost: numeric('summary_cost', { scale: 6 }),
+  summaryTimestamp: timestamp('summary_timestamp', { mode: 'date', withTimezone: true }),
   extractionModel: text('extraction_model'),
   extractionCost: numeric('extraction_cost', { scale: 6 }),
   url: text('url').notNull(),
@@ -109,20 +121,24 @@ export const vacatures = pgTable('vacatures', {
   lastScraped: timestamp('last_scraped', { mode: 'date', withTimezone: true })
     .notNull()
     .defaultNow(),
-  summaryTimestamp: timestamp('summary_timestamp', { mode: 'date', withTimezone: true }),
-  extractionTimestamp: timestamp('extraction_timestamp', { mode: 'date', withTimezone: true }),
   synced: boolean('synced').default(false),
   urenMin: bigint('uren_min', { mode: 'number' }),
   urenMax: bigint('uren_max', { mode: 'number' }),
   professie: text('professie').array().notNull(),
   beroepen: text('beroepen').array().notNull(),
-  stoornissen: json('stoornissen'),
-  behandelmethoden: json('behandelmethoden'),
+  //Stores values as determined by AI. These values are further processed / normalised / standardized in the augmentation step and stored in the stoornissen field.
+  stoornissen_ai: text('stoornissen_ai').array(),
+  stoornissen: text('stoornissen').array(),
+  // See comment on stoornissen
+  behandelmethoden_ai: text('behandelmethoden_ai').array(),
+  behandelmethoden: text('behandelmethoden').array(),
+  locaties: text('locaties').array(),
+  cao: text('CAO'),
   fwg: text('FWG'),
-  locaties: json('locaties'),
   schaalMin: text('schaal_min'),
   schaalMax: text('schaal_max'),
-  screenshotUrl: text('screenshot_url')
+  screenshotUrl: text('screenshot_url'),
+  geoPoint: text('geo_point')
 });
 
 export const selectSchema = createSelectSchema(vacatures);

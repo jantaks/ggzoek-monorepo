@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
-    "module": "es2022",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "experimentalDecorators": true,
     "target": "ES2022",
     "outDir": "dist",
     "noUnusedLocals": false,
     "lib": ["DOM"],
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "./location_data/**/*"
   ]
 }

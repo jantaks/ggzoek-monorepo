@@ -1,44 +1,54 @@
 <script lang="ts">
 
-  import { filterStore, formStore } from '$lib/stores/stores.svelte.js';
-  import type { Selected } from 'bits-ui';
-  import { tick } from 'svelte';
   import RemoveIcon from '$lib/components/icons/CloseIcon.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { type facet } from '$lib/types';
+  import RemoveFiltersButton from '$lib/components/searchform/RemoveFiltersButton.svelte';
+  import type { ListboxOption } from '@melt-ui/svelte/dist/builders/listbox';
+  import { Filter, getSearchForm } from '$lib/stores/formStore.svelte';
+
+  let form = getSearchForm();
 
 
-  function removeFilter(facet: facet, value: Selected<string>) {
-    filterStore.remove(facet, value);
-    tick().then(formStore.submit);
+  function removeFilter(facet: string, selection: ListboxOption<string>) {
+    let filter = form.getFilter(facet);
+    if (filter) {
+      console.log('remove filter', selection);
+      filter.removeSelected(selection);
+    } else {
+      console.error('Filter not found', facet);
+    }
+    form.submit();
   }
 
-  function toggleOperator(facet: facet) {
-    filterStore.toggleOperator(facet);
-    tick().then(formStore.submit);
+  function toggleOperator(filter: Filter) {
+    console.log('toggle operator', filter);
+    filter.operator = filter.operator === 'AND' ? 'OR' : 'AND';
+    form.submit();
   }
-  
+
+
 </script>
 
-{#if filterStore.hasFilters()}
-  <div class="flex flex-wrap gap-2 w-full justify-items-start">
-    {#each filterStore.nonEmptyFilters() as facet}
-      <div class="bg-gray-300 flex flex-wrap p-2 items-center rounded-lg gap-1">
-        {#each filterStore.filters[facet] as selected, index}
-          <Button class='flex flex-row justify-between p-1 h-6 uppercase text-xs bg-pink-500'>
-            {selected.value}
-            <RemoveIcon onclick={() => removeFilter(facet, selected)} class="size-4  ml-1" />
-          </Button>
-          {#if index !== filterStore.get(facet).length - 1}
-            <Button class="h-6 p-1 bg-gray-700/50" onclick={() => toggleOperator(facet)}>
-              {filterStore.getOperator(facet) === 'AND' ? 'EN' : 'OF'}
-            </Button>
-          {/if}
-        {/each}
-      </div>
-    {/each}
-  </div>
-{/if}
+<div class="flex flex-wrap gap-2 w-full justify-items-start">
 
+  {#each form.filters.filter(f => f.isActive) as filter}
+    <div class="bg-gray-300 flex flex-wrap p-2 items-center rounded-lg gap-1">
+      {#each Array.from(filter.selectedValues).sort() as selected, index}
+        <Button class='flex flex-row justify-between p-1 h-6 uppercase text-xs bg-pink-500'>
+          {selected}
+          <RemoveIcon onclick={() => removeFilter(filter.facet, selected)} class="size-4  ml-1" />
+        </Button>
+        {#if index !== filter.selectedValues.size - 1}
+          <Button class="h-6 p-1 bg-gray-700/50" onclick={() => toggleOperator(filter)}>
+            {filter.operator === 'AND' ? 'EN' : 'OF'}
+          </Button>
+        {/if}
+      {/each}
+    </div>
+  {/each}
+  {#if form.filters.reduce((acc, f) => acc + f.selectedValues.size, 0) > 1}
+    <RemoveFiltersButton />
+  {/if}
+</div>
 
 

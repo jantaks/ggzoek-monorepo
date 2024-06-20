@@ -1,10 +1,10 @@
 import 'dotenv/config.js';
 import { chromium, devices } from 'playwright';
-import vacatures from 'packages/ggz-drizzle/src/vacatures.js';
+import { upsert } from '@ggzoek/ggz-drizzle/src/vacatures.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { v2 as cloudinary } from 'cloudinary';
-import { SelectVacature } from '../../../packages/ggz-drizzle/drizzle/schema.js';
-import { acceptCookies } from './utils.js';
+import { SelectVacature } from '../../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { acceptCookies } from '../../utils.js';
 
 async function createScreenshots(vacatures: SelectVacature[]) {
   const browser = await chromium.launch({ headless: false }); // Or 'firefox' or 'webkit'.
@@ -23,7 +23,7 @@ async function createScreenshots(vacatures: SelectVacature[]) {
       log.info(`uploaded screenshot to ${url}`);
       if (url) {
         vacature.screenshotUrl = url;
-        await vacatures.upsert(vacature);
+        await upsert(vacature);
       }
     }
   }
@@ -48,18 +48,10 @@ const uploadImage = async (imagePath: string, folder: string) => {
 
   try {
     const result = await cloudinary.uploader.upload(imagePath, options);
-    log.debug(result, `Image uploaded to ${result.folder}`);
+    log.debug(`Image ${result.url} uploaded to ${result.folder}`);
     return result.url;
   } catch (error) {
     log.error(error);
     return null;
   }
 };
-
-const vacature = await vacatures.getVacatureByUrl(
-  'https://www.pluryn.nl/werken-bij/vacature/persoonlijk-begeleider-jeugd-oosterbeek'
-);
-if (vacature) {
-  const vacatures = [vacature];
-  await createScreenshots(vacatures.slice(0, 5));
-}

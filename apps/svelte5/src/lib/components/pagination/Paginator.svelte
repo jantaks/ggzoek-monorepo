@@ -2,25 +2,27 @@
   import { CaretLeft, CaretRight } from '$lib/components/icons/index';
   import { Pagination } from 'bits-ui';
   import type { SearchResponse } from 'meilisearch';
-  import { formStore } from '$lib/stores/stores.svelte';
   import { resultsPerPage } from '$lib/types';
+  import { getSearchForm } from '$lib/stores/formStore.svelte';
+  import { page } from '$app/stores';
+
+  const form = getSearchForm();
+
+  let offset = parseInt($page.url.searchParams.get('offset') || '0');
 
   const x = Pagination;
 
   type Props = {
     searchResponse: SearchResponse
-    offset: number
   }
 
   const perPage = resultsPerPage;
 
-  let { searchResponse, offset }: Props = $props();
+  let { searchResponse }: Props = $props();
 
-  formStore.addInput('offset', offset.toString());
 
   function onPageChange(page: number) {
-    formStore.addInput('offset', ((page - 1) * perPage).toString());
-    formStore.submitForPage();
+    form.submit(((page - 1) * perPage));
   }
 
   let show = $derived.by(() => {

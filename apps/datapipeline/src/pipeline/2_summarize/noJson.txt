@@ -1,0 +1,15 @@
+Stichting IrisZorg zoekt een Psychiater voor het FACT-team in Apeldoorn. De Psychiater richt zich op diagnostiek en behandeling van cliënten met complexe, meervoudige problematiek, waaronder verslavings-, psychiatrische en somatische stoornissen. De functie vereist een professionele, warme en innovatieve aanpak. De kandidaat werkt multidisciplinair samen met onder andere huisartsen, verslavingsartsen en GZ-psychologen. 
+
+Binnen IrisZorg biedt de rol ruimte voor persoonlijke accenten zoals supervisie en onderwijs. Professionals leveren input voor behandelbeleid en profilering richting management is mogelijk. De organisatie kenmerkt zich door een warme, professionele cultuur met nadruk op samenwerking en reflectie.
+
+IrisZorg bedient een diverse doelgroep en werkt vanuit waarden zoals betrokkenheid en eigen regie. Het biedt een inspirerende werkomgeving en ruimte voor professionele groei. De organisatie biedt een opleidingstraject in methodieken zoals CRA, Krachtwerk en Motiverende Gespreksvoering in het eerste jaar van dienstverband. De functie biedt een vast dienstverband met een flexibele werkweek van 4 tot 36 uur.
+
+De kandidaat is BIG-geregistreerd als Psychiater en heeft een MSR-registratie en AGB-code. Uitdagingen worden niet vermeden en innovatie staat hoog in het vaandel. Het werken bij IrisZorg is tussen 08:30 en 17:00 uur en er is een georganiseerd rooster voor diensten.
+
+###MalformedJSON for testing purposes
+{
+  "salarisMin": 0,
+  "salarisMax": 10376,
+  "urenMin": 4,
+  "urenMax": 36,
+  "title": "Psychiater FACT Apeldoorn",

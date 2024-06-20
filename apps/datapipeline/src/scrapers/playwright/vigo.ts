@@ -21,7 +21,7 @@ s.addDefaultHandler(async ({ page }) => {
 s.addHandler('detail', async ({ request, page, log }) => {
   const bodyHtml = await page.content();
   const $ = cheerio.load(bodyHtml);
-  const title = $('h1').text();
+  const title = $('h1').text().split('|')[0].trim();
   const targetDiv = $('div[role="dialog"]');
   if (targetDiv.length) {
     targetDiv.remove();

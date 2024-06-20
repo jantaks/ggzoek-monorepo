@@ -1,18 +1,27 @@
-import { db, DB, getDb, provideDb } from './client.js';
+import { DB, getDb, provideDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { InsertVacature, SelectVacature, vacatures as vacatureTable } from '../drizzle/schema.js';
+import {
+  InsertVacature,
+  likes,
+  SelectVacature,
+  vacatures as vacatureTable
+} from '../drizzle/schema.js';
 import {
   and,
   arrayOverlaps,
   eq,
   gt,
+  gte,
   inArray,
   isNotNull,
   isNull,
+  lt,
+  max,
   or,
   sql,
   SQLWrapper
 } from 'drizzle-orm';
+import { type BeroepOptions } from '@ggzoek/types';
 
 async function allUrlsForOrganisation(organisation: string, db) {
   const result = await db
@@ -23,7 +32,30 @@ async function allUrlsForOrganisation(organisation: string, db) {
   return result.map((x: { url: string }) => x.url) as string[];
 }
 
-export async function upsert(vacature: InsertVacature) {
+export async function getLikesForUser(user_id: string) {
+  const { db: db } = getDb();
+  const result = await db
+    .select({ urlHash: likes.vacature })
+    .from(likes)
+    .where(eq(likes.userId, user_id))
+    .execute();
+  return result.map((x: { urlHash: string }) => x.urlHash) as string[];
+}
+
+export async function likeVacature(user_id: string, vacature: string) {
+  const { db: db } = getDb();
+  await db.insert(likes).values({ userId: user_id, vacature: vacature }).execute();
+}
+
+export async function unlikeVacature(user_id: string, vacature: string) {
+  const { db: db } = getDb();
+  await db
+    .delete(likes)
+    .where(and(eq(likes.userId, user_id), eq(likes.vacature, vacature)))
+    .execute();
+}
+
+export async function upsert(vacature: Omit<InsertVacature, 'beroepen'>) {
   const { db: db } = getDb();
   const columns = Object.keys(vacatureTable);
   const valuesToInsert = columns.reduce(
@@ -43,11 +75,15 @@ export async function upsert(vacature: InsertVacature) {
     },
     {} as typeof vacatureTable.$inferInsert
   );
-
-  await db.insert(vacatureTable).values(valuesToInsert).onConflictDoUpdate({
-    target: vacatureTable.urlHash,
-    set: valuesToUpdate
-  });
+  try {
+    await db.insert(vacatureTable).values(valuesToInsert).onConflictDoUpdate({
+      target: vacatureTable.urlHash,
+      set: valuesToUpdate
+    });
+  } catch (e) {
+    log.error(`Error upserting ${vacature.url} (id: ${vacature.urlHash})`);
+    log.error(e);
+  }
   log.debug(`UPSERTED ${vacature.url}`);
   log.silly({ json: { ...vacature, body: undefined } });
   log.silly(vacature.body);
@@ -89,13 +125,45 @@ async function getVacatureByUrl(url: string, db: DB) {
   return result[0];
 }
 
-async function getUnsyncedVacatures(db) {
-  const result = (await db
+type SyncOptions = {
+  professies: BeroepOptions[] | 'all';
+  organisaties: string[] | 'all';
+  // If force equals true then all vacatures will be summarized, even if they have been summarized before
+  // Only sync vacatures that have been scraped after this date
+  scrapedAfter?: Date;
+  // Limit the number of vacatures to summarize
+  limit?: number;
+  minBatchId?: number;
+};
+
+/**
+ * Retrieves all vacatures that have not been summarized yet.
+ * @param options
+ */
+export async function getVacaturesToSync(options: SyncOptions) {
+  const db = getDb().db;
+  const clauses: SQLWrapper[] = [];
+  if (options.professies && options.professies.length > 0 && options.professies !== 'all') {
+    clauses.push(arrayOverlaps(vacatureTable.professie, options.professies));
+  }
+  if (options.organisaties && options.organisaties.length > 0 && options.organisaties !== 'all') {
+    clauses.push(inArray(vacatureTable.organisatie, options.organisaties));
+  }
+  if (options.minBatchId) {
+    clauses.push(gte(vacatureTable.summaryBatchId, options.minBatchId));
+  }
+  return await db
     .select()
     .from(vacatureTable)
-    .where(eq(vacatureTable.synced, false))
-    .execute()) as SelectVacature[];
-  return result;
+    .where(
+      and(
+        ...clauses,
+        gt(vacatureTable.lastScraped, options.scrapedAfter),
+        isNotNull(vacatureTable.summaryBatchId)
+      )
+    )
+    .limit(options.limit)
+    .execute();
 }
 
 async function getVacaturesWithoutScreenshot(db) {
@@ -140,7 +208,8 @@ async function getAllUrlsScrapedWithinHours(period, db): Promise<string[]> {
 /**
  * Retrieves all vacatures from the database.
  */
-async function getAll(db) {
+export async function getAll() {
+  const { db: db } = getDb();
   return (await db.select().from(vacatureTable).execute()) as SelectVacature[];
 }
 
@@ -187,6 +256,25 @@ async function getAllWithoutProfessie(db) {
     .execute()) as SelectVacature[];
 }
 
+/** select all vacatures where summary is not null or empty string ... */
+export async function getSummarizedVacatures(
+  options: { limit?: number; summaryAfter?: Date } = { limit: 10000 }
+) {
+  const db = getDb().db;
+
+  const clauses = [];
+  if (options.summaryAfter) {
+    clauses.push(gt(vacatureTable.summaryTimestamp, options.summaryAfter));
+  }
+
+  return await db
+    .select()
+    .from(vacatureTable)
+    .where(and(...clauses, isNotNull(vacatureTable.summary), sql`${vacatureTable.summary} <> ''`))
+    .limit(options.limit)
+    .execute();
+}
+
 /**
  * Retrieves all vacatures that have at least one of the provided professies.
  * @param professies
@@ -200,22 +288,32 @@ async function getAllWithProfessies(professies: string[], db) {
 }
 
 type SummarizeOptions = {
-  professies: string[] | 'all';
+  professies: BeroepOptions[] | 'all';
   organisaties: string[] | 'all';
+  // If force equals true then all vacatures will be summarized, even if they have been summarized before
+  force: boolean;
+  // Only summarize vacatures that have been scraped after this date
+  scrapedAfter?: Date;
+  // Only summarize vacatures that have been summarized before this date (only effective if force is false)
+  summaryDateBefore?: Date;
+  // Limit the number of vacatures to summarize
+  limit?: number;
 };
 
 /**
- * Retrieves all vacatures that need to be summarized / have no summary. Can be filtered on Professies and Organisations.
- * Default is all Psychiater vacatures.
+ * Retrieves all vacatures that have not been summarized yet.
  * @param options
  */
 export async function getVacaturesToSummarize(
-  options: SummarizeOptions = { professies: ['Psychiater'], organisaties: [] }
+  options: SummarizeOptions = {
+    professies: ['Psychiater'],
+    organisaties: 'all',
+    force: false,
+    scrapedAfter: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    limit: 10000
+  }
 ) {
   const db = getDb().db;
-  if (options.professies.length === 0 && options.professies !== 'all') {
-    options.professies = ['Psychiater'];
-  }
   const clauses: SQLWrapper[] = [];
   if (options.professies && options.professies.length > 0 && options.professies !== 'all') {
     clauses.push(arrayOverlaps(vacatureTable.professie, options.professies));
@@ -223,10 +321,26 @@ export async function getVacaturesToSummarize(
   if (options.organisaties && options.organisaties.length > 0 && options.organisaties !== 'all') {
     clauses.push(inArray(vacatureTable.organisatie, options.organisaties));
   }
+  if (!options.force) {
+    clauses.push(or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary)));
+  }
+  if (options.summaryDateBefore) {
+    clauses.push(lt(vacatureTable.summaryTimestamp, options.summaryDateBefore));
+  }
   return await db
     .select()
     .from(vacatureTable)
-    .where(and(...clauses, or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary))))
+    .where(and(...clauses, gt(vacatureTable.lastScraped, options.scrapedAfter)))
+    .limit(options.limit)
+    .execute();
+}
+
+export async function updateSynced(urlHashes: string[], flag: boolean = true) {
+  const db = getDb().db;
+  await db
+    .update(vacatureTable)
+    .set({ synced: flag })
+    .where(inArray(vacatureTable.urlHash, urlHashes))
     .execute();
 }
 
@@ -237,6 +351,17 @@ export async function getAllProfessies() {
     .from(vacatureTable)
     .execute();
   return Array.from(new Set(result.map((x: { professie: string[] }) => x.professie).flat()));
+}
+
+export async function getMaxSummaryBatchId() {
+  const db = getDb().db;
+  const result = await db
+    .select({ maxBatchId: max(vacatureTable.summaryBatchId) })
+    .from(vacatureTable);
+  if (result.length === 0) {
+    return 0;
+  }
+  return result[0].maxBatchId;
 }
 
 const vacatures = {
@@ -250,7 +375,7 @@ const vacatures = {
   // Retrieves a list of URLs that have been scraped within the given time period (@param timeperiodHours).
   getAllWithProfessies: provideDb(getAllWithProfessies),
   getAllWithoutProfessie: provideDb(getAllWithoutProfessie),
-  getUnsyncedVacatures: provideDb(getUnsyncedVacatures),
+  getVacaturesToSync,
   getUpdatedVacatures: provideDb(getUpdatedVacatures),
   getVacature,
   getVacatureByUrl: provideDb(getVacatureByUrl),

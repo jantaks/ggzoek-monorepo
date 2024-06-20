@@ -80,19 +80,23 @@
 
 }
 
-em {
-    @apply underline not-italic;
-    @apply decoration-2;
-    @apply underline-offset-4;
-    @apply decoration-wavy
+/*em {*/
+/*    @apply underline not-italic;*/
+/*    @apply decoration-2;*/
+/*    @apply underline-offset-4;*/
+/*    @apply decoration-wavy*/
+/*}*/
+
+em{
+    @apply bg-pink-100 not-italic
 }
 
 [data-tabs-trigger] {
-    @apply capitalize py-1 border border-pink-200
+    @apply capitalize py-1
 }
 
 [data-tabs-trigger][data-state='active'] {
-    @apply border-t-2 border-t-pink-500 border-b-white bg-white;
+    @apply border-t border-t-pink-500 border-b-white bg-pink-50  rounded-t-2xl;
 }
 
 [data-tabs-trigger][data-state='inactive'] {

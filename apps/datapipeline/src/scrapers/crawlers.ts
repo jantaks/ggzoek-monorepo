@@ -90,7 +90,6 @@ export abstract class BaseScraper implements Scraper {
     });
     this.logger = log.child({ scraper: this.name });
     this.vacaturesPromise = vacatures.getAllForOrganisation(this.name);
-    this.logger.debug(`${this.name} scraper created.`);
   }
 
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
@@ -134,7 +133,7 @@ export abstract class BaseScraper implements Scraper {
   }
 
   async save(data: Data) {
-    const vacature: InsertVacature = {
+    const vacature: Omit<InsertVacature, 'beroepen'> = {
       organisatie: this.name,
       title: cleanTitle(data.title),
       body: data.body,
@@ -295,7 +294,7 @@ export class PlaywrightScraper extends BaseScraper {
         }
         this.logger.info(`Clicking expand button: ${clickedCounter}`);
         await expandButton.first().click({ timeout: 5000 });
-        await sleep(1000);
+        await sleep(2000);
         const $ = await getCheerioFromPage(page);
         const linksOnPage = selectLinks($, options);
         const newUrls = linksOnPage.filter((url) => !urls.includes(url));

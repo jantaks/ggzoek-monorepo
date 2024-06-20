@@ -1,0 +1,15 @@
+{
+  "name": "@ggzoek/types",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "shared types for GGZOEK",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "tsx src/main.ts"
+  },
+  "author": "Jan Taks",
+  "license": "ISC"
+}

@@ -1,28 +1,19 @@
-// @ts-ignore
+// @ts-expect-error no declaration file
 import levenshtein from 'js-levenshtein';
+import { Beroep, BeroepOptions } from '@ggzoek/types/index.js';
 
-export enum Beroep {
-  KindJeugdPsychiater = 'Kinder- & Jeugd Psychiater',
-  Psychiater = 'Psychiater',
-  KlinischPsycholoog = 'Klinisch Psycholoog',
-  GZPsycholoog = 'GZ-Psycholoog',
-  Verpleegkundige = 'Verpleegkundige',
-  VerpleegkundigSpecialist = 'Verpleegkundig Specialist',
-  SociaalPsychiatrischVerpleegkundige = 'Sociaal Psychiatrisch Verpleegkundige',
-  PsychomotorischTherapeut = 'Psychomotorisch Therapeut',
-  Basispsycholoog = 'Basispsycholoog',
-  ANIOS = 'ANIOS',
-  Psychotherapeut = 'Psychotherapeut',
-  Verslavingsarts = 'Verslavingsarts',
-  Systeemtherapeut = 'Systeemtherapeut',
-  Gedragswetenschapper = 'Gedragswetenschapper',
-  Sociotherapeut = 'Sociotherapeut',
-}
-
-const synonyms: { [key in Beroep]?: string[] } = {
-  [Beroep.SociaalPsychiatrischVerpleegkundige]: ['SPV', 'Psychiatrisch Verpleegkundige'],
-  [Beroep.KindJeugdPsychiater]: ['Kind en Jeugd Psychiater', 'Kinder en Jeugd Psychiater', 'Kinderpsychiater', 'Jeugdpsychiater', 'Kind- en Jeugd Psychiater'],
-  [Beroep.Basispsycholoog]: ['master psycholoog', 'psycholoog']
+const synonyms: { [key in BeroepOptions]?: string[] } = {
+  'Sociaal Psychiatrisch Verpleegkundige': ['SPV', 'Psychiatrisch Verpleegkundige'],
+  'Kinder- & Jeugd Psychiater': [
+    'Kind en Jeugd Psychiater',
+    'Kinder en Jeugd Psychiater',
+    'Kinderpsychiater',
+    'Jeugdpsychiater',
+    'Kind- en Jeugd Psychiater'
+  ],
+  Basispsycholoog: ['master psycholoog', 'psycholoog'],
+  Agoog: ['Agogisch Medewerker', 'GGZ agoog', 'Agogisch werkende'],
+  AIOS: ['Arts in opleiding tot specialist', 'Arts-assistent']
 };
 
 const ignoredWords = [
@@ -34,13 +25,15 @@ const ignoredWords = [
   'in opleiding tot gz-psycholoog',
   'in opleiding tot gz psycholoog',
   'i.o. tot gz psycholoog',
-  'i.o. tot gz-psycholoog',
+  'i.o. tot gz-psycholoog'
 ];
 
-const beroepen = Object.values(Beroep);
+const beroepen = Object.getOwnPropertyNames(Beroep).filter((prop) =>
+  isNaN(parseInt(prop))
+) as BeroepOptions[];
 const allOptions = [...beroepen, ...Object.values(synonyms).flat()];
 
-export function findSynonym(value: string): Beroep | undefined {
+function findSynonym(value: string): BeroepOptions | undefined {
   for (const key of Object.keys(synonyms) as Array<keyof typeof synonyms>) {
     const cleanedSynonyms = synonyms[key]?.map(cleanString);
     if (cleanedSynonyms?.includes(cleanString(value))) {
@@ -50,14 +43,15 @@ export function findSynonym(value: string): Beroep | undefined {
   return undefined;
 }
 
-
 const cleanString = (text: string): string =>
-  text.normalize('NFD').replace(/[‘’'`\s\u0300-\u036f-]/g, '').toLowerCase();
+  text
+    .normalize('NFD')
+    .replace(/[‘’'`\s\u0300-\u036f-]/g, '')
+    .toLowerCase();
 
 export const tokenize = (text: string): string[] => {
-  return text.split(/[\s/]+/).filter(token => !ignoredWords.includes(cleanString(token)));
+  return text.split(/[\s/]+/).filter((token) => !ignoredWords.includes(cleanString(token)));
 };
-
 
 function getMaxTokens(beroepen: readonly string[]): number {
   return beroepen.reduce((max, beroep) => {
@@ -66,14 +60,17 @@ function getMaxTokens(beroepen: readonly string[]): number {
   }, 0);
 }
 
-const getClosestMatch = (target: string, options: readonly string[]): {
-  closestMatch?: string,
-  minRelativeDistance: number
+const getClosestMatch = (
+  target: string,
+  options: readonly string[]
+): {
+  closestMatch?: string;
+  minRelativeDistance: number;
 } => {
   let closestMatch: string | undefined = undefined;
   let minDistance = Infinity;
 
-  options.forEach(option => {
+  options.forEach((option) => {
     const absoluteDistance = levenshtein(target, option);
     const maxDistance = Math.max(target.length, option.length);
     const relativeDistance = absoluteDistance / maxDistance;
@@ -99,10 +96,10 @@ function removeWords(title: string) {
   return title;
 }
 
-export function getBeroepen(title: string): Beroep[] {
+export function getBeroepen(title: string) {
   title = removeWords(title);
   const tokens = tokenize(title);
-  const result: Beroep[] = [];
+  const result: Array<BeroepOptions | 'Overig'> = [];
   const margin = 0.15;
   const maxWindowSize = Math.min(tokens.length, getMaxTokens(beroepen));
   const usedIndices: Set<number> = new Set();
@@ -114,14 +111,15 @@ export function getBeroepen(title: string): Beroep[] {
       const tokenWindow = tokens.slice(i, i + windowSize).join('');
       const cleanedTokenWindow = cleanString(tokenWindow);
 
-      const {
-        closestMatch: match,
-        minRelativeDistance: distance
-      } = getClosestMatch(cleanedTokenWindow, allOptions.map(cleanString));
+      const { closestMatch: match, minRelativeDistance: distance } = getClosestMatch(
+        cleanedTokenWindow,
+        allOptions.map(cleanString)
+      );
 
       if (distance < margin) {
-        const beroep = beroepen.find(beroep => cleanString(beroep) === match)
-          || findSynonym(match as string) as Beroep;
+        const beroep =
+          beroepen.find((beroep) => cleanString(beroep) === match) ||
+          (findSynonym(match as string) as BeroepOptions);
         if (beroep) {
           result.push(beroep);
           for (let j = i; j < i + windowSize; j++) {
@@ -131,6 +129,8 @@ export function getBeroepen(title: string): Beroep[] {
       }
     }
   }
-
+  if (result.length === 0) {
+    result.push('Overig');
+  }
   return Array.from(new Set(result));
 }
