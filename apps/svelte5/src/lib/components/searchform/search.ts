@@ -13,7 +13,7 @@ import {
 	type SearchResponse
 } from 'meilisearch';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { type facet, facets } from '$lib/types';
+import { type facet, facets, resultsPerPage } from '$lib/types';
 import { createClient } from '@vercel/kv';
 import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
 import * as crypto from 'crypto';
@@ -26,7 +26,7 @@ type QueryResult = ReturnType<typeof index.search<SelectVacature>>;
 
 export async function query(params: { query: string; offset: number; filters?: string }) {
 	const options: SearchParams = {
-		limit: 10,
+		limit: resultsPerPage,
 		offset: params.offset,
 		attributesToHighlight: ['title', 'summary'],
 		facets: facets,

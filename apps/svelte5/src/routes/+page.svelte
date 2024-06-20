@@ -4,12 +4,24 @@
   import NavBar from '$lib/components/navbar/NavBar.svelte';
   import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
   import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
-  import { formStore } from '$lib/stores/stores.svelte';
+  import { filterStore, formStore, type Operator } from '$lib/stores/stores.svelte';
   import { Input } from '$lib/components/ui/input';
   import { tick } from 'svelte';
   import Paginator from '$lib/components/pagination/Paginator.svelte';
+  import type { facet } from '$lib/types';
 
   let { data } = $props();
+
+  if (data.filterDefinition) {
+    data.filterDefinition.forEach((filter) => {
+      const selected = filter.filters.map((filter) => {
+        return { value: filter };
+      });
+      filterStore.addAll(filter.facet as facet, selected);
+      filterStore.setOperator(filter.facet as facet, filter.operator as Operator);
+    });
+  }
+
 
   const onchange = (event) => {
     if (event.target) {
@@ -42,7 +54,9 @@
         <VacatureCard hit={hit}></VacatureCard>
       {/each}
     </div>
-    <Paginator searchResponse={data.searchResponse}></Paginator>
+    <div class="sbg-yellow-300 mx-auto">
+      <Paginator offset={data.offset} searchResponse={data.searchResponse}></Paginator>
+    </div>
 
     <!--   SEARCHRESULTS-->
   </div>

@@ -3,51 +3,67 @@
   import { Pagination } from 'bits-ui';
   import type { SearchResponse } from 'meilisearch';
   import { formStore } from '$lib/stores/stores.svelte';
+  import { resultsPerPage } from '$lib/types';
 
   const x = Pagination;
 
   type Props = {
     searchResponse: SearchResponse
+    offset: number
   }
 
-  let { searchResponse }: Props = $props();
-  const count = searchResponse.estimatedTotalHits || 0;
+  const perPage = resultsPerPage;
+
+  let { searchResponse, offset }: Props = $props();
+
+  formStore.addInput('offset', offset.toString());
 
   function onPageChange(page: number) {
-    formStore.addInput('offset', ((page - 1) * 10).toString());
-    formStore.submit();
+    formStore.addInput('offset', ((page - 1) * perPage).toString());
+    formStore.submitForPage();
   }
 
-</script>
+  let show = $derived.by(() => {
+    if (searchResponse && searchResponse.estimatedTotalHits) {
+      return searchResponse.estimatedTotalHits > perPage;
+    }
+    return false;
+  });
 
-<Pagination.Root count={count} let:pages let:range onPageChange={onPageChange} perPage={10}>
-  <div class="my-8 flex items-center">
-    <Pagination.PrevButton
-      class="mr-[25px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
-    >
-      <CaretLeft class="size-6" />
-    </Pagination.PrevButton>
-    <div class="flex items-center gap-2.5">
-      {#each pages as page (page.key)}
-        {#if page.type === "ellipsis"}
-          <div class="text-[15px] font-medium text-foreground-alt">...</div>
-        {:else}
-          <Pagination.Page
-            {page}
-            class="inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent text-[15px] font-medium hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-[selected]:bg-foreground data-[selected]:text-background"
-          >
-            {page.value}
-          </Pagination.Page>
-        {/if}
-      {/each}
+
+</script>
+{#if show}
+  <Pagination.Root count={searchResponse.estimatedTotalHits || 0} let:pages let:range onPageChange={onPageChange}
+                   page={offset/perPage+1}
+                   perPage={perPage}>
+    <div class="my-2 nx-auto flex-row justify-center flex items-center">
+      <Pagination.PrevButton
+        class="mr-[25px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+      >
+        <CaretLeft class="size-6" />
+      </Pagination.PrevButton>
+      <div class="flex items-center gap-2.5">
+        {#each pages as page (page.key)}
+          {#if page.type === "ellipsis"}
+            <div class="text-[15px] font-medium text-foreground-alt">...</div>
+          {:else}
+            <Pagination.Page
+              {page}
+              class="inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent text-[15px] font-medium hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 hover:disabled:bg-transparent data-[selected]:bg-foreground data-[selected]:text-background"
+            >
+              {page.value}
+            </Pagination.Page>
+          {/if}
+        {/each}
+      </div>
+      <Pagination.NextButton
+        class="ml-[29px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+      >
+        <CaretRight class="size-6" />
+      </Pagination.NextButton>
     </div>
-    <Pagination.NextButton
-      class="ml-[29px] inline-flex size-10 items-center justify-center rounded-[9px] bg-transparent hover:bg-dark-10 active:scale-98 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
-    >
-      <CaretRight class="size-6" />
-    </Pagination.NextButton>
-  </div>
-  <p class="text-center text-[13px] text-muted-foreground">
-    Showing {range.start} - {range.end}
-  </p>
-</Pagination.Root>
+    <p class="text-center text-[13px] text-muted-foreground">
+      Getoond: {range.start + 1} t/m {range.end}
+    </p>
+  </Pagination.Root>
+{/if}

@@ -8,21 +8,16 @@
   import { type facet } from '$lib/types';
 
 
-  function removeFilter(facet: string, value: Selected<string>) {
+  function removeFilter(facet: facet, value: Selected<string>) {
     filterStore.remove(facet, value);
     tick().then(formStore.submit);
   }
-
 
   function toggleOperator(facet: facet) {
     filterStore.toggleOperator(facet);
     tick().then(formStore.submit);
   }
-
-  let allFacets = Object.keys(filterStore.filters) as facet[];
-  const facets = filterStore.nonEmptyFilters();
-  console.log(`Facets: ${facets}`);
-
+  
 </script>
 
 {#if filterStore.hasFilters()}

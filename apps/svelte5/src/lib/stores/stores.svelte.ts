@@ -1,7 +1,7 @@
 import { type facet, facets } from '$lib/types';
 import type { Selected } from 'bits-ui';
 
-type Operator = 'AND' | 'OR';
+export type Operator = 'AND' | 'OR';
 
 function createFilterStore() {
 	const initialFilters: Record<string, Selected<string>[]> = {};
@@ -109,10 +109,20 @@ export const filterStore = createFilterStore();
 function createFormStore() {
 	let form = $state<HTMLFormElement>();
 
-	const values: string[] = $state([]);
+	const submitForPage = () => {
+		if (form) {
+			form.requestSubmit();
+		} else {
+			console.warn('form not set');
+		}
+	};
 
 	const submit = () => {
 		if (form) {
+			const element = form.querySelector(`input[name="offset"]`) as HTMLInputElement;
+			if (element) {
+				element.value = '0';
+			}
 			form.requestSubmit();
 		} else {
 			console.warn('form not set');
@@ -139,6 +149,7 @@ function createFormStore() {
 			form = value;
 		},
 		submit,
+		submitForPage,
 		addInput
 	};
 }
