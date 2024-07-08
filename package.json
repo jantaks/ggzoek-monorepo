@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "@ggzoek/monorepo",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
