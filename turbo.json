@@ -1,6 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDotEnv": [".env"],
   "globalEnv": ["DATABASE_URL", "KV_REST_API_URL", "KV_REST_API_TOKEN"],
   "pipeline": {
     "build": {
