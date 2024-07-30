@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["DATABASE_URL", "KV_REST_API_URL", "KV_REST_API_TOKEN"],
+  "globalEnv": ["DATABASE_URL", "KV_REST_API_URL", "KV_REST_API_TOKEN", "MEILISEARCH_URL", "MEILISEARCH_KEY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
