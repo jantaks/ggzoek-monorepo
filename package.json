@@ -11,24 +11,24 @@
   "devDependencies": {
     "@repo/eslint-config-custom": "workspace:*",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.0.0",
-    "drizzle-kit": "^0.20.14",
+    "@types/node": "^20.14.13",
+    "drizzle-kit": "^0.20.18",
     "eslint": "^8.57.0",
     "esm": "^3.2.25",
-    "prettier": "^3.2.5",
-    "prettier-plugin-svelte": "^3.2.2",
-    "ts-jest": "^29.1.2",
+    "prettier": "^3.3.3",
+    "prettier-plugin-svelte": "^3.2.6",
+    "ts-jest": "^29.2.3",
     "ts-node": "^10.9.2",
-    "tsx": "^4.4.0",
+    "tsx": "^4.16.2",
     "turbo": "latest",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@types/lodash": "^4.17.4",
-    "dotenv": "^16.4.1",
+    "@types/lodash": "^4.17.7",
+    "dotenv": "^16.4.5",
     "lodash": "^4.17.21",
-    "playwright": "*",
-    "vitest": "^1.2.0"
+    "playwright": "^1.45.3",
+    "vitest": "^1.6.0"
   },
   "resolutions": {
     "htmlparser2": "9.1.0"
