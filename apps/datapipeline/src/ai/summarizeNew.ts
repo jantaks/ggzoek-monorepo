@@ -1,10 +1,6 @@
 import { default as OpenAi } from './openAi.js';
 import { default as Anthropic } from './anthropic.js';
-import {
-  insertSchema,
-  InsertVacature,
-  SelectVacature
-} from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { insertSchema, InsertVacature, SelectVacature } from 'packages/ggz-drizzle/src/schema.js';
 import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
 import { extractDataPrompt, summarizePrompt } from './promptTemplates.js';
 import pMap from 'p-map';

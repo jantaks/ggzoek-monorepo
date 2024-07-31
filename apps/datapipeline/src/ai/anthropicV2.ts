@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import { AnthropicModels } from './summarizeNew.js';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
 import Message = Anthropic.Message;
 
 const anthropic = new Anthropic({

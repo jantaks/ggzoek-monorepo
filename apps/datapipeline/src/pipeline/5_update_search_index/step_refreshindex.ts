@@ -8,7 +8,7 @@ import {
   updateSynonyms
 } from '../../meilisearch/meilisearch.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from 'packages/ggz-drizzle/src/schema.js';
 import { EnqueuedTask, Synonyms } from 'meilisearch';
 import { createMutualAssociations } from '../../mutualSynonyms.js';
 import _ from 'lodash';

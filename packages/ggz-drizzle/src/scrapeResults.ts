@@ -1,6 +1,6 @@
 import { getDb } from './client.js';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { scrapeResults } from '../drizzle/schema.js';
+import { scrapeResults } from './schema.js';
 import { desc } from 'drizzle-orm';
 
 export async function insert(result: typeof scrapeResults.$inferInsert) {

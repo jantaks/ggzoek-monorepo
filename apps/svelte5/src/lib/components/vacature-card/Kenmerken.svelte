@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Hit } from 'meilisearch';
-  import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
+	import type { Hit } from 'meilisearch';
+	import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 
-  type Props = {
+	type Props = {
 		hit: Hit<SelectVacature>
 	};
 

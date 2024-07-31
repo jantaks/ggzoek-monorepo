@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getAllPC4 } from '@ggzoek/ggz-drizzle/location_data/repo.js';
-import { type Plaatsen } from '@ggzoek/ggz-drizzle/location_data/schema.js';
+import { getAllPC4 } from '@ggzoek/ggz-drizzle/dist/location_data/repo.js';
+import { type Plaatsen } from '@ggzoek/ggz-drizzle/dist/schema';
 
 export const GET: RequestHandler = async ({ url, setHeaders }) => {
 	const _3months = 60 * 60 * 24 * 31 * 3;

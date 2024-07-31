@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import csv, { type Options } from 'csv-parser';
 import _ from 'lodash';
-import { getDb } from '../src/client.js';
-import { plaatsen } from '../drizzle/schema.js';
+import { getDb } from '../client.js';
+import { plaatsen } from '../schema.js';
 
 interface Plaats {
   Plaats: string;

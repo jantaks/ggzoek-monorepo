@@ -15,7 +15,7 @@ import {
 import { log } from '@ggzoek/logging/src/logger.js';
 import { type facet, facets, resultsPerPage } from '$lib/types';
 import { createClient } from '@vercel/kv';
-import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
+import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 import * as crypto from 'crypto';
 
 const client = new MeiliSearch({ host: MEILISEARCH_URL, apiKey: MEILISEARCH_KEY });

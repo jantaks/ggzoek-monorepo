@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { MeiliSearch, Synonyms } from 'meilisearch';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
 
 const url = process.env.MEILISEARCH_URL;
 const key = process.env.MEILISEARCH_KEY;

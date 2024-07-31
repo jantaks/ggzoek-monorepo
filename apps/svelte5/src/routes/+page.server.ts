@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types.js';
 import { getFacets, query } from '$lib/components/searchform/search';
 import type { PageServerLoadEvent } from './$types';
-import { getGeoPointPC4 } from '@ggzoek/ggz-drizzle/location_data/repo';
-import { log } from '@ggzoek/logging/src/logger.js';
+import { getGeoPointPC4 } from '@ggzoek/ggz-drizzle/dist/location_data/repo';
+import { log } from '@ggzoek/logging/dist/logger.js';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const _12hours = 60 * 60 * 12;

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import 'dotenv/config';
 import { ChatCompletion } from 'openai/resources/index';
 import { OpenAIModels } from './summarizeNew.js';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
 import fs from 'fs';
 import { synonyms } from '../pipeline/4_augment/synonyms.js';
 

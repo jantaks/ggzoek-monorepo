@@ -1,4 +1,4 @@
-import type { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema';
+import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 import { type SupabaseClient } from '@supabase/supabase-js';
 
 export const facets: Array<facet> = ['beroepen', 'behandelmethoden', 'organisatie', 'stoornissen'];

@@ -26,10 +26,7 @@ import {
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
 import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
-import {
-  InsertScrapeResult,
-  InsertVacature
-} from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { InsertScrapeResult, InsertVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
 import { getBeroepen } from '../beroepen.js';
 import { getLatest, insert } from '@ggzoek/ggz-drizzle/src/scrapeResults.js';
 

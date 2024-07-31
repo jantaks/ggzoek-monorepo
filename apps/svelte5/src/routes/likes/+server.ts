@@ -1,6 +1,6 @@
 import { error, json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import type { MyLocals } from '$lib/types';
-import { likeVacature, unlikeVacature } from '@ggzoek/ggz-drizzle/src/vacatures';
+import { likeVacature, unlikeVacature } from '@ggzoek/ggz-drizzle/dist/vacatures';
 
 type Body = { vacature: string };
 

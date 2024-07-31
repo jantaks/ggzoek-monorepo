@@ -1,6 +1,6 @@
 import { log } from '@ggzoek/logging/src/logger.js';
 import fs from 'fs';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
 
 export const templateSummary = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke GezondheidsZorg (GGZ).

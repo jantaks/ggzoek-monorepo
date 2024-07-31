@@ -1,7 +1,7 @@
 import { and, eq, gte, isNotNull, lte, sql } from 'drizzle-orm';
-import { log } from '@ggzoek/logging/src/logger.js';
-import { getDb } from '../src/client.js';
-import { plaatsen } from '../drizzle/schema.js';
+import { log } from '@ggzoek/logging/dist/logger.js';
+import { getDb } from '../client.js';
+import { plaatsen } from '../schema.js';
 
 const { db: db } = getDb();
 

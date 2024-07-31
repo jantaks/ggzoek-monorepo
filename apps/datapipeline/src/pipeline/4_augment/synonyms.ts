@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from 'packages/ggz-drizzle/src/schema.js';
 import { getBeroepen } from '../../beroepen.js';
 import { BeroepOptions } from '@ggzoek/types/index.js';
 

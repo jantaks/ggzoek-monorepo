@@ -3,7 +3,7 @@ import { chromium, devices } from 'playwright';
 import { upsert } from '@ggzoek/ggz-drizzle/src/vacatures.js';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { v2 as cloudinary } from 'cloudinary';
-import { SelectVacature } from '../../../../../packages/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from '../../../../../packages/ggz-drizzle/src/schema.js';
 import { acceptCookies } from '../../utils.js';
 
 async function createScreenshots(vacatures: SelectVacature[]) {

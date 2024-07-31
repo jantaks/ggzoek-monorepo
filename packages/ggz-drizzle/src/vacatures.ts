@@ -1,11 +1,6 @@
 import { DB, getDb, provideDb } from './client.js';
-import { log } from '@ggzoek/logging/src/logger.js';
-import {
-  InsertVacature,
-  likes,
-  SelectVacature,
-  vacatures as vacatureTable
-} from '../drizzle/schema.js';
+import { log } from '@ggzoek/logging/dist/logger.js';
+import { InsertVacature, likes, SelectVacature, vacatures as vacatureTable } from './schema.js';
 import {
   and,
   arrayOverlaps,

@@ -1,17 +1,10 @@
 {
+  "extends": "@ggzoek/tsconfig/base.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "experimentalDecorators": true,
-    "target": "ES2022",
     "outDir": "dist",
-    "noUnusedLocals": false,
-    "lib": ["DOM"],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "declaration": true
   },
   "include": [
-    "./src/**/*",
-    "./location_data/**/*"
+    "./src/**/*"
   ]
 }

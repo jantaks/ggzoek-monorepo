@@ -1,6 +1,6 @@
 import { getSummarizedVacatures, upsert } from '@ggzoek/ggz-drizzle/src/vacatures.js';
 import { correctSpelling } from './synonyms.js';
-import { SelectVacature } from '@ggzoek/ggz-drizzle/drizzle/schema.js';
+import { SelectVacature } from 'packages/ggz-drizzle/src/schema.js';
 import { getGeoPointMultiplePlaatsen } from '@ggzoek/ggz-drizzle/location_data/repo.js';
 import inquirer from 'inquirer';
 

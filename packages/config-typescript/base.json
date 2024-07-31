@@ -3,10 +3,10 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "target": "ES2022",
-        "outDir": "dist",
         "noUnusedLocals": false,
         "lib": ["DOM"],
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "skipLibCheck": true
     },
     "include": [
         "./src/**/*"

@@ -6,6 +6,7 @@
   "dependencies": {
     "@ggzoek/logging": "workspace:*",
     "@ggzoek/types": "workspace:*",
+    "@ggzoek/tsconfig": "workspace:*",
     "@inquirer/prompts": "^5.1.1",
     "better-sqlite3": "^11.0.0",
     "csv-parser": "^3.0.0",
@@ -13,7 +14,6 @@
     "drizzle-zod": "^0.5.1",
     "lodash": "^4.17.21",
     "postgres": "^3.4.3",
-    "tsconfig": "workspace:*",
     "zod": "^3.23.6"
   },
   "devDependencies": {
@@ -23,9 +23,10 @@
   "scripts": {
     "main": "tsx src/main.ts",
     "make_migrations": "drizzle-kit generate:pg",
-    "create_location_database": "tsx location_data/create_database.ts",
-    "to_supabase": "tsx location_data/load_data_to_supabase.ts",
-    "migrate": "tsx src/migrate.ts"
+    "create_location_database": "tsx src/location_data/create_database.ts",
+    "to_supabase": "tsx src/location_data/load_data_to_supabase.ts",
+    "migrate": "tsx src/migrate.ts",
+    "build": "tsc"
   },
   "author": "It's not you it's me",
   "license": "ISC"

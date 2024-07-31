@@ -29,7 +29,7 @@ yarn-error.log*
 
 # turbo
 .turbo
-/packages/ggz-drizzle/location_data/georef-netherlands-postcode-pc4.csv
-/packages/ggz-drizzle/location_data/locaties2.db
-/packages/ggz-drizzle/location_data/pc4_plaats_mapping.csv
-/packages/ggz-drizzle/location_data/spellfix.dylib
+/packages/ggz-drizzle/src/location_data/georef-netherlands-postcode-pc4.csv
+/packages/ggz-drizzle/src/location_data/locaties2.db
+/packages/ggz-drizzle/src/location_data/pc4_plaats_mapping.csv
+/packages/ggz-drizzle/src/location_data/spellfix.dylib
