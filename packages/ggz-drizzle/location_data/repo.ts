@@ -1,18 +1,9 @@
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-import { plaatsen } from './schema.js';
-import { and, eq, gte, isNotNull, lte } from 'drizzle-orm';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { log } from '@ggzoek/logging/src/logger.js';
+import { and, eq, gte, isNotNull, lte, sql } from 'drizzle-orm';
+// import { log } from '@ggzoek/logging/src/logger.js';
+import { getDb } from '../src/client.js';
+import { plaatsen } from '../drizzle/schema.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const sqlite = new Database(`${__dirname}/locaties2.db`);
-sqlite.loadExtension(`${__dirname}/spellfix.dylib`);
-console.log('Loaded spellfix extension');
-const db: BetterSQLite3Database = drizzle(sqlite);
+const { db: db } = getDb();
 
 function getMiddlePoint(result: { GeoPoint: string }[]) {
   const lat =
@@ -30,7 +21,7 @@ function getMiddlePoint(result: { GeoPoint: string }[]) {
  */
 export function getAllPC4(PC4: number) {
   if (PC4 < 1 || PC4 > 9999) {
-    log.warn(`Invalid PC4: ${PC4}`);
+    // log.warn(`Invalid PC4: ${PC4}`);
     return [];
   }
   const length = PC4.toString().length;
@@ -76,17 +67,21 @@ export async function getGeoPointPlaats(plaatsNaam: string) {
 
 /** Get the geopoint based on the PC4.
  * If the geopoint is null, it will try to find the nearest geopoint based on the same plaatsnaam and PC4*/
-export function getGeoPointPC4(pc4: number) {
-  log.info(`Getting geopoint for PC4: ${pc4}`);
-  const result = db.select().from(plaatsen).where(eq(plaatsen.PC4, pc4)).get();
-  const plaatsNaam = result.Plaats;
-  if (result && result.GeoPoint) {
-    return result.GeoPoint;
+export async function getGeoPointPC4(pc4: number) {
+  // log.info(`Getting geopoint for PC4: ${pc4}`);
+  const result = await db.select().from(plaatsen).where(eq(plaatsen.PC4, pc4)).limit(1);
+  if (result.length == 0) {
+    // log.warn(`No result found for PC4: ${pc4}`);
+    return;
+  }
+  const plaatsNaam = result[0].Plaats;
+  if (result[0].GeoPoint) {
+    return result[0].GeoPoint;
   }
 
-  function find(index: number) {
+  async function find(index: number) {
     const nextPostcode = pc4 + index;
-    const result = db
+    const result = await db
       .select()
       .from(plaatsen)
       .where(
@@ -96,13 +91,13 @@ export function getGeoPointPC4(pc4: number) {
           eq(plaatsen.Plaats, plaatsNaam)
         )
       )
-      .get();
-    if (result) {
-      return result.GeoPoint;
+      .limit(1);
+    if (result.length > 0) {
+      return result[0].GeoPoint;
     }
   }
 
-  if (!result.GeoPoint) {
+  if (!result[0].GeoPoint) {
     for (let i = 1; i < 100; i++) {
       const next = find(i);
       const previous = find(-i);
@@ -119,13 +114,10 @@ export function getGeoPointPC4(pc4: number) {
 // db.run(sql(`SELECT load_extension('spellfix1');"))
 
 export async function findPlaats(plaats: string) {
-  try {
-    const result = sqlite
-      .prepare('SELECT word from demo where word match ? AND TOP=5')
-      .all(plaats) as { word: string }[];
-    return result[0].word;
-  } catch (e) {
-    console.error(`Error finding plaats: ${plaats} ${e}`);
-    process.exit(1);
+  const result = await db.execute(sql`select *
+                                      from plaatsen
+                                      where SIMILARITY(plaatsen."Plaats", ${plaats}) > 0.4`);
+  if (result.length == 0) {
+    return result[0].Plaats;
   }
 }

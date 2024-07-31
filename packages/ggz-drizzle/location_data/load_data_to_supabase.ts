@@ -49,23 +49,25 @@ function fromRow(row: Plaats, pc4: number) {
 }
 
 async function insertPlaatsen(rows: Plaats[]) {
+  const batch = [];
   for (const row of rows) {
     const pc4Range = row.PC4.split('–');
     if (pc4Range.length === 2) {
       const start = parseInt(pc4Range[0], 10);
       const end = parseInt(pc4Range[1], 10);
       for (let pc4 = start; pc4 <= end; pc4++) {
-        try {
-          const values = fromRow(row, pc4);
-          await db.insert(plaatsen).values(values);
-          console.log(`Inserted ${row.Plaats} ${pc4}`);
-        } catch (err) {
-          console.log(`Could not insert ${row.Plaats} ${pc4}`, err.toString());
-        }
+        const value = fromRow(row, pc4);
+        batch.push(value);
       }
     } else {
-      await db.insert(plaatsen).values(fromRow(row, parseInt(row.PC4, 10)));
+      let value = fromRow(row, parseInt(row.PC4, 10));
+      batch.push(value);
     }
+  }
+  try {
+    await db.insert(plaatsen).values(batch).onConflictDoNothing();
+  } catch (err) {
+    console.error(err);
   }
 }
 
