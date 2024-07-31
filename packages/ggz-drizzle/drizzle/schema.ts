@@ -9,6 +9,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
@@ -37,6 +38,22 @@ export const auth = pgSchema('auth');
 export const users = auth.table('users', {
   id: uuid('id').primaryKey().notNull()
 });
+
+export const plaatsen = pgTable(
+  'plaatsen',
+  {
+    Plaats: text('Plaats'),
+    PC4: integer('PC4'),
+    Gemeente: text('Gemeente'),
+    Provincie: text('Provincie'),
+    GeoPoint: text('GeoPoint')
+  },
+  (t) => ({
+    unq: unique().on(t.PC4, t.Plaats)
+  })
+);
+
+export type Plaatsen = typeof plaatsen.$inferSelect;
 
 export const likes = pgTable('likes', {
   // You can use { mode: "bigint" } if numbers are exceeding js number limitations

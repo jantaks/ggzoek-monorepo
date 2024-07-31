@@ -24,6 +24,7 @@
     "main": "tsx src/main.ts",
     "make_migrations": "drizzle-kit generate:pg",
     "create_location_database": "tsx location_data/create_database.ts",
+    "to_supabase": "tsx location_data/load_data_to_supabase.ts",
     "migrate": "tsx src/migrate.ts"
   },
   "author": "It's not you it's me",
