@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import postgres from 'postgres';
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { log } from '@ggzoek/logging/src/logger.js';
+import { log } from '@ggzoek/logging/dist/logger.js';
 import _ from 'lodash';
 
 const connectionString = process.env['DATABASE_URL'] as string;

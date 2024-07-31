@@ -1,4 +1,4 @@
-import { log } from './logger';
+import { log } from './logger.js';
 
 log.info('Dit is info', { scraper: 'Parnassia' });
 log.debug('Een stukje debuggen', { scraper: 'Parnassia' });

@@ -1,5 +1,5 @@
 import { and, eq, gte, isNotNull, lte, sql } from 'drizzle-orm';
-// import { log } from '@ggzoek/logging/src/logger.js';
+import { log } from '@ggzoek/logging/src/logger.js';
 import { getDb } from '../src/client.js';
 import { plaatsen } from '../drizzle/schema.js';
 
@@ -21,7 +21,7 @@ function getMiddlePoint(result: { GeoPoint: string }[]) {
  */
 export function getAllPC4(PC4: number) {
   if (PC4 < 1 || PC4 > 9999) {
-    // log.warn(`Invalid PC4: ${PC4}`);
+    log.warn(`Invalid PC4: ${PC4}`);
     return [];
   }
   const length = PC4.toString().length;
@@ -68,10 +68,10 @@ export async function getGeoPointPlaats(plaatsNaam: string) {
 /** Get the geopoint based on the PC4.
  * If the geopoint is null, it will try to find the nearest geopoint based on the same plaatsnaam and PC4*/
 export async function getGeoPointPC4(pc4: number) {
-  // log.info(`Getting geopoint for PC4: ${pc4}`);
+  log.info(`Getting geopoint for PC4: ${pc4}`);
   const result = await db.select().from(plaatsen).where(eq(plaatsen.PC4, pc4)).limit(1);
   if (result.length == 0) {
-    // log.warn(`No result found for PC4: ${pc4}`);
+    log.warn(`No result found for PC4: ${pc4}`);
     return;
   }
   const plaatsNaam = result[0].Plaats;
@@ -99,8 +99,8 @@ export async function getGeoPointPC4(pc4: number) {
 
   if (!result[0].GeoPoint) {
     for (let i = 1; i < 100; i++) {
-      const next = find(i);
-      const previous = find(-i);
+      const next = await find(i);
+      const previous = await find(-i);
       if (next) {
         return next;
       }
@@ -117,7 +117,7 @@ export async function findPlaats(plaats: string) {
   const result = await db.execute(sql`select *
                                       from plaatsen
                                       where SIMILARITY(plaatsen."Plaats", ${plaats}) > 0.4`);
-  if (result.length == 0) {
-    return result[0].Plaats;
+  if (result.length > 0) {
+    return result[0].Plaats as string;
   }
 }

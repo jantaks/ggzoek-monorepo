@@ -8,21 +8,17 @@ import {
 } from './repo.js';
 
 describe('Locatie repo test', () => {
-  it('gets location based on plaatsnaam', async () => {
-    const result = getAllPC4('Amsterdam');
-    console.log(result);
-  });
   it('Gets geopoint based on PC4', async () => {
     const result = getGeoPointPC4(1095);
     console.log(result);
   });
   it('Retrieves Geopoint for next PC4 and same Plaatsnaam if geopoint is null', async () => {
-    const result = getGeoPointPC4(1040);
+    const result = await getGeoPointPC4(1040);
     console.log(result);
     expect(result).toBe('52.4129956147,4.8432371208');
   });
   it('Retrieves nearest Geopoint for previous PC4 and same Plaatsnaam if geopoint is null', async () => {
-    const result = getGeoPointPC4(1084);
+    const result = await getGeoPointPC4(1084);
     console.log(result);
     expect(result).toBe('52.3314532985,4.88852781396');
   });
@@ -32,7 +28,7 @@ describe('Locatie repo test', () => {
     expect(result).toBe('52.3735254197736,4.8825790459775');
   });
   it('Returns average Geopoint also when name misspelled', async () => {
-    const result = await getGeoPointPlaats('denhaag');
+    const result = await getGeoPointPlaats('dehaag');
     console.log(result);
     expect(result).toBe('52.06997066644755,4.300333195993115');
   });
