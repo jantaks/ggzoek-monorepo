@@ -28,12 +28,14 @@ async function allUrlsForOrganisation(organisation: string, db) {
 }
 
 export async function getLikesForUser(user_id: string) {
+  console.log('getLikesForUser user: ', user_id);
   const { db: db } = getDb();
   const result = await db
     .select({ urlHash: likes.vacature })
     .from(likes)
     .where(eq(likes.userId, user_id))
     .execute();
+  console.log('getLikesForUser result: ', result);
   return result.map((x: { urlHash: string }) => x.urlHash) as string[];
 }
 

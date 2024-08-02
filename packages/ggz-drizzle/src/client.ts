@@ -5,11 +5,17 @@ import { log } from '@ggzoek/logging/dist/logger.js';
 import _ from 'lodash';
 
 const connectionString = process.env['DATABASE_URL'] as string;
+if (connectionString.length === 0) {
+  console.error('DATABASE_URL not set');
+}
+
 export const client = postgres(connectionString);
 export const db = drizzle(client);
 
 export function getDb() {
-  // log.debug(`Connecting to ${connectionString}`);
+  if (connectionString.length === 0) {
+    console.error('DATABASE_URL not set');
+  }
   // const client = postgres(connectionString)
   // const db =  drizzle(client)
   return { client, db };

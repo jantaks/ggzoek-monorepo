@@ -33,3 +33,4 @@ yarn-error.log*
 /packages/ggz-drizzle/src/location_data/locaties2.db
 /packages/ggz-drizzle/src/location_data/pc4_plaats_mapping.csv
 /packages/ggz-drizzle/src/location_data/spellfix.dylib
+.vercel
