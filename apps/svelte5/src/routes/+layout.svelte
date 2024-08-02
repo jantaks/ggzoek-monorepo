@@ -1,12 +1,14 @@
 <script lang="ts">
-  import '../app.css';
-  import { createUser } from '$lib/stores/userStore.svelte';
-  import { page } from '$app/stores';
-  import { createSearchForm } from '$lib/stores/formStore.svelte';
+	import '../app.css';
+	import { createSearchForm } from '$lib/stores/formStore.svelte';
+	import { createUser } from '$lib/stores/userStore.svelte';
+	import { page } from '$app/stores';
 
-  const user = createUser($page.data.email, $page.data.likes);
+	if ($page.data.email) {
+		createUser($page.data.email, $page.data.likes);
+	}
 
-  createSearchForm();
+	createSearchForm();
 
 </script>
 

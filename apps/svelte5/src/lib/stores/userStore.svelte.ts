@@ -1,8 +1,8 @@
 import { goto } from '$app/navigation';
 import { getContext, setContext } from 'svelte';
 
-class User {
-	constructor(email: string, likes: string[]) {
+class _User {
+	constructor(email?: string, likes?: string[]) {
 		this._email = email;
 		this._likes = likes;
 	}
@@ -17,7 +17,7 @@ class User {
 		this._email = value;
 	}
 
-	_likes = $state<string[]>([]);
+	_likes: string[] | undefined = $state<string[]>([]);
 
 	get likes() {
 		return this._likes;
@@ -41,7 +41,8 @@ class User {
 	}
 
 	async toggleLike(vacature: string | undefined) {
-		if (!vacature) {
+		if (!vacature || !this._likes) {
+			console.log('no vacature or likes');
 			return;
 		}
 		const action = this._likes.includes(vacature) ? 'DELETE' : 'POST';
@@ -73,9 +74,11 @@ class User {
 const CONTEXT_NAME = Symbol('USER');
 
 export function createUser(email: string, likes: string[]) {
-	return setContext(CONTEXT_NAME, new User(email, likes));
+	return setContext(CONTEXT_NAME, new _User(email, likes));
 }
 
 export function getUser() {
-	return getContext<ReturnType<typeof createUser>>(CONTEXT_NAME);
+	return getContext<_User | undefined>(CONTEXT_NAME);
 }
+
+export type User = typeof _User;

@@ -18,7 +18,7 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 		const pc4 = parseInt(postcode, 10);
 		const radius = parseInt(distance, 10) * 1000;
 		log.info(`Geopoint for PC4: ${pc4}`);
-		const geopoint = getGeoPointPC4(pc4);
+		const geopoint = await getGeoPointPC4(pc4);
 		if (geopoint) {
 			const [lat, lon] = geopoint.split(',');
 			const concatenator = filters.length > 0 ? ' AND ' : '';

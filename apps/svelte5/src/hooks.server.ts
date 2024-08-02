@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { type Handle, redirect } from '@sveltejs/kit';
 import type { MyLocals } from '$lib/types';
 import { log } from '@ggzoek/logging/src/logger.js';
+import { minimatch } from 'minimatch';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -11,23 +12,16 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 	throw new Error('Please set the SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
 }
 
-const public_paths = [
-	'/',
-	'/__data.json',
-	'/auth/login',
-	'/auth/register',
-	'/auth/confirm',
-	'/auth/logout'
-];
+const protectedRoutes = ['/likes', '**/api/*', '**/protected/*'];
 
-function isPathAllowed(path: string) {
-	return public_paths.some(
-		(allowedPath) => path === allowedPath || path.startsWith(allowedPath + '/')
-	);
+function isProtected(path: string) {
+	let isProtected = protectedRoutes.some((protectedRoute) => minimatch(path, protectedRoute));
+	log.debug(`${path} is protected: ${isProtected}`);
+	return isProtected;
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	log.info('HOOK: ', event.request.url);
+	log.info(`Hook handling: ${event.request.url}`);
 	const myLocals = event.locals as MyLocals;
 	const supabaseClient = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 		cookies: {
@@ -61,7 +55,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session;
 	};
 	const url = new URL(event.request.url);
-	if (!(await myLocals.getSession()) && !isPathAllowed(url.pathname)) {
+	if (!(await myLocals.getSession()) && isProtected(url.pathname)) {
+		log.debug('Trying to access a protected route without valid session, redirecting to login.');
 		let next = '/';
 		if (
 			event.request.method === 'POST' &&
@@ -69,12 +64,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		) {
 			const data = await event.request.formData();
 			next = data.get('next') as string;
-			log.info('NEXT: (HOOK): ', next);
+			log.debug('NEXT: (HOOK): ', next);
 		} else {
 			next = url.pathname;
 		}
 		const location = `/auth/login?next=${encodeURIComponent(next)}`;
-		console.log(location);
+		log.debug('Redirecting to: ', location);
 		redirect(301, location);
 	}
 
