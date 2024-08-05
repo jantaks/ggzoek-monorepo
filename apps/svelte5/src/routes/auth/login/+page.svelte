@@ -55,7 +55,7 @@
 
 			<input name="next" type="hidden" value={next} />
 		</form>
-		<p>Nog geen account? <a class="text-pink-500" href="/register">Registreer hier.</a></p>
+		<p>Nog geen account? <a class="text-pink-500" href="register">Registreer hier.</a></p>
 	</div>
 
 
