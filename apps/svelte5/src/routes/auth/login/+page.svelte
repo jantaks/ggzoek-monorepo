@@ -13,7 +13,7 @@
 
 <div class="flex flex-col items-center justify-center grow h-screen">
 	<div class="max-w-lg w-full  p-10	bg-white rounded-lg shadow-md shadow-pink-300">
-		<h1 class="text-center text-3xl text-pink-600 font-bold px-2 border-b-1">GGZOEK</h1>
+		<h1 class="text-center text-3xl text-pink-600 font-bold px-2 border-b-1">GGZOEK - INLOGGEN</h1>
 		<form action="/auth/login" class="space-y-6"
 					method="post">
 			{#if form?.errors}
