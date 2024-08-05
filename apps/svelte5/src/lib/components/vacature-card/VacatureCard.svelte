@@ -20,15 +20,17 @@
 		easing: cubicInOut
 	});
 
+	const locaties = hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend';
+
 
 </script>
 
 <div class="p-4 rounded-lg bg-white text-slate-700 border shadow ">
-	<div class="flex flex-row justify-between space-x-2 items-center border-b pb-2 border-b-pink-200" id="header">
+	<div class="flex flex-row justify-between space-x-2 items-center pb-2 " id="header">
 		<div>
 			<h2 class="font-bold text-xl min-w-fit mb-1">{@html hit.title}</h2>
 			<h2 class="font-semibold uppercase mr-1 truncate">{@html hit.organisatie} <span
-				class="truncate capitalize font-light ml-1">{hit.locaties.join(', ')}</span>
+				class="truncate capitalize font-light ml-1">{locaties}</span>
 			</h2>
 		</div>
 

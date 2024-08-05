@@ -96,7 +96,7 @@ em{
 }
 
 [data-tabs-trigger][data-state='active'] {
-    @apply border-t border-t-pink-500 border-b-white bg-pink-50  rounded-t-2xl;
+    @apply border-t border-t-2 border-t-pink-500 border-b-white ;
 }
 
 [data-tabs-trigger][data-state='inactive'] {
