@@ -29,8 +29,8 @@
 	<div class="flex flex-row justify-between space-x-2 items-center pb-2 " id="header">
 		<div>
 			<h2 class="font-bold text-xl min-w-fit mb-1">{@html hit.title}</h2>
-			<h2 class="font-semibold uppercase mr-1 truncate">{@html hit.organisatie} <span
-				class="truncate capitalize font-light ml-1">{locaties}</span>
+			<h2 class="font-semibold uppercase mr-1 truncate max-w-lg">{@html hit.organisatie} <span
+				class="truncate capitalize font-light ml-1 ">{locaties}</span>
 			</h2>
 		</div>
 

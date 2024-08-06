@@ -17,6 +17,6 @@
 
 <style lang="postcss">
     :global(body) {
-        @apply bg-gradient-to-r from-indigo-50 to-pink-100
+        @apply bg-gradient-to-br from-indigo-100 to-pink-50
     }
 </style>
