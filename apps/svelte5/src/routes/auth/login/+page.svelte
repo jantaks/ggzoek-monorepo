@@ -8,6 +8,7 @@
 	}
 
 	const { form, action, next }: Props = $props();
+	console.log(`Form, action, next: ${form}, ${action}, ${next}`);
 
 </script>
 
@@ -17,9 +18,11 @@
 		<form action="/auth/login" class="space-y-6"
 					method="post">
 			{#if form?.errors}
+
 				ERRORS: {form.errors}
 			{/if}
 			<div>
+				<input name="next" type="hidden" value="/zoekresultaten/" />
 				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="email">Email</label>
 				<input
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
@@ -53,7 +56,6 @@
 				Inloggen
 			</button>
 
-			<input name="next" type="hidden" value={next} />
 		</form>
 		<p>Nog geen account? <a class="text-pink-500" href="register">Registreer hier.</a></p>
 	</div>

@@ -156,7 +156,7 @@ export class SearchForm {
 		this.isLoading = true;
 		const searchParams = this.searchParams();
 		if (offset) searchParams.set('offset', offset.toString());
-		await goto('/?' + searchParams);
+		await goto('/zoekresultaten?' + searchParams);
 		this.isLoading = false;
 	}
 

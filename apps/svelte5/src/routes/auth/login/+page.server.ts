@@ -18,6 +18,7 @@ export const actions = {
 		if (myLocals.supabase && email && password) {
 			const result = await myLocals.supabase.auth.signInWithPassword({ email, password });
 			if (!result.error) {
+				console.log('LOGIN SUCCESS, redirecting to: ', next);
 				redirect(303, next);
 			}
 			return { email, status: 500, errors: 'Ongeldige gebruikersnaam en/of wachtwoord' };

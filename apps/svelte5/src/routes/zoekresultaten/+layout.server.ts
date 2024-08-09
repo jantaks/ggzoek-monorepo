@@ -1,6 +1,6 @@
-import type { LayoutServerLoad } from './$types';
 import type { MyLocals } from '$lib/types';
 import { getLikesForUser } from '@ggzoek/ggz-drizzle/dist/vacatures';
+import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = (async (event) => {
 	const myLocals = event.locals as MyLocals;

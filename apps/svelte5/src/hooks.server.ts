@@ -57,7 +57,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const url = new URL(event.request.url);
 	if (!(await myLocals.getSession()) && isProtected(url.pathname)) {
 		log.debug('Trying to access a protected route without valid session, redirecting to login.');
-		let next = '/';
+		let next: string;
 		if (
 			event.request.method === 'POST' &&
 			event.request.headers.get('content-type') === 'application/x-www-form-urlencoded'

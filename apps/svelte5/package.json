@@ -45,6 +45,7 @@
     "@ggzoek/ggz-drizzle": "workspace:*",
     "@ggzoek/logging": "workspace:*",
     "@iconify/json": "^2.2.221",
+    "@rive-app/canvas": "^2.19.6",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.43.5",
     "@vercel/kv": "^1.0.1",
