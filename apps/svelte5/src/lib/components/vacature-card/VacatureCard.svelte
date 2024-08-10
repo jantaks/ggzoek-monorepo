@@ -20,7 +20,7 @@
 		easing: cubicInOut
 	});
 
-	const locaties = hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend';
+	let locaties = $derived(hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend');
 
 
 </script>

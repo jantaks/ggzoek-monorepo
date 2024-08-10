@@ -23,7 +23,7 @@
 	</style>
 </svelte:head>
 
-<NavBar class="mb-4 bg-indigo-900 text-white h-14"></NavBar>
+<NavBar class="mb-4 bg-indigo-900 text-white h-14" showLinks={true} showLogin={true}></NavBar>
 <div class="flex flex-row mx-auto max-w-7xl relative">
 	<div class="w-2/5 min-w-fit sticky top-20">
 		<Searchform facets={data.facets}></Searchform>

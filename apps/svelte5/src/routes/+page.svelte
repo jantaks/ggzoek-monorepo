@@ -18,7 +18,7 @@
 </svelte:head>
 
 <div class="w-full bg-indigo-900 ">
-	<NavBar class="mb-4 bg-transparent text-white"></NavBar>
+	<NavBar class="mb-4 bg-transparent text-white" showLogin></NavBar>
 	<div class="mx-auto max-w-7xl pb-4 md:pb-0 lg:px-8 text-white">
 		<div class="lg:grid lg:grid-cols-2 lg:gap-8">
 			<div
