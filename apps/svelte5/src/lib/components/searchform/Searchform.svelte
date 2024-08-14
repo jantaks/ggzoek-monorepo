@@ -20,10 +20,10 @@
 
 </script>
 
-<div class={"p-4 space-y-4 justify-left bg-primary rounded-xl shadow-xl " + className}>
+<div class={"sm:p-4 space-y-4 justify-left bg-primary rounded-xl shadow-xl " + className}>
 	<PostCodeSelect></PostCodeSelect>
 
-	<div class=" space-y-4">
+	<div class="sm:space-y-4">
 		{#each allFacets as facet}
 			<FacetSelectFilterNew facets={facets[facet]}
 														filterLabel={facet}></FacetSelectFilterNew>

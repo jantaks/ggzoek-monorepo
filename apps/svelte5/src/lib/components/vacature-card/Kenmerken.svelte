@@ -11,12 +11,12 @@
 </script>
 {#snippet row(title, value)}
 	<div class="grid grid-cols-2 items-center border-b border-b-gray-300 py-1 ">
-		<h3 class="">{title}:</h3>
+		<h3 class="truncate">{title}:</h3>
 		<p>{value || 'onbekend' }</p>
 	</div>
 {/snippet}
-<div class="py-4 px-4 bg-white">
-	<div class="grid grid-cols-2 items-start cols-auto gap-2 w-full">
+<div class="p-1  bg-white">
+	<div class="grid grid-cols-1 lg:grid-cols-2 items-start cols-auto gap-2 w-full">
 		<div class="h-full bg-transparent p-2">
 			<h2 class="font-semibold mb-2">Arbeidsvoorwaarden</h2>
 			{@render row("CAO", hit.cao)}

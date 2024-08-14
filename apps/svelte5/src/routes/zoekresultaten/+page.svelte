@@ -24,17 +24,20 @@
 </svelte:head>
 
 <NavBar class="mb-4 bg-secondary-900 text-white h-14" showLinks showLogin></NavBar>
-<div class="flex flex-col sm:flex-row mx-auto max-w-7xl relative space-y-4 sm:space-y-0">
-	<div class="sm:w-2/5 min-w-fit">
+<div class="flex flex-col md:flex-row mx-auto max-w-7xl relative">
+	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
 	</div>
-	<div class="sm:ml-4 w-full space-y-4">
-		<Input bind:value={form.query} class="mb-4 border border-primary-light h-14" id="name"
+	<div class="md:ml-4 w-full space-y-4">
+		<Input bind:value={form.query} class="mb-4 border border-primary-light h-14 rounded-none" id="name"
 					 onchange={() => form.submit()}
 					 placeholder="Zoekcriteria invoeren"
 					 required
 					 type="text"
 		/>
+		<div class="md:hidden md:w-2/5 min-w-fit">
+			<Searchform class="rounded-none md:rounded-2xl px-2 py-4 md:p-1.5" facets={data.facets}></Searchform>
+		</div>
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
 		<div class="space-y-4">

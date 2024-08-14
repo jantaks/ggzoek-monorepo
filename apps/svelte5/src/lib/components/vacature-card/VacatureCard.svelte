@@ -33,17 +33,17 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<div class="p-4 rounded-lg bg-white text-slate-700 border shadow ">
-	<div class="flex flex-row justify-between space-x-2 items-center pb-2 " id="header">
+<div class="p-1.5 sm:p-4 sm:rounded-lg bg-white text-slate-700 border shadow ">
+	<div class="flex flex-wrap lg:flex-row justify-between" id="header">
+
 		<div>
-			<h2 class="font-bold text-xl min-w-fit mb-1">{@html hit.title}</h2>
+			<h2 class="font-bold sm:text-xl min-w-fit mb-1">{@html hit.title}</h2>
 			<h2 class="font-semibold uppercase mr-1 truncate max-w-lg">{@html hit.organisatie} <span
 				class="truncate capitalize font-light ml-1 ">{locaties}</span>
 			</h2>
 		</div>
 
-		<div class="font-normal justify-end flex flex-row space-x-2">
-
+		<div class="font-normal flex flex-row space-x-2 p-2">
 			<SaveVacature urlhash="{hit.urlHash}" />
 			<GotoWebsiteButton url={hit.url} />
 		</div>

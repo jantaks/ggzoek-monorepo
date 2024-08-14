@@ -1,19 +1,23 @@
 <script lang="ts">
-  import SaveSearchButton from '$lib/components/results-bar/SaveSearchButton.svelte';
+	import SaveSearchButton from '$lib/components/results-bar/SaveSearchButton.svelte';
 
-  type Props = {
-    count?: number;
-    loading: boolean;
-  }
+	type Props = {
+		count?: number;
+		loading: boolean;
+	}
 
-  let { count, loading }: Props = $props();
+	let { count, loading }: Props = $props();
 </script>
 
-<p class="flex flex-wrap gap-2 w-full justify-items-start h-fit min-h-12 text-2xl">
-  {#if loading}
-    <span class="font-bold">GGZoeken...</span>
-  {:else}
-    <span class="font-bold">{count} Resultaten</span> voor uw zoekopdracht
-    <SaveSearchButton />
-  {/if}
-</p>
+
+<div class="gap-2 w-full h-fit sm:text-2xl">
+	{#if loading}
+		<span class="font-bold">GGZoeken...</span>
+	{:else}
+		<div class="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
+			<p><span class="font-bold">{count} Resultaten</span> voor uw zoekopdracht</p>
+			<SaveSearchButton />
+		</div>
+	{/if}
+</div>
+
