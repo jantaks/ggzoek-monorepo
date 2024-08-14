@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { type facet } from '$lib/types';
-  import type { getFacets } from '$lib/components/searchform/search';
-  import { Label, Slider } from 'bits-ui';
-  import FacetSelectFilterNew from '$lib/components/searchform/FacetSelectFilterNew.svelte';
-  import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';
+	import { type facet } from '$lib/types';
+	import type { getFacets } from '$lib/components/searchform/search';
+	import { Label, Slider } from 'bits-ui';
+	import FacetSelectFilterNew from '$lib/components/searchform/FacetSelectFilterNew.svelte';
+	import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';
 
-  const x = { Slider, Label };
+	const x = { Slider, Label };
 
 
 	type Props = {
@@ -20,7 +20,7 @@
 
 </script>
 
-<div class={"p-4 space-y-4 justify-left bg-pink-400 rounded-xl shadow-xl " + className}>
+<div class={"p-4 space-y-4 justify-left bg-primary rounded-xl shadow-xl " + className}>
 	<PostCodeSelect></PostCodeSelect>
 
 	<div class=" space-y-4">

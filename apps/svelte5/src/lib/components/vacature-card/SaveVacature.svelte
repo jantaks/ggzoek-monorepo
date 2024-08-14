@@ -19,7 +19,7 @@
 	});
 
 	let updatePending = $state(false);
-	
+
 	async function handleClick() {
 		if (!user) {
 			console.log('user not logged in');
@@ -35,10 +35,10 @@
 </script>
 
 <Button
-	class="px-2 h-8 border-pink-200 border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-pink-500 hover:bg-white "
+	class="px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white "
 	onclick={handleClick}>
 	<Heart
-		class={`text-pink-600 size-5 mr-1 ${liked? "fill-pink-600" : "" } ${updatePending? "fill-pink-200 text-pink-200" : "" }`}></Heart>
+		class={`text-primary size-5 mr-1 ${liked? "fill-primary" : "" } ${updatePending? "fill-primary-light text-primary-light" : "" }`}></Heart>
 	<p class="text-xs text-slate-900">{liked ? "Bewaard" : "Bewaar"}</p>
 </Button>
 

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { type ComboboxOptionProps, createCombobox, melt } from '@melt-ui/svelte';
-  import { fly } from 'svelte/transition';
-  import { Label, Slider } from 'bits-ui';
-  import { page } from '$app/stores';
-  import { CloseIcon } from '$lib/components/icons';
-  import DistanceSlider from '$lib/components/searchform/DistanceSlider.svelte';
-  import { getSearchForm } from '$lib/stores/formStore.svelte';
+	import { type ComboboxOptionProps, createCombobox, melt } from '@melt-ui/svelte';
+	import { fly } from 'svelte/transition';
+	import { Label, Slider } from 'bits-ui';
+	import { page } from '$app/stores';
+	import { CloseIcon } from '$lib/components/icons';
+	import DistanceSlider from '$lib/components/searchform/DistanceSlider.svelte';
+	import { getSearchForm } from '$lib/stores/formStore.svelte';
 
-  const form = getSearchForm();
+	const form = getSearchForm();
 
 	const x = { Slider, Label };
 
@@ -99,14 +99,14 @@
 
 	<div class="relative w-full">
 		<input
-			class="flex h-10 items-center justify-between rounded-lg bg-white border border-pink-200
+			class="flex h-10 items-center justify-between rounded-lg bg-white border border-primary-light
           px-3 pr-12 text-black w-full"
 			onblur={onBlur}
 			oninput={onInput}
 			placeholder="Type om te zoeken"
 			use:melt={$input}
 		/>
-		<div class="absolute right-1 top-1/2 z-10 -translate-y-1/2 text-pink-900">
+		<div class="absolute right-1 top-1/2 z-10 -translate-y-1/2 text-primary-dark">
 			{#if plaats}
 				<button onclick={clear}>
 					<CloseIcon />
@@ -135,8 +135,8 @@
 						<li
 							use:melt={$option(toOption(plaats))}
 							class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4
-        hover:bg-pink-100
-        data-[highlighted]:bg-pink-200 data-[highlighted]:text-pink-900
+        hover:bg-primary-light
+        data-[highlighted]:bg-primary-light data-[highlighted]:text-primary-dark
           data-[disabled]:opacity-50"
 						>
 							<div class="pl-4">

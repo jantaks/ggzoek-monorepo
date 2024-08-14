@@ -18,18 +18,18 @@
 <svelte:head>
 	<style>
       body {
-          @apply bg-gradient-to-r from-indigo-300 via-pink-100 to-white;
+          @apply bg-gradient-to-r from-secondary-300 via-primary-light to-white;
       }
 	</style>
 </svelte:head>
 
-<NavBar class="mb-4 bg-indigo-900 text-white h-14" showLinks={true} showLogin={true}></NavBar>
-<div class="flex flex-row mx-auto max-w-7xl relative">
-	<div class="w-2/5 min-w-fit sticky top-20">
+<NavBar class="mb-4 bg-secondary-900 text-white h-14" showLinks showLogin></NavBar>
+<div class="flex flex-col sm:flex-row mx-auto max-w-7xl relative space-y-4 sm:space-y-0">
+	<div class="sm:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
 	</div>
-	<div class="ml-4 w-full space-y-4 ">
-		<Input bind:value={form.query} class="mb-4 border border-pink-200 h-14" id="name"
+	<div class="sm:ml-4 w-full space-y-4">
+		<Input bind:value={form.query} class="mb-4 border border-primary-light h-14" id="name"
 					 onchange={() => form.submit()}
 					 placeholder="Zoekcriteria invoeren"
 					 required

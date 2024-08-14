@@ -25,6 +25,14 @@
 
 </script>
 
+{#snippet tabTrigger(value, title)}
+	<Tabs.Trigger
+		value={value}>
+		<div class="py-0.5 px-4">{title}
+		</div>
+	</Tabs.Trigger>
+{/snippet}
+
 <div class="p-4 rounded-lg bg-white text-slate-700 border shadow ">
 	<div class="flex flex-row justify-between space-x-2 items-center pb-2 " id="header">
 		<div>
@@ -46,15 +54,8 @@
 		<Tabs.Root>
 			<Tabs.List
 				class="lg:w-fit flex flex-row">
-				<Tabs.Trigger
-					value="overzicht">
-					<div class="py-0.5 px-4">samenvatting
-					</div>
-				</Tabs.Trigger>
-				<Tabs.Trigger
-					value="kenmerken">
-					<div class="py-0.5 px-4">kenmerken</div>
-				</Tabs.Trigger>
+				{@render tabTrigger("overzicht", "Overzicht")}
+				{@render tabTrigger("kenmerken", "Kenmerken")}
 			</Tabs.List>
 			<Tabs.Content value="overzicht">
 				<div class="py-4 px-4 bg-white">
@@ -66,6 +67,7 @@
 			<Tabs.Content value="kenmerken">
 				<Kenmerken hit={hit}></Kenmerken>
 			</Tabs.Content>
+
 		</Tabs.Root>
 	</div>
 </div>

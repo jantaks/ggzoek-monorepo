@@ -18,9 +18,9 @@
 
 <div class={"w-full " + className}>
 	<nav class={"flex items-center py-2 mx-auto max-w-7xl justify-between pr-10"}>
-		<h1 class="text-3xl px-2 border-b-1"><a href="/">gg<span class="text-pink-300">zoek</span></a></h1>
+		<h1 class="text-3xl px-2 border-b-1"><a href="/">gg<span class="text-primary">zoek</span></a></h1>
 		{#if showLinks}
-			<ul class="flex flex-row gap-8 mx-auto items-center">
+			<ul class="hidden sm:flex flex-row  gap-8 mx-auto items-center">
 				<li><a href="/">Home</a></li>
 				<li><a href="/pages/about">Over ons</a></li>
 				<li><a href="/">Instellingen</a></li>
@@ -30,7 +30,7 @@
 		{#if loggedIn && showLogin}
 			<UserDropDown class=""></UserDropDown>
 		{:else if showLogin}
-			<a href="/auth/login?next=zoekresultaten" class="text-pink-300">inloggen</a>
+			<a href="/auth/login?next=zoekresultaten" class="hidden sm:flex text-primary">inloggen</a>
 		{/if}
 	</nav>
 </div>
