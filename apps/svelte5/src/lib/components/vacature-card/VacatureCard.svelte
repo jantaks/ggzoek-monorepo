@@ -5,9 +5,9 @@
 	import GotoWebsiteButton from '$lib/components/vacature-card/GotoWebsiteButton.svelte';
 	import SaveVacature from '$lib/components/vacature-card/SaveVacature.svelte';
 	import Kenmerken from '$lib/components/vacature-card/Kenmerken.svelte';
-	import { slide } from 'svelte/transition';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { createCollapsible, melt } from '@melt-ui/svelte';
+	import { slide } from 'svelte/transition';
 
 	const x = Tabs; //HACK TO AVOID UNUSED IMPORTS.
 
@@ -29,17 +29,16 @@
 </script>
 
 {#snippet tabTrigger(value, title)}
-	<Tabs.Trigger
-		value={value}>
+	<Tabs.Trigger class="mb-2"
+								value={value}>
 		<div class="mr-4">
-			<hr class="w-12 mx-auto">
-			<div class="py-1  text-center">{title}</div>
+			<p class="text-center font-medium mb-1">{title}</p>
+			<hr class="w-20 mx-auto">
 		</div>
-
 	</Tabs.Trigger>
 {/snippet}
 
-<div class="p-1.5 sm:p-4 sm:rounded-lg bg-white/50 text-slate-700 border shadow">
+<div class="p-2 sm:p-4 sm:rounded-lg bg-white/50 text-slate-700 border shadow">
 	<div>
 		<div class="flex flex-row justify-between">
 			<h2 class="font-bold sm:text-xl mb-1">{@html hit.title}</h2>
@@ -49,7 +48,7 @@
 			</div>
 		</div>
 
-		<h2 class="font-semibold uppercase py-2">{@html hit.organisatie} <span
+		<h2 class="text-sm sm:text-md font-semibold uppercase py-2">{@html hit.organisatie} <span
 			class="truncate capitalize font-light ml-1 text-wrap ">{locaties}</span>
 		</h2>
 
@@ -57,19 +56,19 @@
 	</div>
 
 	<div class="">
-		<Tabs.Root>
+		<Tabs.Root class="mt-4 text-sm md:text-base">
 			<Tabs.List
 				class="lg:w-fit flex sm:flex-row">
 				{@render tabTrigger("overzicht", "Samenvatting")}
 				{@render tabTrigger("kenmerken", "Kenmerken")}
 			</Tabs.List>
 			<Tabs.Content value="overzicht">
-				<div class="py-4 px-0 bg-transparent">
+				<div class="bg-transparent" use:melt={$root}>
 					{#if hit.summary && hit.summary.length > 0}
 						{#if !$open}
-							<div use:melt={$content} transition:slide>
+							<div use:melt={$content}>
 								<p
-									class="line-clamp-4 md:line-clamp-6">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
+									class="line-clamp-4 md:line-clamp-6 text-sm md:text-base">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
 								</p>
 							</div>
 						{:else}
@@ -86,16 +85,17 @@
 							use:melt={$trigger}>
 							{#if !$open}
 								<ChevronDown
-									class="size-8  text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
+									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
 							{:else}
-								<ChevronUp class="size-8  text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
+								<ChevronUp
+									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
 							{/if}
 						</button>
 					</div>
 				</div>
 			</Tabs.Content>
 			<Tabs.Content value="kenmerken">
-				<Kenmerken hit={hit}></Kenmerken>
+				<Kenmerken class="bg-transparent" hit={hit}></Kenmerken>
 			</Tabs.Content>
 		</Tabs.Root>
 	</div>

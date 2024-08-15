@@ -97,7 +97,7 @@
 
 	<div class="relative w-full">
 		<input
-			class="flex h-10 items-center justify-between rounded-lg bg-white border border-primary-light
+			class="flex h-10 text-sm items-center justify-between rounded-lg bg-white border border-primary-light
           px-3 pr-12 text-black w-full"
 			placeholder="Type om te zoeken"
 			use:melt={$input}

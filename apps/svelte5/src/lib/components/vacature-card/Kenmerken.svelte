@@ -15,7 +15,7 @@
 		<p class="text-wrap truncate">{value || 'onbekend' }</p>
 	</div>
 {/snippet}
-<div class="bg-white">
+<div class="bg-transparent">
 	<div class="grid grid-cols-1 lg:grid-cols-2 items-start cols-auto gap-2 w-full">
 		<div class="h-full bg-transparent mt-2">
 			<h2 class="font-semibold mb-2 border-b border-b-gray-300 py-1">Arbeidsvoorwaarden</h2>

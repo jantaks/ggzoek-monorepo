@@ -92,14 +92,14 @@
 <div class="flex flex-col gap-1 w-full ">
 	<!-- svelte-ignore a11y_label_has_associated_control - $label contains the 'for' attribute -->
 	<label use:melt={$label}>
-    <span class="text-white"
+    <span class="text-sm font-medium text-primary-light capitalize"
 		>Postcode:</span
 		>
 	</label>
 
 	<div class="relative w-full">
 		<input
-			class="flex h-10 items-center justify-between rounded-lg bg-white border border-primary-light
+			class="flex h-10 text-sm items-center justify-between rounded-lg bg-white border border-primary-light
           px-3 pr-12 text-black w-full"
 			onblur={onBlur}
 			oninput={onInput}
