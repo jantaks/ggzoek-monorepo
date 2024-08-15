@@ -27,7 +27,7 @@
 
 <div class="w-full">
 	<Label.Root
-		class="text-primary-light text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+		class="text-primary-light font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 		for="distance-slider"
 		id="distance-slider-label"
 	>

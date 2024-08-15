@@ -92,14 +92,14 @@
 <div class="flex flex-col gap-1 w-full ">
 	<!-- svelte-ignore a11y_label_has_associated_control - $label contains the 'for' attribute -->
 	<label use:melt={$label}>
-    <span class="text-sm font-medium text-primary-light capitalize"
+    <span class="font-medium capitalize"
 		>Postcode:</span
 		>
 	</label>
 
 	<div class="relative w-full">
 		<input
-			class="flex h-10 text-sm items-center justify-between rounded-lg bg-white border border-primary-light
+			class="flex h-10 items-center justify-between rounded-lg bg-white border border-primary-light
           px-3 pr-12 text-black w-full"
 			onblur={onBlur}
 			oninput={onInput}
@@ -141,7 +141,7 @@
 						>
 							<div class="pl-4">
 								<span class="font-medium">{plaats.PC4}</span>
-								<span class="text-sm opacity-75">({plaats.Plaats})</span>
+								<span class=" opacity-75">({plaats.Plaats})</span>
 							</div>
 						</li>
 					{/each}
@@ -151,7 +151,7 @@
 					class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
 					tabindex="0"
 				>
-					<li class="text-sm text-gray-500">Geen resultaten gevonden</li>
+					<li class=" text-gray-500">Geen resultaten gevonden</li>
 				</div>
 			{/if}
 		{/await}

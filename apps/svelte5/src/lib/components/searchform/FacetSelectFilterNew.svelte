@@ -90,15 +90,15 @@
 <div class="flex flex-col gap-1 ">
 	<!-- svelte-ignore a11y_label_has_associated_control - $label contains the 'for' attribute -->
 	<label use:melt={$label}>
-    <span class="text-sm font-medium text-primary-light capitalize"
+    <span class=" font-medium text-primary-light capitalize"
 		>{filterLabel}:</span
 		>
 	</label>
 
 	<div class="relative w-full">
 		<input
-			class="flex h-10 text-sm items-center justify-between rounded-lg bg-white border border-primary-light
-          px-3 pr-12 text-black w-full"
+			class="flex h-10  items-center justify-between rounded-lg bg-white border border-primary-light
+          px-3 pr-12 text-slate-800 w-full"
 			placeholder="Type om te zoeken"
 			use:melt={$input}
 		/>
@@ -119,7 +119,7 @@
 	>
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div
-			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-slate-50 border-2 border-slate-50 shadow px-2 py-2 text-black"
+			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-slate-50 border-2 border-slate-50 shadow px-2 py-2 text-slate-800 text-sm font-light"
 			tabindex="0"
 		>
 			{#each filteredOptions as optionValue, index (index)}
@@ -137,7 +137,7 @@
 					{/if}
 					<div class="pl-4">
 						<span class="font-medium">{optionValue}</span>
-						<span class="text-sm opacity-75">{getFacetCount(optionValue)}</span>
+						<span class=" opacity-75">{getFacetCount(optionValue)}</span>
 					</div>
 				</li>
 			{:else}

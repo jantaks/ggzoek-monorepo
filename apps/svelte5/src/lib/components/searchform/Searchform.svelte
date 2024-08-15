@@ -12,28 +12,29 @@
 
 	type Props = {
 		facets: Awaited<ReturnType<typeof getFacets>>,
-		class?: string
 	}
 
-	let { class: className, facets }: Props = $props();
+	let { facets }: Props = $props();
 
 	let allFacets = Object.keys(facets) as facet[];
 
 	let innerWidth: number = $state(0);
-	let toggleOn = $state(false);
+	let toggleOn = $state(true);
 	let showFilters = $derived(innerWidth > 768 || toggleOn);
 
 
 </script>
 <svelte:window bind:innerWidth />
 
-<div class={"md:p-4 space-y-4 justify-left bg-primary md:rounded-xl shadow-xl " + className}>
+<div
+	class="px-2 pt-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-xs md:text-sm text-primary-light">
 	<div class="md:hidden">
 		<SearchBox />
 	</div>
 	{#if showFilters}
-		<PostCodeSelect></PostCodeSelect>
-		<div class="sm:space-y-4">
+		<div class="space-y-2 sm:space-y-4">
+			<PostCodeSelect></PostCodeSelect>
+
 			{#each allFacets as facet}
 				<FacetSelectFilterNew facets={facets[facet]}
 															filterLabel={facet}></FacetSelectFilterNew>
@@ -42,11 +43,11 @@
 	{/if}
 	{#if innerWidth < 768}
 		<button onclick={() => toggleOn = !toggleOn}
-						class="w-full flex flex-row text-white text-sm justify-center items-center">
+						class="w-full flex flex-row text-primary-light justify-center items-center">
 			{#if !showFilters}
 				Toon filters
 				<ChevronDown
-					class="size-8 text-white text-sm transform hover:scale-125 transition duration-500 ease-in-out" />
+					class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 			{:else}
 				Verberg filters
 				<ChevronUp

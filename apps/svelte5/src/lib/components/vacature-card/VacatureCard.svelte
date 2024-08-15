@@ -38,10 +38,10 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<div class="p-2 sm:p-4 sm:rounded-lg bg-white/50 text-slate-700 border shadow">
+<div class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow">
 	<div>
 		<div class="flex flex-row justify-between">
-			<h2 class="font-bold sm:text-xl mb-1">{@html hit.title}</h2>
+			<h2 class="font-bold sm:text-xl mb-1 text-wrap truncate">{@html hit.title}</h2>
 			<div class="font-normal flex flex-row space-x-2 px-1">
 				<SaveVacature urlhash="{hit.urlHash}" />
 				<GotoWebsiteButton url={hit.url} />

@@ -18,12 +18,12 @@
 <svelte:head>
 	<style>
       body {
-          @apply bg-gradient-to-r from-secondary-300 via-primary-light to-white;
+          @apply bg-secondary-100 md:bg-gradient-to-r from-secondary-300 via-primary-light to-white;
       }
 	</style>
 </svelte:head>
 
-<NavBar class="mb-4 bg-secondary-900 text-white h-14" showLinks showLogin></NavBar>
+<NavBar class="md:mb-4 bg-secondary-900 text-white h-14" showLinks showLogin></NavBar>
 <div class="flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
@@ -34,7 +34,7 @@
 		</div>
 
 		<div class="md:hidden md:w-2/5 min-w-fit">
-			<Searchform class="rounded-none md:rounded-2xl px-2 py-4 md:p-1.5" facets={data.facets}></Searchform>
+			<Searchform facets={data.facets}></Searchform>
 		</div>
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
