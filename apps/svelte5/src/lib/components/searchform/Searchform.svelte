@@ -19,7 +19,7 @@
 	let allFacets = Object.keys(facets) as facet[];
 
 	let innerWidth: number = $state(0);
-	let toggleOn = $state(true);
+	let toggleOn = $state(false);
 	let showFilters = $derived(innerWidth > 768 || toggleOn);
 
 
