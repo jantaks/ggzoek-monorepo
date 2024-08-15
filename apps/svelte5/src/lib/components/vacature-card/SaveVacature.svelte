@@ -39,7 +39,7 @@
 	onclick={handleClick}>
 	<Heart
 		class={`text-primary size-5 mr-1 ${liked? "fill-primary" : "" } ${updatePending? "fill-primary-light text-primary-light" : "" }`}></Heart>
-	<p class="text-xs text-slate-900">{liked ? "Bewaard" : "Bewaar"}</p>
+	<p class="hidden md:flex text-xs text-slate-900">{liked ? "Bewaard" : "Bewaar"}</p>
 </Button>
 
 

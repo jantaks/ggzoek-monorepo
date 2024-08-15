@@ -13,6 +13,6 @@
 	<Button
 		class="px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white ">
 		<SquareArrowUpRight class="text-primary size-5 mr-1 "></SquareArrowUpRight>
-		<p class="text-xs text-slate-900">Website</p>
+		<p class="hidden md:flex text-xs text-slate-900">Website</p>
 	</Button>
 </a>

@@ -10,11 +10,11 @@
 </script>
 
 
-<div class="gap-2 w-full h-fit sm:text-2xl">
+<div class="gap-2 w-full h-fit lg:text-xl">
 	{#if loading}
 		<span class="font-bold">GGZoeken...</span>
 	{:else}
-		<div class="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
+		<div class="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
 			<p><span class="font-bold">{count} Resultaten</span> voor uw zoekopdracht</p>
 			<SaveSearchButton />
 		</div>

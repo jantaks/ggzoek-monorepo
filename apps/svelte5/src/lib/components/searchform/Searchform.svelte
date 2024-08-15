@@ -20,7 +20,7 @@
 
 </script>
 
-<div class={"sm:p-4 space-y-4 justify-left bg-primary rounded-xl shadow-xl " + className}>
+<div class={"sm:p-4 space-y-4 justify-left bg-primary md:rounded-xl shadow-xl " + className}>
 	<PostCodeSelect></PostCodeSelect>
 
 	<div class="sm:space-y-4">

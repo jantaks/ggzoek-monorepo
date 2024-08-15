@@ -11,11 +11,11 @@ em{
     @apply capitalize py-1
 }
 
-[data-tabs-trigger][data-state='active'] {
-    @apply border-t border-t-2 border-t-primary border-b-white ;
+[data-tabs-trigger][data-state='active'] hr {
+    @apply border-t-4 border-t-primary border-b-white ;
 }
 
-[data-tabs-trigger][data-state='inactive'] {
-    @apply text-opacity-50 border-0;
+[data-tabs-trigger][data-state='inactive'] hr {
+    @apply border-t-4 border-t-transparent border-b-white ;
 }
 

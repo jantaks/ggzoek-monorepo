@@ -12,7 +12,7 @@
 <svelte:head>
 	<style>
       body {
-          @apply bg-gradient-to-r from-secondary-300 via-primary-light to-white;
+          @apply md:bg-gradient-to-r md:from-secondary-300 md:via-primary-light to-white;
       }
 	</style>
 </svelte:head>
