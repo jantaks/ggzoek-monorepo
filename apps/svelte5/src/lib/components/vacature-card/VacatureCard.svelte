@@ -5,9 +5,9 @@
 	import GotoWebsiteButton from '$lib/components/vacature-card/GotoWebsiteButton.svelte';
 	import SaveVacature from '$lib/components/vacature-card/SaveVacature.svelte';
 	import Kenmerken from '$lib/components/vacature-card/Kenmerken.svelte';
-	import { crossfade } from 'svelte/transition';
-	import { cubicInOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
+	import { createCollapsible, melt } from '@melt-ui/svelte';
 
 	const x = Tabs; //HACK TO AVOID UNUSED IMPORTS.
 
@@ -16,14 +16,14 @@
 	}
 	let { hit }: Props = $props();
 
-	const [send, receive] = crossfade({
-		duration: 250,
-		easing: cubicInOut
-	});
-
-	let collapse = $state(true);
-
 	let locaties = $derived(hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend');
+
+	const {
+		elements: { root, content, trigger },
+		states: { open }
+	} = createCollapsible({
+		forceVisible: true
+	});
 
 
 </script>
@@ -66,15 +66,25 @@
 			<Tabs.Content value="overzicht">
 				<div class="py-4 px-0 bg-transparent">
 					{#if hit.summary && hit.summary.length > 0}
-						<p
-							class={collapse?`line-clamp-4 md:line-clamp-6 duration-500 ease-in-out transition-all`:' duration-1000 ease-in-out transition-all'}>{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
-						</p>
+						{#if !$open}
+							<div use:melt={$content} transition:slide>
+								<p
+									class="line-clamp-4 md:line-clamp-6">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
+								</p>
+							</div>
+						{:else}
+							<div use:melt={$content} transition:slide>
+								<p
+									class="line-clamp-none">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
+								</p>
+							</div>
+						{/if}
 					{/if}
 					<div class="w-full justify-center flex flex-row">
 						<button
 							class="text-blue-500 hover:text-blue-700 underline"
-							onclick={() => collapse = !collapse}>
-							{#if collapse}
+							use:melt={$trigger}>
+							{#if !$open}
 								<ChevronDown
 									class="size-8  text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
 							{:else}
