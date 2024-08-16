@@ -15,7 +15,7 @@
 	};
 </script>
 
-<label class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white" for="default-search">Zoeken</label>
+<label class="mb-2  font-medium text-gray-900 sr-only dark:text-white" for="default-search">Zoeken</label>
 <div class="relative">
 	<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 		<svg aria-hidden="true" class="w-4 h-4 text-secondary dark:text-gray-400" fill="none"

@@ -27,7 +27,7 @@
 <svelte:window bind:innerWidth />
 
 <div
-	class="px-2 pt-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-xs md:text-sm text-primary-light">
+	class="px-2 pt-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
 	<div class="md:hidden">
 		<SearchBox />
 	</div>

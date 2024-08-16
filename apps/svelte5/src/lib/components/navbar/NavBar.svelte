@@ -1,6 +1,7 @@
 <script lang="ts">
 	import UserDropDown from '$lib/components/navbar/UserDropDown.svelte';
 	import { page } from '$app/stores';
+	import Logo from '$lib/components/Logo.svelte';
 
 	type Props = {
 		class?: string
@@ -18,7 +19,7 @@
 
 <div class={"w-full " + className}>
 	<nav class={"flex items-center py-2 mx-auto max-w-7xl justify-between pr-10"}>
-		<h1 class="text-3xl px-2 border-b-1"><a href="/">gg<span class="text-primary">zoek</span></a></h1>
+		<Logo variant="small" />
 		{#if showLinks}
 			<ul class="hidden sm:flex flex-row  gap-8 mx-auto items-center">
 				<li><a href="/">Home</a></li>

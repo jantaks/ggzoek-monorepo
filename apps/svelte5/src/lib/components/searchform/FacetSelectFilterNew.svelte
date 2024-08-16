@@ -119,7 +119,7 @@
 	>
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div
-			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-slate-50 border-2 border-slate-50 shadow px-2 py-2 text-slate-800 text-sm font-light"
+			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-slate-50 border-2 border-slate-50 shadow px-2 py-2 text-slate-800  font-light"
 			tabindex="0"
 		>
 			{#each filteredOptions as optionValue, index (index)}
