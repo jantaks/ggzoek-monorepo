@@ -6,7 +6,6 @@
 	import SaveVacature from '$lib/components/vacature-card/SaveVacature.svelte';
 	import Kenmerken from '$lib/components/vacature-card/Kenmerken.svelte';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
-	import { createCollapsible, melt } from '@melt-ui/svelte';
 	import { slide } from 'svelte/transition';
 
 	const x = Tabs; //HACK TO AVOID UNUSED IMPORTS.
@@ -18,12 +17,7 @@
 
 	let locaties = $derived(hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend');
 
-	const {
-		elements: { root, content, trigger },
-		states: { open }
-	} = createCollapsible({
-		forceVisible: true
-	});
+	let collapsed = $state(true);
 
 
 </script>
@@ -63,32 +57,28 @@
 				{@render tabTrigger("kenmerken", "Kenmerken")}
 			</Tabs.List>
 			<Tabs.Content value="overzicht">
-				<div class="bg-transparent" use:melt={$root}>
+				<div class="bg-transparent">
 					{#if hit.summary && hit.summary.length > 0}
-						{#if !$open}
-							<div use:melt={$content}>
-								<p
-									class="line-clamp-4 md:line-clamp-6 text-sm md:text-base">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
+						<div>
+							{#key collapsed}
+								<p in:slide={{duration: 500}}
+									 class={collapsed? "line-clamp-4 md:line-clamp-6  md:text-base": "line-clamp-none  md:text-base"}>{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
 								</p>
-							</div>
-						{:else}
-							<div use:melt={$content} transition:slide>
-								<p
-									class="line-clamp-none">{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
-								</p>
-							</div>
-						{/if}
+							{/key}
+						</div>
 					{/if}
 					<div class="w-full justify-center flex flex-row">
 						<button
 							class="text-blue-500 hover:text-blue-700 underline"
-							use:melt={$trigger}>
-							{#if !$open}
+						>
+							{#if collapsed}
 								<ChevronDown
-									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
+									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out"
+									onclick={() => collapsed = !collapsed} />
 							{:else}
 								<ChevronUp
-									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out" />
+									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out"
+									onclick={() => collapsed = !collapsed} />
 							{/if}
 						</button>
 					</div>

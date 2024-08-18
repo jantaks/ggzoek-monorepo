@@ -1,22 +1,18 @@
 <script lang="ts">
-	import type { ActionData } from '../../../../.svelte-kit/types/src/routes/auth/login/$types';
+	import type { ActionData } from './$types';
 
 	type Props = {
-		next: string,
 		form: ActionData,
-		action: string,
 	}
 
-	const { form, action, next }: Props = $props();
-	console.log(`Form, action, next: ${form}, ${action}, ${next}`);
+	const { form }: Props = $props();
 
 </script>
 <h1 class="text-center font-semibold text-xl text-secondary-900">Inloggen</h1>
 <form action="/auth/login" class="space-y-4"
 			method="post">
 	{#if form?.errors}
-
-		ERRORS: {form.errors}
+		<p class="text-red-500 text-sm text-wrap truncate">{form.errors}</p>
 	{/if}
 	<div>
 		<input name="next" type="hidden" value="/zoekresultaten/" />
@@ -34,6 +30,7 @@
 			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
 			id="password"
 			name="password"
+			placeholder="Wachtwoord"
 			required
 			type="password" />
 	</div>

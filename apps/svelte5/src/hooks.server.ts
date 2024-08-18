@@ -12,7 +12,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 	throw new Error('Please set the SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
 }
 
-const protectedRoutes = ['/likes', '**/api/*', '**/protected/*'];
+const protectedRoutes = ['/likes', '**/api/*', '**/protected/*', '/bewaard'];
 
 function isProtected(path: string) {
 	let isProtected = protectedRoutes.some((protectedRoute) => minimatch(path, protectedRoute));

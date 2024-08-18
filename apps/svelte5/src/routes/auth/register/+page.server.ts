@@ -1,17 +1,23 @@
-import { type Actions, redirect, type RequestEvent } from '@sveltejs/kit';
+import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import type { MyLocals } from '$lib/types';
 
 export const actions = {
-	default: async ({  request, locals }: RequestEvent) => {
+	default: async ({ request, locals }: RequestEvent) => {
 		const myLocals = locals as MyLocals;
-		const data = await request.formData();
-		const email = data.get('email') as string;
-		const password = data.get('password') as string;
-		if (!email || !password) return ({email, status: 500, errors: "Invalid credentials"})
-		const result = await myLocals.supabase.auth.signUp({email, password})
-		if (!result.error) {
-			redirect(303,"/");
+		const form = await request.formData();
+		const email = form.get('email') as string;
+		const password1 = form.get('password1') as string;
+		if (password1 !== form.get('password2')) return fail(400, { email, passwordMismatch: true });
+		const { data, error } = await myLocals.supabase.auth.signUp({ email, password: password1 });
+		console.log('SIGNUP RESULT: ', data);
+		if (data.user && data.user.identities && data.user.identities.length === 0) {
+			return fail(400, { email, error: 'Er bestaat al een account met deze gebruikersnaam' });
 		}
-		return ({email, status: 500, errors: "Invalid credentials"})
-	},
-} satisfies Actions;
+		if (!error) {
+			redirect(303, '/');
+		} else {
+			console.log(error);
+			return fail(400, { email, error: error.message });
+		}
+	}
+};

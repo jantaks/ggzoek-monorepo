@@ -28,6 +28,7 @@
 	<input
 		bind:value={form.query}
 		class="glowing border-primary-light block w-full p-4 h-10 ps-10 text-gray-900 border rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+		data-sveltekit-keepfocus
 		id="default-search"
 		oninput={delayedSubmit(1000)}
 		placeholder="Zoek tekst, beroep, locatie, ..."

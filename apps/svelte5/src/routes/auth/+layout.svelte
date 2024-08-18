@@ -12,10 +12,11 @@
 	</style>
 </svelte:head>
 <NavBar class="bg-secondary-900 text-white" showLinks={true} showLogin={false} />
-<div class="flex flex-col items-center justify-center grow h-screen">
+<div class="flex flex-col items-center justify-center h-[90dvh] px-4">
 	<div class="max-w-lg w-full p-10 space-y-4 bg-white rounded-lg shadow-md shadow-primary-light">
 		<slot></slot>
 	</div>
 </div>
+
 
 

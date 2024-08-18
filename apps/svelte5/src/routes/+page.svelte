@@ -23,19 +23,20 @@
 		<div class="lg:grid lg:grid-cols-2 lg:gap-8">
 			<div
 				class="mx-auto max-w-md px-6 sm:max-w-2xl sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left ">
-				<div class="flex flex-col pb-8 gap-5">
+				<div class="flex flex-col pb-8 gap-4 xl:gap-8">
 					<h1
-						class="mt-4 text-3xl font-bold tracking-tight text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
+						class="text-3xl font-bold tracking-tight text-white sm:mt-5 md:text-4xl xl:text-5xl  ">
 					<span
 						class="block">Alle vacatures in de GGZ</span><span
 						class="block pb-3 text-primary sm:pb-5">voor BIG professionals</span>
 					</h1>
-					<p class="lg:text-md text-lg text-gray-300">Voor professionals in de ggz is het moeilijk om een overzicht te
+					<p class="lg:text-md text-lg text-gray-300">Voor professionals in de ggz is het vaak lastig om een overzicht
+						te
 						krijgen van alle vacatures. Daarom hebben wij GGZoek gemaakt, een centrale, eenvoudige plek om vacatures te
 						vinden en met elkaar te vergelijken.
 					</p>
 					<div
-						class="relative mt-4 flex w-full flex-col items-stretch justify-stretch gap-2 sm:justify-center md:flex-row lg:justify-start">
+						class="z-50 relative mt-4 flex w-full flex-col items-stretch justify-stretch gap-2 sm:justify-center md:flex-row lg:justify-start">
 						<a
 							class="line-clamp-1 flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-center text-base font-bold text-white shadow-sm hover:bg-primary/80"
 							href="/zoekresultaten">Zoek in 2023 vacatures</a>
@@ -44,7 +45,7 @@
 			</div>
 			<div
 				class="mx-auto max-w-md px-6 sm:max-w-2xl sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left  hidden">
-				<div class="absolute right-40 top-10 bg-transparent z-10">
+				<div class="absolute right-0 xl:right-40 top-10 bg-transparent z-10">
 					<RiveComponent src="/ggzoek3.riv" stateMachines="StateMachine1" />
 				</div>
 			</div>

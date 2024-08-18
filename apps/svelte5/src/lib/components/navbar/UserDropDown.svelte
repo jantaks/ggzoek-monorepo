@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getUser } from '$lib/stores/userStore.svelte';
 	import { createDropdownMenu, melt } from '@melt-ui/svelte';
-	import { fly } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 
 	const user = getUser();
 
@@ -12,23 +12,32 @@
 	let { class: className }: Props = $props();
 
 	const {
-		elements: { trigger, menu, item, separator, arrow }
+		elements: { trigger, menu, item, arrow }
 	} = createDropdownMenu({
 			loop: true,
-			arrowSize: 20
+			arrowSize: 10
 		}
 	);
+
 
 </script>
 
 <div
-	class={"bg-primary rounded-full p-2 text-white size-10 hover:ring flex items-center justify-center" + className}>
-	<button use:melt={$trigger}>
-		<span class="uppercase text-sm font-bold">{user.initials}</span>
+	class={"bg-primary rounded-lg p-2 text-white size-8 hover:ring flex items-center justify-center" + className}>
+	<button class="relative" use:melt={$trigger}>
+		<span class="uppercase text-sm font-bold">{user?.initials}</span>
+		{#key user?.likes?.length}
+		<span in:scale={{ duration: 1000, start: 0.5 }}
+					class="absolute -top-4 left-4 bg-secondary text-xs rounded-full p-1">{user?.likes?.length}</span>
+		{/key}
 	</button>
+
 	<div class="menu" transition:fly={{ duration: 150, y: -10 }} use:melt={$menu}>
-		<div {...$item} class="item" use:item>{user.email}</div>
-		<div {...$item} class="item" use:item>Bewaarde vacatures ({user.likes.length})</div>
+		<div class="heading">{user?.email}</div>
+		<hr class="h-px my-1 bg-primary border-1 dark:bg-gray-700">
+		<div {...$item} class="item" use:item>
+			<a data-sveltekit-reload href="/bewaard">Bewaarde vacatures ({user?.likes?.length})</a>
+		</div>
 		<div {...$item} class="item" use:item>
 			<a data-sveltekit-reload href="/auth/logout">Uitloggen</a>
 		</div>
@@ -43,48 +52,32 @@
         @apply ring-0 !important;
     }
 
-    .subMenu {
-        @apply min-w-[220px] shadow-md shadow-neutral-900/30;
+    .heading {
+        @apply relative h-6 min-h-[24px] bg-secondary-100 select-none rounded-sm pl-6 pr-1 py-3 mb-0.5;
+        @apply flex items-center text-sm leading-none;
+        @apply z-20 text-secondary-900 outline-none;
     }
 
     .item {
         @apply relative h-6 min-h-[24px] select-none rounded-sm pl-6 pr-1 py-2 mb-0.5;
-        @apply z-20 text-primary-dark outline-none;
+        @apply z-20 text-secondary-900 outline-none;
         @apply data-[highlighted]:bg-primary-light data-[highlighted]:text-primary-dark;
         @apply data-[disabled]:text-neutral-300;
         @apply flex items-center text-sm leading-none;
         @apply cursor-default ring-0 !important;
     }
 
-    .trigger {
-        @apply inline-flex items-center justify-center rounded-md bg-white px-3 py-2;
-        @apply text-primary-dark transition-colors hover:bg-white/90 data-[highlighted]:outline-none;
-        @apply overflow-visible data-[highlighted]:bg-primary-light data-[highlighted]:ring-primary !important;
-        @apply !cursor-default text-sm font-medium leading-none focus:z-30 focus:ring;
+    .pulse {
+        animation: pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) 1s;
     }
 
-    .check {
-        @apply absolute left-2 top-1/2 text-primary;
-        translate: 0 calc(-50% + 1px);
-    }
 
-    .dot {
-        @apply h-[4.75px] w-[4.75px] rounded-full bg-primary-dark;
-    }
-
-    .separator {
-        @apply m-[5px] h-[1px] bg-primary-light;
-    }
-
-    .rightSlot {
-        @apply ml-auto pl-5;
-    }
-
-    .check {
-        @apply absolute left-0 inline-flex w-6 items-center justify-center;
-    }
-
-    .text {
-        @apply pl-6 text-xs leading-6 text-neutral-600;
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: .5;
+        }
     }
 </style>
