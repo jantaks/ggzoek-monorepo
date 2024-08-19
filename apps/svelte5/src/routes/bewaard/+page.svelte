@@ -1,12 +1,17 @@
 <script lang="ts">
 	import NavBar from '$lib/components/navbar/NavBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
-	import { getUser } from '$lib/stores/userStore.svelte';
+	import { setContext } from 'svelte';
 
 	let { data } = $props();
-	let user = getUser();
 
-	let savedVacatures = $derived(data.vacatures.filter(v => user?.likes?.includes((v.vacature.id))));
+	let vacs = $state(data.vacatures);
+
+
+	setContext('onRemove', (urlHash: string) => {
+		vacs = vacs.filter(vac => vac.vacature.urlHash !== urlHash);
+	});
+
 
 </script>
 
@@ -23,7 +28,7 @@
 	{#if !data.vacatures}
 		<p>Geen vacatures gevonden</p>
 	{:else}
-		{#each data.vacatures as vacature}
+		{#each vacs as vacature}
 			<VacatureCard hit={vacature.vacature}></VacatureCard>
 		{/each}
 	{/if}

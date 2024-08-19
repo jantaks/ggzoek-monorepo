@@ -3,8 +3,11 @@
 	import { Heart } from 'lucide-svelte';
 	import { getUser } from '$lib/stores/userStore.svelte';
 	import { goto } from '$app/navigation';
+	import { getContext } from 'svelte';
+
 
 	const user = getUser();
+	const onRemove = getContext<(urlHash: string) => void>('onRemove');
 
 	type Props = {
 		urlhash?: string;
@@ -25,6 +28,9 @@
 			console.log('user not logged in');
 			await goto('/auth/login');
 			return;
+		}
+		if (liked && onRemove) {
+			onRemove(urlhash);
 		}
 		updatePending = true;
 		await user.toggleLike(urlhash);

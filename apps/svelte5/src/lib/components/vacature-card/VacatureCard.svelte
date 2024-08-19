@@ -12,6 +12,7 @@
 
 	type Props = {
 		hit: Hit<Partial<SelectVacature>>;
+		onSave?: () => void;
 	}
 	let { hit }: Props = $props();
 
