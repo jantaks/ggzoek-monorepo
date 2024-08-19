@@ -7,6 +7,7 @@
 	if ($page.data.email) {
 		createUser($page.data.email, $page.data.likes);
 	}
+	console.log('Index layout');
 
 	createSearchForm();
 </script>

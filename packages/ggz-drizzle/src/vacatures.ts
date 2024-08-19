@@ -27,6 +27,11 @@ async function allUrlsForOrganisation(organisation: string, db) {
   return result.map((x: { url: string }) => x.url) as string[];
 }
 
+export async function getVacaturesByIds(ids: string[]) {
+  const db = getDb().db;
+  return await db.select().from(vacatureTable).where(inArray(vacatureTable.urlHash, ids)).execute();
+}
+
 export async function getLikesForUser(user_id: string) {
   console.log('getLikesForUser user: ', user_id);
   const { db: db } = getDb();
@@ -37,6 +42,17 @@ export async function getLikesForUser(user_id: string) {
     .execute();
   console.log('getLikesForUser result: ', result);
   return result.map((x: { urlHash: string }) => x.urlHash) as string[];
+}
+
+export async function getVacaturesForUser(user_id: string) {
+  const { db: db } = getDb();
+  // join vacatures with likes
+  return await db
+    .select({ vacature: vacatureTable })
+    .from(vacatureTable)
+    .leftJoin(likes, eq(vacatureTable.urlHash, likes.vacature))
+    .where(eq(likes.userId, user_id))
+    .execute();
 }
 
 export async function likeVacature(user_id: string, vacature: string) {
