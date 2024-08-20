@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ActionData } from './$types';
 	import { z } from 'zod';
-	import { LoaderCircle } from 'lucide-svelte';
+	import Processing from '$lib/components/Processing.svelte';
 
 	type Props = {
 		form: ActionData,
@@ -13,8 +13,10 @@
 
 	const emailSchema = z.string().email();
 
-	function validatePassword(e: MouseEvent) {
-		if (!emailSchema.safeParse(email).success) {
+	function validateEmail(e: MouseEvent) {
+		console.log('validatePassword');
+		if (!email || !emailSchema.safeParse(email).success) {
+			console.log('invalid email');
 			alert('Vul een geldig emailadres in.');
 			e.preventDefault();
 			return;
@@ -28,12 +30,7 @@
 
 </script>
 
-{#if processing}
-	<div class="flex flex-row items-center justify-center w-full">
-		<LoaderCircle class="animate-spin size-14 text-secondary-800" />
-	</div>
-{/if}
-
+<Processing processing={processing} />
 <form action="?/login" class={processing? "hidden": "space-y-4"}`
 			method="post"
 			onsubmit={() => processing = !processing}>
@@ -62,11 +59,13 @@
 			type="password" />
 	</div>
 	<div>
-		<button formaction="?/reset" onclick={validatePassword}>Wachtwoord vergeten?</button>
+		<button formaction="?/reset" onclick={validateEmail} onsubmit={() => processing = !processing}>Wachtwoord vergeten?
+		</button>
 	</div>
 	<button
-		class="mb-8 text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg  w-full sm:w-auto px-5 py-2.5 text-center dark:bg-primary dark:hover:bg-primary-dark dark:focus:ring-primary-dark"
-		onsubmit={() => processing = !processing} type="submit"
+		class="mb-8 text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg sm:w-auto px-5 py-2.5 text-center dark:bg-primary dark:hover:bg-primary-dark dark:focus:ring-primary-dark"
+		onsubmit={() => processing = !processing}
+		type="submit"
 		value="login">
 		Inloggen
 	</button>

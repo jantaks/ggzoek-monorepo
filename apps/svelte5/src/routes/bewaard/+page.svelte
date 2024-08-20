@@ -2,14 +2,18 @@
 	import NavBar from '$lib/components/navbar/NavBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import { setContext } from 'svelte';
+	import { slide } from 'svelte/transition';
 
 	let { data } = $props();
 
 	let vacs = $state(data.vacatures);
 
+	let found = $derived(vacs.length > 0);
+
+	let removed = $state([]);
 
 	setContext('onRemove', (urlHash: string) => {
-		vacs = vacs.filter(vac => vac.vacature.urlHash !== urlHash);
+		removed = [...removed, urlHash];
 	});
 
 
@@ -24,12 +28,16 @@
 </svelte:head>
 
 <NavBar class="md:mb-4 bg-secondary-900 text-white" showLinks showLogin></NavBar>
-<div>
-	{#if !data.vacatures}
+<div class="flex flex-col justify-center items-center w-full space-y-4">
+	{#if found === false}
 		<p>Geen vacatures gevonden</p>
 	{:else}
 		{#each vacs as vacature}
-			<VacatureCard hit={vacature.vacature}></VacatureCard>
+			{#if !removed.includes(vacature.vacature.urlHash)}
+				<div out:slide={{axis:"y", duration:300, delay:150}} in:slide={{axis:"y", duration:500}} class="max-w-3xl">
+					<VacatureCard hit={vacature.vacature}></VacatureCard>
+				</div>
+			{/if}
 		{/each}
 	{/if}
 </div>

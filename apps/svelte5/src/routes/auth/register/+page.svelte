@@ -2,6 +2,7 @@
 
 
 	import type { ActionData } from './$types';
+	import Processing from '$lib/components/Processing.svelte';
 
 	type Props = {
 		form: ActionData,
@@ -9,14 +10,20 @@
 
 	const { form }: Props = $props();
 
+	let processing = $state(false);
+
 </script>
-<h1 class="text-center font-semibold text-xl text-secondary-900">Registreren</h1>
-{#if form?.error}
-	<p class="text-red-500 text-sm text-wrap truncate text-center">{form.error}</p>
-{/if}
-<form action="/auth/register" class="space-y-4"
-			method="post">
+<Processing processing={processing} />
+
+<form action="/auth/register"
+			class={processing? "hidden": "space-y-4"}
+			method="post"
+			onsubmit={() => processing = !processing}>
 	<div>
+		<h1 class="text-center font-semibold text-xl text-secondary-900">Registreren</h1>
+		{#if form?.error}
+			<p class="text-red-500 text-sm text-wrap truncate text-center">{form.error}</p>
+		{/if}
 		<input name="next" type="hidden" value="/zoekresultaten/" />
 		<label class="block mb-1  font-medium text-gray-900 dark:text-white" for="email">Email:</label>
 		<input
@@ -65,9 +72,9 @@
 
 	<button
 		class="mb-8 text-white bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg  w-full sm:w-auto px-5 py-2.5 text-center dark:bg-primary dark:hover:bg-primary-dark dark:focus:ring-primary-dark"
+		onsubmit={() => processing = !processing}
 		type="submit">
 		Registreer nu!
 	</button>
-
+	<p>Al een account? <a class="text-primary" href="login">Hier inloggen.</a></p>
 </form>
-<p>Al een account? <a class="text-primary" href="login">Hier inloggen.</a></p>

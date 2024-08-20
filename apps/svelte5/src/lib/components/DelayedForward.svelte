@@ -1,15 +1,16 @@
 <script lang="ts">
 
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	let { target = '/', title = 'de hoofdpagina', delay = 5 } = $props();
 
 	if (browser) {
-		const interval = setInterval(() => {
+		const interval = setInterval(async () => {
 			delay -= 1;
 			if (delay === 0) {
 				clearInterval(interval);
+				await invalidateAll();
 				goto(target);
 			}
 		}, 1000);

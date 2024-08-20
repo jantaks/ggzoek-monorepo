@@ -4,6 +4,8 @@ import { log } from '@ggzoek/logging/dist/logger.js';
 import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
+	const { email } = await event.parent();
+	console.log('zoekresultaten page load. Email: ', email);
 	const _12hours = 60 * 60 * 12;
 	event.setHeaders({
 		'cache-control': `max-age=${_12hours}`
