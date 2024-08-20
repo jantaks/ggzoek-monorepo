@@ -3,6 +3,9 @@
 	import { page } from '$app/stores';
 	import Logo from '$lib/components/Logo.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { getUser } from '$lib/stores/userStore.svelte';
+
+	const user = getUser();
 
 	type Props = {
 		class?: string
@@ -19,6 +22,7 @@
 </script>
 
 <div class={"w-full " + className}>
+
 	<nav class={"flex items-center py-4 mx-auto max-w-7xl justify-between pr-10"}>
 		<Logo variant="small" />
 		{#if showLinks}

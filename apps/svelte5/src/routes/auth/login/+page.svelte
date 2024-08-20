@@ -24,10 +24,6 @@
 
 	}
 
-	function submit(e: Event) {
-		processing = !processing;
-	}
-
 </script>
 
 <Processing processing={processing} />

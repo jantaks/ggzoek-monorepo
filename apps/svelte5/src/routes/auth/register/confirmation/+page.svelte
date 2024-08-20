@@ -6,4 +6,4 @@
 </script>
 
 <div>Bedankt voor het bevestigen van uw registratie! We hebben u automatisch ingelogd.</div>
-<DelayedForward delay=3 target="/zoekresultaten" title="de zoekpagina"></DelayedForward>
+<DelayedForward delay={3} target="/zoekresultaten" title="de zoekpagina"></DelayedForward>

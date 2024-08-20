@@ -6,6 +6,7 @@
 	import { CloseIcon } from '$lib/components/icons';
 	import DistanceSlider from '$lib/components/searchform/DistanceSlider.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
+	import { LoaderCircle } from 'lucide-svelte';
 
 	const form = getSearchForm();
 
@@ -124,7 +125,13 @@
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 
 		{#await filteredResults}
-			<p>Searching ...</p>
+			<div
+				class="flex max-h-full flex-row gap-0 overflow-y-auto bg-white px-2 py-2 text-black justify-center items-center"
+				tabindex="0"
+			>
+				<p class=" text-gray-500">Postcodes zoeken ...</p>
+				<LoaderCircle class="animate-spin size-6 text-secondary-800" />
+			</div>
 		{:then filteredResults}
 			{#if filteredResults && filteredResults.length > 0}
 				<div
@@ -146,12 +153,12 @@
 						</li>
 					{/each}
 				</div>
-			{:else if filteredResults && filteredResults.length === 0}
+			{:else if filteredResults && filteredResults.length === 0 && $inputValue.length > 2}
 				<div
 					class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
 					tabindex="0"
 				>
-					<li class=" text-gray-500">Geen resultaten gevonden</li>
+					<li class="">Geen postcodes gevonden die beginnen met {$input.value}</li>
 				</div>
 			{/if}
 		{/await}

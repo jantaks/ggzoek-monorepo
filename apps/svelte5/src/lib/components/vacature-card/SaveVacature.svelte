@@ -2,7 +2,6 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Heart } from 'lucide-svelte';
 	import { getUser } from '$lib/stores/userStore.svelte';
-	import { goto } from '$app/navigation';
 	import { getContext } from 'svelte';
 
 
@@ -24,11 +23,6 @@
 	let updatePending = $state(false);
 
 	async function handleClick() {
-		if (!user) {
-			console.log('user not logged in');
-			await goto('/auth/login');
-			return;
-		}
 		if (liked && onRemove) {
 			onRemove(urlhash);
 		}
@@ -44,7 +38,7 @@
 	class="px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white "
 	onclick={handleClick}>
 	<Heart
-		class={`text-primary size-5 mr-1 ${liked? "fill-primary" : "" } ${updatePending? "fill-primary-light text-primary-light" : "" }`}></Heart>
+		class={`text-primary size-5 mr-1 ${liked? "fill-primary" : "" } ${updatePending? "fill-primary text-primary-light animate-spin" : "" }`}></Heart>
 	<p class="hidden md:flex text-xs text-slate-900">{liked ? "Bewaard" : "Bewaar"}</p>
 </Button>
 

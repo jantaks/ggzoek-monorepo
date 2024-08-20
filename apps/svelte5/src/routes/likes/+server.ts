@@ -16,7 +16,7 @@ export const DELETE: RequestHandler = async (event) => {
 async function execute(event: RequestEvent, type: 'CREATE' | 'DELETE') {
 	log.debug(`Executing ${type} like`);
 	const locals = event.locals as MyLocals;
-	const userId = locals.userId;
+	const userId = locals.user?.id;
 	if (!userId) {
 		log.debug(`Unauthorized request to ${event.request.url}`);
 		return error(401, 'Unauthorized');

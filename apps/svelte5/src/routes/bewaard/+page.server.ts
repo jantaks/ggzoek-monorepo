@@ -4,7 +4,7 @@ import type { PageServerLoad, PageServerLoadEvent } from './$types';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const locals = event.locals as MyLocals;
-	const userId = locals.userId;
+	const userId = locals.user?.id;
 	if (userId) {
 		let vacatures = await getVacaturesForUser(userId);
 		const result = { vacatures: vacatures, test: 'HALLO' + userId };

@@ -16,12 +16,11 @@ const protectedRoutes = ['/likes', '**/api/*', '**/protected/*', '/bewaard'];
 
 function isProtected(path: string) {
 	let isProtected = protectedRoutes.some((protectedRoute) => minimatch(path, protectedRoute));
-	log.debug(`${path} is protected: ${isProtected}`);
 	return isProtected;
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	log.info(`Hook handling: ${event.request.url}`);
+	log.info(`Hook handling: ${event.request.url}. Protected? ${isProtected(event.request.url)}`);
 	const locals = event.locals as MyLocals;
 	const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 		cookies: {
@@ -47,6 +46,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (error) {
 		log.info(`Could not get user: ${error.message}`);
+	} else {
+		log.info(`Got user: ${JSON.stringify(data)}`);
 	}
 
 	const user = data.user;
@@ -70,8 +71,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		log.debug('Redirecting to: ', location);
 		redirect(301, location);
 	}
-
-	log.debug(`Hooks - user:  ${JSON.stringify(locals.user)}`);
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {

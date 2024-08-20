@@ -5,6 +5,8 @@
 
 	const user = getUser();
 
+	console.log('FROM USERDROPDOWN: ', user);
+
 	type Props = {
 		class?: string
 	}
@@ -28,7 +30,7 @@
 		<span class="uppercase text-sm font-bold">{user?.initials}</span>
 		{#key user?.likes?.length}
 		<span in:scale={{ duration: 1000, start: 0.5 }}
-					class={`absolute -top-4 left-4 bg-secondary text-xs rounded-full py-1  ${user?.likes.length>9? "px-1.5": "px-2"}`}>{user?.likes?.length}</span>
+					class={`absolute -top-4 left-4 bg-secondary text-xs rounded-full py-1  ${user.likes?.length>9? "px-1.5": "px-2"}`}>{user?.likes?.length}</span>
 		{/key}
 	</button>
 

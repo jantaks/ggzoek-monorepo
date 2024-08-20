@@ -14,10 +14,6 @@
 	let form = getSearchForm();
 	form.initiate($page.url.searchParams);
 
-	if ($page.url.searchParams.get('reload') === 'true' && browser) {
-		console.log('reloading zoekresultaten');
-		invalidateAll();
-	}
 
 </script>
 <svelte:head>

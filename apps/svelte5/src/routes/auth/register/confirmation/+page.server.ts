@@ -13,12 +13,18 @@ export const load = (async (event) => {
 		error(404, { message: 'Geen geldige authorisatiecode' });
 	}
 	console.log('Email confirmation. Verifying code: ', code);
-	const { data, error: err } = await locals.supabase.auth.exchangeCodeForSession(code);
-	console.log('Email confirmation. Verifying code result: ', data, err);
-	if (err) {
-		console.log('Error verifying code: ', err);
-		error(404, { message: err.message });
+	//Workaround below: see: https://github.com/supabase/auth-helpers/issues/545
+	try {
+		const { data, error: err } = await locals.supabase.auth.exchangeCodeForSession(code);
+		console.log('Email confirmation. Verifying code result: ', data, err);
+		if (err) {
+			console.log('Error verifying code: ', err);
+			error(404, { message: err.message });
+		}
+	} catch (e) {
+		console.log('Ignoring: ', e.message);
 	}
 }) satisfies PageServerLoad;
+
 
 //http://localhost:5173/auth/register/confirmation?code=a293f58a-096b-4c14-844d-6f2add79a799&token_hash=pkce_213ef6ab07a36e2a03fbc1546f971b6b3a656b8678764d08f22eaeb5

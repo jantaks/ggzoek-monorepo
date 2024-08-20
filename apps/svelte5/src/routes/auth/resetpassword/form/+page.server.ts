@@ -3,7 +3,7 @@ import type { MyLocals } from '$lib/types';
 
 export async function load(event: RequestEvent) {
 	const locals = event.locals as MyLocals;
-	if (locals.userId) {
+	if (locals.user) {
 		return {};
 	}
 	const code = event.url.searchParams.get('code');

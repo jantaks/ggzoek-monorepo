@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	import { browser } from '$app/environment';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	let { target = '/', title = 'de hoofdpagina', delay = 5 } = $props();
 
@@ -10,8 +10,8 @@
 			delay -= 1;
 			if (delay === 0) {
 				clearInterval(interval);
-				await invalidateAll();
-				goto(target);
+				console.log('Invalidating cache (rerunning load functions)');
+				await goto(target, { invalidateAll: true, replaceState: true });
 			}
 		}, 1000);
 	}

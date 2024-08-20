@@ -16,9 +16,14 @@ export const actions = {
 			if (!result.error) {
 				console.log('LOGIN SUCCESS, redirecting to: ', next);
 				redirect(303, next);
+			} else {
+				console.log('LOGIN FAILED: ', result.error);
+				return fail(400, {
+					email,
+					status: 500,
+					errors: 'Ongeldige gebruikersnaam en/of wachtwoord'
+				});
 			}
-			console.log('LOGIN FAILED: ', result.error);
-			return fail(400, { email, status: 500, errors: 'Ongeldige gebruikersnaam en/of wachtwoord' });
 		}
 	},
 	reset: async (event) => {

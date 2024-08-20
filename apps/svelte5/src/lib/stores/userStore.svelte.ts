@@ -4,10 +4,11 @@ import { getContext, setContext } from 'svelte';
 class _User {
 	constructor(email?: string, likes?: string[]) {
 		this._email = email;
-		this._likes = likes;
+		this._likes = likes !== undefined ? likes : [];
+		console.log('USERSTORE LIKES: ', this._likes);
 	}
 
-	_email = $state<string>();
+	_email = $state<string | undefined>();
 
 	get email() {
 		return this._email;
@@ -17,7 +18,7 @@ class _User {
 		this._email = value;
 	}
 
-	_likes: string[] | undefined = $state<string[]>([]);
+	_likes: string[] = $state<string[]>([]);
 
 	get likes() {
 		return this._likes;
@@ -27,8 +28,13 @@ class _User {
 		this._likes = value;
 	}
 
+	get authenticated() {
+		return this._email !== undefined;
+	}
+
 	get initials() {
-		if (!this._email) {
+		console.log('EMAIL:', this._email);
+		if (this._email === undefined) {
 			return '';
 		}
 		const name = this._email.split('@')[0];
@@ -41,8 +47,12 @@ class _User {
 	}
 
 	async toggleLike(vacature: string | undefined) {
-		if (!vacature || !this._likes) {
-			console.log('no vacature or likes');
+		if (!this.authenticated) {
+			await goto('/auth/login');
+			return;
+		}
+		if (!vacature) {
+			console.log('no vacature');
 			return;
 		}
 		const action = this._likes.includes(vacature) ? 'DELETE' : 'POST';
@@ -73,12 +83,12 @@ class _User {
 
 const CONTEXT_NAME = Symbol('USER');
 
-export function createUser(email: string, likes: string[]) {
+export function createUser(email?: string, likes?: string[]) {
 	return setContext(CONTEXT_NAME, new _User(email, likes));
 }
 
 export function getUser() {
-	return getContext<_User | undefined>(CONTEXT_NAME);
+	return getContext<_User>(CONTEXT_NAME);
 }
 
 export type User = typeof _User;

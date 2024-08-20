@@ -6,14 +6,14 @@
 
 	let { data } = $props();
 
-	let vacs = $state(data.vacatures);
 
-	let found = $derived(vacs.length > 0);
+	let found = $state(data.vacatures.length);
 
-	let removed = $state([]);
+	let removed = $state<string[]>([]);
 
-	setContext('onRemove', (urlHash: string) => {
+	setContext('onRemove', async (urlHash: string) => {
 		removed = [...removed, urlHash];
+		found = found - 1;
 	});
 
 
@@ -29,15 +29,12 @@
 
 <NavBar class="md:mb-4 bg-secondary-900 text-white" showLinks showLogin></NavBar>
 <div class="flex flex-col justify-center items-center w-full space-y-4">
-	{#if found === false}
-		<p>Geen vacatures gevonden</p>
-	{:else}
-		{#each vacs as vacature}
-			{#if !removed.includes(vacature.vacature.urlHash)}
-				<div out:slide={{axis:"y", duration:300, delay:150}} in:slide={{axis:"y", duration:500}} class="max-w-3xl">
-					<VacatureCard hit={vacature.vacature}></VacatureCard>
-				</div>
-			{/if}
-		{/each}
-	{/if}
+	<h1 class="text-xl font-bold">U heeft {found} bewaarde vacatures.</h1>
+	{#each data.vacatures as vacature}
+		{#if !removed.includes(vacature.vacature.urlHash)}
+			<div out:slide={{axis:"y", duration:300, delay:150}} in:slide={{axis:"y", duration:500}} class="max-w-3xl">
+				<VacatureCard hit={vacature.vacature}></VacatureCard>
+			</div>
+		{/if}
+	{/each}
 </div>
