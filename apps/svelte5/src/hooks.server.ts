@@ -22,8 +22,8 @@ function isProtected(path: string) {
 
 export const handle: Handle = async ({ event, resolve }) => {
 	log.info(`Hook handling: ${event.request.url}`);
-	const myLocals = event.locals as MyLocals;
-	const supabaseClient = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+	const locals = event.locals as MyLocals;
+	const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 		cookies: {
 			get: (key) => event.cookies.get(key),
 			/**
@@ -41,21 +41,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	});
 
-	myLocals.supabase = supabaseClient;
+	locals.supabase = supabase;
 
-	/**
-	 * a little helper that is written for convenience so that instead
-	 * of calling `const { data: { session } } = await supabase.auth.getSession()`
-	 * you just call this `await getSession()`
-	 */
-	myLocals.getSession = async () => {
-		const {
-			data: { session }
-		} = await supabaseClient.auth.getSession();
-		return session;
-	};
+	const { data, error } = await supabase.auth.getUser();
+
+	if (error) {
+		log.info(`Could not get user: ${error.message}`);
+	}
+
+	const user = data.user;
+	locals.user = data.user;
 	const url = new URL(event.request.url);
-	if (!(await myLocals.getSession()) && isProtected(url.pathname)) {
+
+	if (!user && isProtected(url.pathname)) {
 		log.debug('Trying to access a protected route without valid session, redirecting to login.');
 		let next: string;
 		if (
@@ -73,8 +71,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		redirect(301, location);
 	}
 
-	myLocals.userId = (await supabaseClient.auth.getUser()).data.user?.id;
-	log.debug(`USERID:  ${myLocals.userId}`);
+	log.debug(`Hooks - user:  ${JSON.stringify(locals.user)}`);
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {

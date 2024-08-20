@@ -1,19 +1,19 @@
 import type { MyLocals } from '$lib/types';
 import { getLikesForUser } from '@ggzoek/ggz-drizzle/dist/vacatures';
 import type { LayoutServerLoad } from './$types';
+import { log } from '@ggzoek/logging/src/logger.js';
 
 export const load: LayoutServerLoad = (async (event) => {
-	const myLocals = event.locals as MyLocals;
-	const session = await myLocals.getSession();
+	const locals = event.locals as MyLocals;
 	let email = undefined;
 	let likes = undefined;
-	if (session && session.user) {
-		console.log(`FOUND SESSION`);
-		email = session.user.email;
-		likes = await getLikesForUser(session.user.id);
+	if (locals.user) {
+		log.info(`FOUND SESSION`);
+		email = locals.user.email;
+		likes = await getLikesForUser(locals.user.id);
 	} else {
-		console.log(`NO SESSION FOUND`);
+		log.debug(`NO SESSION FOUND`);
 	}
-	console.log(`RETURNING EMAIL: ${email}`);
+	log.debug(`RETURNING EMAIL: ${email}`);
 	return { email, likes };
 }) satisfies LayoutServerLoad;
