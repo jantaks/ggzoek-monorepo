@@ -5,7 +5,7 @@
 
 	const user = getUser();
 
-	console.log('FROM USERDROPDOWN: ', user);
+	console.debug(`${new Date().toLocaleTimeString()} [UserDropDown.svelte - 78101f17] : `, { user });
 
 	type Props = {
 		class?: string

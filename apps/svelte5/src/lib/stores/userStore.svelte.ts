@@ -5,7 +5,6 @@ class _User {
 	constructor(email?: string, likes?: string[]) {
 		this._email = email;
 		this._likes = likes !== undefined ? likes : [];
-		console.log('USERSTORE LIKES: ', this._likes);
 	}
 
 	_email = $state<string | undefined>();
@@ -33,7 +32,6 @@ class _User {
 	}
 
 	get initials() {
-		console.log('EMAIL:', this._email);
 		if (this._email === undefined) {
 			return '';
 		}
@@ -52,11 +50,9 @@ class _User {
 			return;
 		}
 		if (!vacature) {
-			console.log('no vacature');
 			return;
 		}
 		const action = this._likes.includes(vacature) ? 'DELETE' : 'POST';
-		console.log('like');
 		const result = await fetch('/likes', {
 			method: action,
 			headers: {
@@ -67,7 +63,6 @@ class _User {
 			})
 		});
 		if (result.redirected) {
-			console.log('redirect');
 			await goto(result.url);
 		}
 		if (result.ok) {
@@ -77,7 +72,6 @@ class _User {
 				this._likes = this._likes.filter((like) => like !== vacature);
 			}
 		}
-		console.log(result);
 	}
 }
 

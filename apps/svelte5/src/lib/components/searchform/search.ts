@@ -13,10 +13,12 @@ import {
 	type SearchResponse
 } from 'meilisearch';
 import { log } from '@ggzoek/logging/src/logger.js';
-import { type facet, facets, resultsPerPage } from '$lib/types';
+import { type facet, facets } from '$lib/types';
+import { MAXRESULTS, RESULTS_PER_PAGE } from '$lib/constants';
 import { createClient } from '@vercel/kv';
 import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 import * as crypto from 'crypto';
+import { error } from '@sveltejs/kit';
 
 const client = new MeiliSearch({ host: MEILISEARCH_URL, apiKey: MEILISEARCH_KEY });
 const kv = createClient({ url: KV_REST_API_URL, token: KV_REST_API_TOKEN });
@@ -25,8 +27,11 @@ const index = client.index('vacatures');
 type QueryResult = ReturnType<typeof index.search<SelectVacature>>;
 
 export async function query(params: { query: string; offset: number; filters?: string }) {
+	if (params.offset > MAXRESULTS) {
+		error(400, 'Alleen eerste 100 resultaten zijn beschikbaar. Gebruik filters om te verfijnen.');
+	}
 	const options: SearchParams = {
-		limit: resultsPerPage,
+		limit: RESULTS_PER_PAGE,
 		offset: params.offset,
 		attributesToHighlight: ['title', 'summary'],
 		facets: facets,
@@ -38,7 +43,7 @@ export async function query(params: { query: string; offset: number; filters?: s
 		.digest('hex');
 	const cachedResponse = await kv.get(hash);
 	if (cachedResponse) {
-		log.debug(`Cache hit for query`, params.query, options);
+		log.debug(`Cache hit (key: ${hash}) for query`, params.query, options);
 		return cachedResponse as QueryResult;
 	}
 	const searchResponse = await index.search<SelectVacature>(params.query, options);

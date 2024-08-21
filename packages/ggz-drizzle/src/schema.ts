@@ -7,6 +7,7 @@ import {
   pgEnum,
   pgSchema,
   pgTable,
+  serial,
   text,
   timestamp,
   unique,
@@ -66,15 +67,6 @@ export const likes = pgTable('likes', {
     .references(() => vacatures.urlHash, { onDelete: 'cascade' })
 });
 
-export const savedSearches = pgTable('saved_searches', {
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  search: text('search').notNull(),
-  lastResults: text('last_results').array(),
-  timestamp: timestamp('timestamp', { mode: 'date', withTimezone: true })
-});
-
 export const scrapeResults = pgTable('scrape_results', {
   scraperName: text('scraper').notNull(),
   vacaturesFound: bigint('vacatures_found', { mode: 'number' }).notNull(),
@@ -107,6 +99,35 @@ export const scrapeResults = pgTable('scrape_results', {
 
 export type InsertScrapeResult = typeof scrapeResults.$inferInsert;
 export type SelectScrapeResult = typeof scrapeResults.$inferSelect;
+
+export const savedSearches = pgTable('saved_searches', {
+  id: serial('id').primaryKey(),
+  search: text('search').notNull().unique()
+});
+
+export const userSearches = pgTable(
+  'user_searches',
+  {
+    id: serial('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    searchId: integer('search_id')
+      .notNull()
+      .references(() => savedSearches.id, { onDelete: 'cascade' })
+  },
+  (t) => ({
+    unq: unique().on(t.userId, t.searchId)
+  })
+);
+
+export const searchResults = pgTable('search_results', {
+  searchId: integer('search_id')
+    .notNull()
+    .references(() => savedSearches.id, { onDelete: 'cascade' }),
+  result: text('result').array().notNull(),
+  dateTime: timestamp('date_time', { mode: 'date', withTimezone: true }).notNull().defaultNow()
+});
 
 export const vacatures = pgTable('vacatures', {
   urlHash: text('url_hash').primaryKey().notNull(),
@@ -186,7 +207,7 @@ export type MinimumVacature = Pick<
   | 'body'
   | 'url'
   | 'bodyHash'
-  | 'firstScraped'
+  // | 'firstScraped'
   | 'lastScraped'
   | 'professie'
 >;

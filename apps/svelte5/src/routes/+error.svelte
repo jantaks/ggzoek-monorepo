@@ -16,8 +16,9 @@
 		<h1 class="text-3xl">Oeps, er is iets misgegaan ...</h1>
 		<h1 class="text-lg">{$page.error?.message}</h1>
 		<div class="pt-10">
-			<a class="text-base bg-primary p-2 rounded-lg text-white hover:bg-primary-light hover:text-slate-800" href="/">Naar
-				homepage</a>
+			<a class="text-base bg-primary p-2 rounded-lg text-white hover:bg-primary-light hover:text-slate-800"
+				 href="/zoekresultaten">Naar
+				zoekpagina</a>
 		</div>
 	</div>
 

@@ -17,4 +17,4 @@
 </script>
 
 
-<h1 class={className}><a data-sveltekit-reload href="/">gg<span class="text-primary">zoek</span></a></h1>
+<h1 class={className}><a href="/zoekresultaten">gg<span class="text-primary">zoek</span></a></h1>
