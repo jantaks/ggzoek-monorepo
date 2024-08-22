@@ -121,17 +121,21 @@ export async function createSavedSearch(search: string, userId: string, results:
   return { searchId, resultId, userSearchId };
 }
 
-// Deletes a saved search from the database.
-// Related records in the user_searches and search_results table will / should be deleted via cascading delete.
+/**
+ * Deletes a saved search from the database.
+ * Related records in the user_searches and search_results table will / should be deleted via cascading delete.
+ */
 export async function deleteSavedSearch(search: string) {
   const { db: db } = getDb();
   const result = await db.delete(savedSearches).where(eq(savedSearches.search, search)).execute();
   return result.count === 1 ? { result: 'success' } : { result: 'notFound' };
 }
 
-//Returns the latest and previous search results for a user.
-// The previous search result is the last search result that was saved for, and communicated to the user.
-// These results are used to determine if the user should be notified of new search results.
+/**
+ * Returns the latest and previous search results for a user.
+ * The previous search result is the last search result that was saved for, and communicated to the user.
+ * These results are used to determine if the user should be notified of new search results.
+ */
 export async function getUserSearchResults(userId: string, search: string) {
   const { db: db } = getDb();
   const lastSearchResult = await db
