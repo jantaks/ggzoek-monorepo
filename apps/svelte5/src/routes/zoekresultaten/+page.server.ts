@@ -1,7 +1,9 @@
-import { getFacets, query } from '$lib/components/searchform/search';
-import { getGeoPointPC4 } from '@ggzoek/ggz-drizzle/dist/location_data/repo';
+import { getFacets, getQueryParams, query } from '$lib/search';
 import { log } from '@ggzoek/logging/dist/logger.js';
 import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
+import type { MyLocals } from '$lib/types';
+import { redirect } from '@sveltejs/kit';
+import { saveSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const { email } = await event.parent();
@@ -10,31 +12,30 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	event.setHeaders({
 		'cache-control': `max-age=${_12hours}`
 	});
-	const offset = Number(event.url.searchParams.get('offset') || 0);
-	let filters = event.url.searchParams.get('filters') || '';
-	const postcode = event.url.searchParams.get('postcode') || undefined;
-	let distance = event.url.searchParams.get('distance') || undefined;
-	if (postcode) {
-		distance = distance || '30';
-		const pc4 = parseInt(postcode, 10);
-		const radius = parseInt(distance, 10) * 1000;
-		log.info(`Geopoint for PC4: ${pc4}`);
-		const geopoint = await getGeoPointPC4(pc4);
-		if (geopoint) {
-			const [lat, lon] = geopoint.split(',');
-			const concatenator = filters.length > 0 ? ' AND ' : '';
-			filters += concatenator + `_geoRadius(${lat},${lon},${radius})`;
-		}
-	}
-	const searchParams = {
-		query: event.url.searchParams.get('fullText') || '',
-		offset: offset,
-		filters: filters
-	};
+	const searchParams = await getQueryParams(event.url.searchParams);
 	log.info(searchParams);
 	let facets = await getFacets();
 	return {
 		facets: facets,
 		searchResponse: await query(searchParams)
 	};
+};
+
+export const actions = {
+	saveSearch: async (event) => {
+		console.debug(
+			`${new Date().toLocaleTimeString()} [+page.server.ts - e6701fa3] : Saving search `
+		);
+		const locals = event.locals as MyLocals;
+		const userId = locals.user?.id;
+		if (!userId) {
+			console.debug(
+				`${new Date().toLocaleTimeString()} [+server.ts - a8df235b] : Unauthorized request to ${event.request.url} `
+			);
+			return redirect(301, '/auth/login');
+		}
+		const formData = await event.request.formData();
+		const id = await saveSearch(formData.get('searchParams') as string, userId);
+		return { id };
+	}
 };

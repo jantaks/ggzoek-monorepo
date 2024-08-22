@@ -12,13 +12,14 @@ import {
 	type SearchParams,
 	type SearchResponse
 } from 'meilisearch';
-import { log } from '@ggzoek/logging/src/logger.js';
 import { type facet, facets } from '$lib/types';
 import { MAXRESULTS, RESULTS_PER_PAGE } from '$lib/constants';
 import { createClient } from '@vercel/kv';
 import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 import * as crypto from 'crypto';
 import { error } from '@sveltejs/kit';
+import { log } from '../../../../packages/logging/dist/logger';
+import { getGeoPointPC4 } from '@ggzoek/ggz-drizzle/dist/location_data/repo';
 
 const client = new MeiliSearch({ host: MEILISEARCH_URL, apiKey: MEILISEARCH_KEY });
 const kv = createClient({ url: KV_REST_API_URL, token: KV_REST_API_TOKEN });
@@ -77,4 +78,28 @@ export async function getFacets() {
 		facetMap[facet] = facetValues.facetHits;
 	}
 	return facetMap;
+}
+
+export async function getQueryParams(event: URLSearchParams) {
+	const offset = Number(event.get('offset') || 0);
+	let filters = event.get('filters') || '';
+	const postcode = event.get('postcode') || undefined;
+	let distance = event.get('distance') || undefined;
+	if (postcode) {
+		distance = distance || '30';
+		const pc4 = parseInt(postcode, 10);
+		const radius = parseInt(distance, 10) * 1000;
+		log.info(`Geopoint for PC4: ${pc4}`);
+		const geopoint = await getGeoPointPC4(pc4);
+		if (geopoint) {
+			const [lat, lon] = geopoint.split(',');
+			const concatenator = filters.length > 0 ? ' AND ' : '';
+			filters += concatenator + `_geoRadius(${lat},${lon},${radius})`;
+		}
+	}
+	return {
+		query: event.get('fullText') || '',
+		offset: offset,
+		filters: filters
+	};
 }

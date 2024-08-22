@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getFacets } from '$lib/components/searchform/search';
-import { reconstructFilters, SearchForm } from '$lib/stores/formStore.svelte';
+import { getFacets } from '$lib/search';
+import { reconstructFilters, SearchForm } from '$lib/stores/formStore.svelte.js';
 
 describe('sum test', () => {});
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type facet } from '$lib/types';
-	import type { getFacets } from '$lib/components/searchform/search';
+	import type { getFacets } from '$lib/search';
 	import { Label, Slider } from 'bits-ui';
 	import FacetSelectFilterNew from '$lib/components/searchform/FacetSelectFilterNew.svelte';
 	import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';

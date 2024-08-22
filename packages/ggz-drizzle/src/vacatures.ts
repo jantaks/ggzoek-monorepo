@@ -33,7 +33,6 @@ export async function getVacaturesByIds(ids: string[]) {
 }
 
 export async function getLikesForUser(user_id: string) {
-  console.log('getLikesForUser user: ', user_id);
   const { db: db } = getDb();
   const result = await db
     .select({ urlHash: likes.vacature })

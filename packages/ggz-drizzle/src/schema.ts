@@ -114,20 +114,32 @@ export const userSearches = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     searchId: integer('search_id')
       .notNull()
-      .references(() => savedSearches.id, { onDelete: 'cascade' })
+      .references(() => savedSearches.id, { onDelete: 'cascade' }),
+    updatedDateTime: timestamp('updated_date_time', { mode: 'date', withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedResultId: integer('updated_result_id').references(() => searchResults.id, {
+      onDelete: 'set null'
+    })
   },
   (t) => ({
-    unq: unique().on(t.userId, t.searchId)
+    unq1: unique().on(t.userId, t.searchId),
+    unq2: unique().on(t.userId, t.searchId, t.updatedResultId)
   })
 );
 
-export const searchResults = pgTable('search_results', {
-  searchId: integer('search_id')
-    .notNull()
-    .references(() => savedSearches.id, { onDelete: 'cascade' }),
-  result: text('result').array().notNull(),
-  dateTime: timestamp('date_time', { mode: 'date', withTimezone: true }).notNull().defaultNow()
-});
+export const searchResults = pgTable(
+  'search_results',
+  {
+    id: serial('id').primaryKey(),
+    searchId: integer('search_id')
+      .notNull()
+      .references(() => savedSearches.id, { onDelete: 'cascade' }),
+    result: text('result').array().notNull(),
+    dateTime: timestamp('date_time', { mode: 'date', withTimezone: true }).notNull().defaultNow()
+  },
+  (t) => ({ unq: unique().on(t.searchId, t.id) })
+);
 
 export const vacatures = pgTable('vacatures', {
   urlHash: text('url_hash').primaryKey().notNull(),
