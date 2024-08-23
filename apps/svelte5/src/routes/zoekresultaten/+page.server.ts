@@ -1,9 +1,9 @@
-import { getFacets, getQueryParams, query } from '$lib/search';
+import { getFacets, getQueryParams, querySearchEngine } from '$lib/search';
 import { log } from '@ggzoek/logging/dist/logger.js';
 import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
 import type { MyLocals } from '$lib/types';
-import { redirect } from '@sveltejs/kit';
-import { saveSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
+import { error, redirect } from '@sveltejs/kit';
+import { createSavedSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const { email } = await event.parent();
@@ -12,30 +12,49 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	event.setHeaders({
 		'cache-control': `max-age=${_12hours}`
 	});
-	const searchParams = await getQueryParams(event.url.searchParams);
-	log.info(searchParams);
+	const { query, options } = await getQueryParams(event.url.searchParams);
 	let facets = await getFacets();
 	return {
 		facets: facets,
-		searchResponse: await query(searchParams)
+		searchResponse: await querySearchEngine(query, options)
 	};
 };
 
+/*
+ The MEILI HITSPERPAGE LIMIT is 1000, the default is 20.
+ In theory the number of results for a saved Searches could increase dramatically after creation,
+ so we need to be able to handle this.
+ At creation time the maximum is MAXRESULTS (100)
+*/
+const HITS_PER_PAGE = 1000;
+
 export const actions = {
 	saveSearch: async (event) => {
-		console.debug(
-			`${new Date().toLocaleTimeString()} [+page.server.ts - e6701fa3] : Saving search `
-		);
 		const locals = event.locals as MyLocals;
 		const userId = locals.user?.id;
 		if (!userId) {
-			console.debug(
-				`${new Date().toLocaleTimeString()} [+server.ts - a8df235b] : Unauthorized request to ${event.request.url} `
-			);
 			return redirect(301, '/auth/login');
 		}
 		const formData = await event.request.formData();
-		const id = await saveSearch(formData.get('searchParams') as string, userId);
+
+		let searchParams = formData.get('searchParams');
+		if (searchParams === null) {
+			return error(400, 'searchParams is required');
+		}
+		log.info(`saving search with searchParams: ${searchParams}`);
+		const urlSearchParams = new URLSearchParams(searchParams as string);
+		const { query, options } = await getQueryParams(urlSearchParams);
+
+		const updatedOptions = {
+			...options,
+			offset: undefined,
+			hitsPerPage: HITS_PER_PAGE,
+			attributesToRetrieve: ['urlHash'],
+			noLimit: true
+		};
+		const results = await querySearchEngine(query, updatedOptions);
+		const urlHashes = results.hits.filter((hit) => hit !== undefined).map((hit) => hit.urlHash);
+		const id = await createSavedSearch(searchParams.toString(), userId, urlHashes as string[]);
 		return { id };
 	}
 };
