@@ -1,9 +1,5 @@
 import { redirect, type RequestEvent } from '@sveltejs/kit';
-import supabase from '@supabase/supabase-js';
-
-type MyLocals = {
-	supabase: supabase.SupabaseClient;
-};
+import type { MyLocals } from '$lib/types';
 
 export const GET = async ({ locals }: RequestEvent) => {
 	console.log('logging out');
