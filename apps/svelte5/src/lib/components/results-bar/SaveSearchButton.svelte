@@ -8,15 +8,15 @@
 
 	const params = $page.url.searchParams;
 	const userStore = getUser()
-
-	async function save() {
-		console.debug(`${new Date().toLocaleTimeString()} [SaveSearchButton.svelte - 327c423e] : search: `, params.toString());
-	}
-
 	let processing = $state(false);
 	let saved = $state(false)
 
 	const enh: SubmitFunction = async (input) => {
+		if (processing) {
+			console.log('cancelling submit')
+			input.cancel();
+			return
+		}
 		processing = true;
 		return async ({ result, update }) => {
 			console.log('result', result);
@@ -30,6 +30,7 @@
 		if (userStore.savedSearches) {
 			saved = userStore.savedSearches.includes(params.toString());
 		}
+		console.log('saved', saved)
 	});
 
 
