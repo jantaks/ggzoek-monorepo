@@ -6,12 +6,13 @@
 
 
 	console.log('Initialising index,layout. Creating userStore');
-	const userStore = createUser($page.data.email, $page.data.likes);
+	const userStore = createUser($page.data.email, $page.data.likes, $page.data.savedSearches);
 
 	$effect(() => {
 		// We run this effect to update the userStore when the page data changes. This way we can keep the userStore in sync with the page data without redirecting.
 		userStore.email = $page.data.email;
 		userStore.likes = $page.data.likes;
+		userStore.savedSearches = $page.data.savedSearches;
 	});
 
 	createSearchForm();

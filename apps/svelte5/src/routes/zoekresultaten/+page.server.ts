@@ -3,7 +3,7 @@ import { log } from '@ggzoek/logging/dist/logger.js';
 import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
 import type { MyLocals } from '$lib/types';
 import { error, redirect } from '@sveltejs/kit';
-import { createSavedSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
+import { createSavedSearch, deleteUserSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 	const { email } = await event.parent();
@@ -41,7 +41,7 @@ export const actions = {
 		if (searchParams === null) {
 			return error(400, 'searchParams is required');
 		}
-		log.info(`saving search with searchParams: ${searchParams}`);
+		log.debug(`saving search with searchParams: ${searchParams}`);
 		const urlSearchParams = new URLSearchParams(searchParams as string);
 		const { query, options } = await getQueryParams(urlSearchParams);
 
@@ -50,11 +50,36 @@ export const actions = {
 			offset: undefined,
 			hitsPerPage: HITS_PER_PAGE,
 			attributesToRetrieve: ['urlHash'],
-			noLimit: true
+			limit: HITS_PER_PAGE
 		};
 		const results = await querySearchEngine(query, updatedOptions);
 		const urlHashes = results.hits.filter((hit) => hit !== undefined).map((hit) => hit.urlHash);
-		const id = await createSavedSearch(searchParams.toString(), userId, urlHashes as string[]);
-		return { id };
+		const { userSearchId } = await createSavedSearch(
+			searchParams.toString(),
+			userId,
+			urlHashes as string[]
+		);
+		log.debug(
+			`Saved search with initial results: ${urlHashes.length} and userSearchId: ${userSearchId}`
+		);
+		return { userSearchId };
+	},
+	deleteSearch: async (event) => {
+		const locals = event.locals as MyLocals;
+		const userId = locals.user?.id;
+		if (!userId) {
+			return redirect(301, '/auth/login');
+		}
+		const formData = await event.request.formData();
+
+		let search = formData.get('searchParams') as string;
+		if (search === null) {
+			return error(400, 'searchParams is required');
+		}
+		const response = await deleteUserSearch({ userId, search });
+		if (response.result !== 'success') {
+			return error(404, 'Search not found');
+		}
+		return { success: true };
 	}
 };

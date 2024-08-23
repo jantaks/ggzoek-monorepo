@@ -2,9 +2,20 @@ import { goto } from '$app/navigation';
 import { getContext, setContext } from 'svelte';
 
 class _User {
-	constructor(email?: string, likes?: string[]) {
+	constructor(email?: string, likes?: string[], savedSearches?: string[]) {
 		this._email = email;
 		this._likes = likes !== undefined ? likes : [];
+		this._savedSearches = savedSearches !== undefined ? savedSearches : [];
+	}
+
+	_savedSearches: string[] = $state<string[]>([]);
+
+	get savedSearches() {
+		return this._savedSearches;
+	}
+
+	set savedSearches(value: string[]) {
+		this._savedSearches = value;
 	}
 
 	_email = $state<string | undefined>();
@@ -77,8 +88,8 @@ class _User {
 
 const CONTEXT_NAME = Symbol('USER');
 
-export function createUser(email?: string, likes?: string[]) {
-	return setContext(CONTEXT_NAME, new _User(email, likes));
+export function createUser(email?: string, likes?: string[], savedSearches?: string[]) {
+	return setContext(CONTEXT_NAME, new _User(email, likes, savedSearches));
 }
 
 export function getUser() {

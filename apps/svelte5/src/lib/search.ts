@@ -41,11 +41,11 @@ export async function querySearchEngine(query?: string | null, options?: SearchP
 	};
 	log.info(`Querying with options: ${JSON.stringify(updatedOptions)}`);
 	const { hash, cachedItem } = await getCachedResponse(query, options);
-	// if (cachedItem !== null) {
-	// 	log.debug(`returning  ${JSON.stringify(cachedItem.estimatedTotalHits)} cached items:`);
-	// 	log.info(`FacetDistribution: ${JSON.stringify(cachedItem.facetDistribution)}`);
-	// 	return cachedItem;
-	// }
+	if (cachedItem !== null) {
+		log.debug(`returning  ${JSON.stringify(cachedItem.estimatedTotalHits)} cached items`);
+		log.debug(`FacetDistribution: ${JSON.stringify(cachedItem.facetDistribution)}`);
+		return cachedItem;
+	}
 	const searchResponse = await index.search<SelectVacature>(query, updatedOptions);
 	log.debug(`Estimated hits for query "${query}": ${searchResponse.estimatedTotalHits}`);
 	log.info(`FacetDistribution: ${JSON.stringify(searchResponse.facetDistribution)}`);
