@@ -203,5 +203,6 @@ export async function selectNewLinks($: CheerioAPI, options: LinksOptions) {
 }
 
 export function equalArrays(array1: any[], array2: any[]) {
+  if (!array1 || !array2) return false;
   return array1.length === array2.length && array1.every((value) => array2.includes(value));
 }
