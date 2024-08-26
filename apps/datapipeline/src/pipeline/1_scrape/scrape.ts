@@ -113,5 +113,7 @@ const selectedCrawlers = await checkbox({
 const crawlersToRun = crawlers.filter((crawler) => selectedCrawlers.includes(crawler.name));
 for (const crawler of crawlersToRun) {
   log.info(`Running ${crawler.name}`);
-  await crawler.crawl();
+  crawler.crawl().then(() => {
+    log.info(`Finished ${crawler.name}`);
+  });
 }

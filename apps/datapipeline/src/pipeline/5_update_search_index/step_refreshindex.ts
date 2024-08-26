@@ -63,7 +63,7 @@ mutualSynonyms.forEach(async (mutualSynonyms) => {
 const completed = await getVacaturesToSync({
   limit: 10000,
   organisaties: 'all',
-  scrapedAfter: new Date('2024-01-01'),
+  scrapedAfter: new Date('2024-08-23'),
   minBatchId: 4,
   professies: [
     'Psychiater',
@@ -72,7 +72,12 @@ const completed = await getVacaturesToSync({
     'GZ-Psycholoog',
     'Verpleegkundig Specialist',
     'Verslavingsarts',
-    'Sociaal Psychiatrisch Verpleegkundige'
+    'Sociaal Psychiatrisch Verpleegkundige',
+    'ANIOS',
+    'Gedragswetenschapper',
+    'Basispsycholoog',
+    'Orthopedagoog',
+    'Maatschappelijk Werker'
   ]
 });
 log.info(`Found ${completed.length} vacatures to sync`);

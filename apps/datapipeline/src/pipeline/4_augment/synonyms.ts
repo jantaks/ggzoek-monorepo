@@ -1,7 +1,8 @@
 import 'dotenv/config';
-import { SelectVacature } from 'packages/ggz-drizzle/src/schema.js';
+import { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema.js';
 import { getBeroepen } from '../../beroepen.js';
 import { BeroepOptions } from '@ggzoek/types/index.js';
+import { log } from '@ggzoek/logging/src/logger.js';
 
 export const synonyms: SynonymsDictionary = {
   behandelmethoden_ai: {
@@ -153,6 +154,8 @@ export const synonyms: SynonymsDictionary = {
   }
 } as const;
 
+const OVERIG = 'Overig';
+
 type Synonyms = {
   // The field in the vacature object where the mapped value should be stored .
   // If not provided, the field is assumed to be the same as the key.
@@ -182,6 +185,7 @@ export function correctSpelling(
   }
 
   let isUpdated = false;
+  let defaultedToOverig = [];
   for (const field in vacature) {
     assertField(field, vacature);
     const fieldSynonyms: Synonyms = getSynonyms(field, dictionary);
@@ -192,6 +196,9 @@ export function correctSpelling(
       for (const value of vacature[field]) {
         const betterAlternative = findSynonyms(value, fieldSynonyms);
         if (betterAlternative) {
+          if (betterAlternative === OVERIG) {
+            defaultedToOverig.push(`Updated ${value} in ${field} to ${betterAlternative}`);
+          }
           console.log(`Updating ${value} in ${field} to ${betterAlternative}`);
           updatedField.add(betterAlternative);
           isUpdated = true;
@@ -207,6 +214,11 @@ export function correctSpelling(
       if (typeof value === 'string') {
         const betterAlternative = findSynonyms(value, fieldSynonyms);
         if (betterAlternative) {
+          if (betterAlternative === OVERIG) {
+            defaultedToOverig.push(
+              `Updated ${vacature[field]} in ${field} to ${betterAlternative}`
+            );
+          }
           console.log(`Found synonym for ${vacature[field]} in ${field}: ${betterAlternative}`);
           (vacature[targetField] as string) = betterAlternative;
           isUpdated = true;
@@ -230,7 +242,7 @@ export function correctSpelling(
     }
   }
 
-  return { isUpdated, vacature };
+  return { isUpdated, defaultedToOverig };
 }
 
 function getSynonyms(fieldName: string, dictionary: SynonymsDictionary = synonyms) {
@@ -238,6 +250,7 @@ function getSynonyms(fieldName: string, dictionary: SynonymsDictionary = synonym
 }
 
 function findSynonyms(value: string, synonyms: Synonyms) {
+  log.debug(`Finding synonyms for ${value}`);
   for (const preferredSpelling of Object.keys(synonyms.mappings)) {
     if (value === preferredSpelling) {
       return null;
@@ -256,5 +269,6 @@ function findSynonyms(value: string, synonyms: Synonyms) {
       return preferredSpelling;
     }
   }
-  return synonyms.defaultToOverig && value !== 'Overig' ? 'Overig' : null;
+  log.debug(`No synonyms found for ${value}`);
+  return synonyms.defaultToOverig && value !== OVERIG ? OVERIG : null;
 }

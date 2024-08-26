@@ -39,12 +39,14 @@ describe('Replace values with preferred spelling', () => {
     console.log(result);
     const expected = {
       isUpdated: true,
+      defaultedToOverig: [],
       vacature: {
-        locaties: ['Den Bosch'],
         behandelmethoden: [
           'Cognitieve gedragstherapie',
           'Cognitive Behavioral Therapy-Enhanced (CBT-E)'
-        ]
+        ],
+        behandelmethoden_ai: ['cgt', 'cbt-e'],
+        locaties: ['Den Bosch']
       }
     };
     expect(result).toEqual(expected);
@@ -56,6 +58,7 @@ describe('Replace values with preferred spelling', () => {
     };
     const expected = {
       isUpdated: true,
+      defaultedToOverig: [],
       vacature: {
         title: 'Vacature voor een psychiater en een GZ psycholoog in den Haag en omstreken',
         beroepen: ['GZ-Psycholoog', 'Psychiater']
@@ -73,6 +76,10 @@ describe('Replace values with preferred spelling', () => {
     };
     const expected = {
       isUpdated: true,
+      defaultedToOverig: [
+        'Updated Zuiptherapie,Brommers kieken in behandelmethoden_ai to Overig',
+        'Updated Zuiptherapie,Brommers kieken in behandelmethoden_ai to Overig'
+      ],
       vacature: {
         behandelmethoden_ai: ['Zuiptherapie', 'Brommers kieken'],
         behandelmethoden: ['Overig'],

@@ -6,10 +6,18 @@ import { plaatsen } from '../schema.js';
 const { db: db } = getDb();
 
 function getMiddlePoint(result: { GeoPoint: string }[]) {
+  const cleaned = result.filter((r) => r.GeoPoint != undefined && true);
+  if (cleaned.length == 1) {
+    // No need to calculate middle point if there is only one
+    return cleaned[0].GeoPoint;
+  }
+  log.debug(`Calculating middle point for ${cleaned.length} geopoints`);
   const lat =
-    result.reduce((acc, curr) => acc + parseFloat(curr.GeoPoint.split(',')[0]), 0) / result.length;
+    cleaned.reduce((acc, curr) => acc + parseFloat(curr.GeoPoint.split(',')[0]), 0) /
+    cleaned.length;
   const lon =
-    result.reduce((acc, curr) => acc + parseFloat(curr.GeoPoint.split(',')[1]), 0) / result.length;
+    cleaned.reduce((acc, curr) => acc + parseFloat(curr.GeoPoint.split(',')[1]), 0) /
+    cleaned.length;
   return `${lat},${lon}`;
 }
 
@@ -39,6 +47,7 @@ export function getAllPC4(PC4: number) {
 }
 
 export async function getGeoPointMultiplePlaatsen(plaatsen: string[]) {
+  log.debug(`Getting geopoint for multiple plaatsen: ${plaatsen}`);
   const result = await Promise.all(
     plaatsen.map(async (plaats) => {
       return {
@@ -50,7 +59,12 @@ export async function getGeoPointMultiplePlaatsen(plaatsen: string[]) {
 }
 
 export async function getGeoPointPlaats(plaatsNaam: string) {
+  log.debug(`Getting geopoint for plaats: ${plaatsNaam}`);
   const plaats = await findPlaats(plaatsNaam);
+  if (!plaats) {
+    log.warn(`No result found for plaats: ${plaatsNaam}`);
+    return null;
+  }
   const result = await db
     .select()
     .from(plaatsen)
@@ -113,11 +127,11 @@ export async function getGeoPointPC4(pc4: number) {
 
 // db.run(sql(`SELECT load_extension('spellfix1');"))
 
-export async function findPlaats(plaats: string) {
+export async function findPlaats(plaats: string): Promise<string | null> {
   const result = await db.execute(sql`select *
                                       from plaatsen
                                       where SIMILARITY(plaatsen."Plaats", ${plaats}) > 0.4`);
   if (result.length > 0) {
     return result[0].Plaats as string;
-  }
+  } else return null;
 }

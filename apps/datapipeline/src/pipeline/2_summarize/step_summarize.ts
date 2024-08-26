@@ -44,12 +44,16 @@ async function stepfunction() {
         'GZ-Psycholoog',
         'Verpleegkundig Specialist',
         'Verslavingsarts',
-        'Sociaal Psychiatrisch Verpleegkundige'
+        'Sociaal Psychiatrisch Verpleegkundige',
+        'ANIOS',
+        'Gedragswetenschapper',
+        'Basispsycholoog',
+        'Orthopedagoog',
+        'Maatschappelijk Werker'
       ],
       organisaties: 'all',
-      force: true,
-      scrapedAfter: new Date('2024-07-03'),
-      summaryDateBefore: new Date('2024-07-07')
+      force: false,
+      lastScrapedAfterDays: 4
     })
   ).slice(0, 5000);
   todo = vacatures.length;
@@ -69,7 +73,7 @@ async function stepfunction() {
 
 stepfunction()
   .then(() => {
-    console.log('done');
+    console.log('Summarizing done');
     process.exit(1);
   })
   .catch(console.error);

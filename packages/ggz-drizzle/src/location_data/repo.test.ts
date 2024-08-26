@@ -45,6 +45,12 @@ describe('Locatie repo test', () => {
     console.log(result);
     expect(result).toBe('51.6795514547,5.41192890272');
   });
+  it('It correctly handles undefined / unknown plaatsen', async () => {
+    const unknown = undefined;
+    const result = await getGeoPointMultiplePlaatsen(['berlicum', 'Regio Meijerij']);
+    console.log(result);
+    expect(result).toBe('51.6795514547,5.41192890272');
+  });
   it('Returns correct result on array of 1', async () => {
     const result = await getGeoPointMultiplePlaatsen(['berlcum']);
     console.log(result);

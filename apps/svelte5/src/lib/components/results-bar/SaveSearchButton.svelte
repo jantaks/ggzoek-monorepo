@@ -42,7 +42,7 @@
 		class='px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
 		type="submit"
 	>
-		<Bell class={`text-primary size-5 mr-1 ${saved? "fill-primary" : "" } ${processing? "fill-primary text-primary-light animate-spin" : "" }`} />
+		<Bell class={`text-primary size-5 mr-1 ${saved? "fill-primary" : "" } ${processing? "text-primary-light animate-spin" : "" }`} />
 		<span class="text-xs">Verwijder zoekopdracht</span>
 	</Button>
 	</form>
@@ -53,7 +53,7 @@
 	class='px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
 	type="submit"
 >
-	<Bell class={`text-primary size-5 mr-1 ${saved? "fill-primary" : "" } ${processing? "text-primary	 animate-spin" : "" }`} />
+	<Bell class={`text-primary size-5 mr-1 ${saved? "fill-primary" : "" } ${processing? "text-primary animate-spin" : "" }`} />
 	<span class="text-xs">Bewaar zoekopdracht</span>
 </Button>
 </form>

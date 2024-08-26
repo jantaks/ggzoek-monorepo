@@ -304,8 +304,8 @@ type SummarizeOptions = {
   organisaties: string[] | 'all';
   // If force equals true then all vacatures will be summarized, even if they have been summarized before
   force: boolean;
-  // Only summarize vacatures that have been scraped after this date
-  scrapedAfter?: Date;
+  // Only summarize vacatures that have been scraped for the last time this many days ago
+  lastScrapedAfterDays?: number;
   // Only summarize vacatures that have been summarized before this date (only effective if force is false)
   summaryDateBefore?: Date;
   // Limit the number of vacatures to summarize
@@ -321,11 +321,12 @@ export async function getVacaturesToSummarize(
     professies: ['Psychiater'],
     organisaties: 'all',
     force: false,
-    scrapedAfter: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    lastScrapedAfterDays: 1,
     limit: 10000
   }
 ) {
   const db = getDb().db;
+  const lastScraped = new Date(Date.now() - options.lastScrapedAfterDays * 24 * 60 * 60 * 1000);
   const clauses: SQLWrapper[] = [];
   if (options.professies && options.professies.length > 0 && options.professies !== 'all') {
     clauses.push(arrayOverlaps(vacatureTable.professie, options.professies));
@@ -336,13 +337,13 @@ export async function getVacaturesToSummarize(
   if (!options.force) {
     clauses.push(or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary)));
   }
-  if (options.summaryDateBefore) {
+  if (options.summaryDateBefore && !options.force) {
     clauses.push(lt(vacatureTable.summaryTimestamp, options.summaryDateBefore));
   }
   return await db
     .select()
     .from(vacatureTable)
-    .where(and(...clauses, gt(vacatureTable.lastScraped, options.scrapedAfter)))
+    .where(and(...clauses, gt(vacatureTable.lastScraped, lastScraped)))
     .limit(options.limit)
     .execute();
 }
