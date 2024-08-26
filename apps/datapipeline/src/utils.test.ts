@@ -1,4 +1,4 @@
-import { cleanTitle, combineUrl, formatDate, randomItems } from './utils.js';
+import { cleanTitle, combineUrl, equalArrays, formatDate, randomItems } from './utils.js';
 import { describe, expect, it } from 'vitest';
 import { getBeroepen } from './beroepen.js';
 
@@ -185,5 +185,26 @@ describe('should clean up text', () => {
     expect(result).toEqual(
       'Werken bij GGz Breburg Verpleegkundig Specialist - Angst- en Stemmingsstoornissen'
     );
+  });
+});
+
+describe('Compare 2 similar arrays', () => {
+  it('2 arrays are equal', () => {
+    const arr1 = ['foo', 'bar', 'baz'];
+    const arr2 = ['bar', 'baz', 'foo'];
+    const result = equalArrays(arr1, arr2);
+    expect(result).toBe(true);
+  });
+  it('Arrays with different length are not similar ', () => {
+    const arr1 = ['foo', 'bar', 'baz'];
+    const arr2 = ['foo', 'bar', 'baz', 'qux'];
+    const result = equalArrays(arr1, arr2);
+    expect(result).toBe(false);
+  });
+  it('Arrays with different length are not similar 2', () => {
+    const arr1 = ['foo'];
+    const arr2: string[] = [];
+    const result = equalArrays(arr1, arr2);
+    expect(result).toBe(false);
   });
 });

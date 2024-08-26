@@ -53,8 +53,9 @@ for (const vacature of vacatures) {
   count++;
   log.debug(`Processing ${vacature.url}`);
   const { isUpdated, defaultedToOverig } = correctSpelling(vacature);
+  overig.push(...defaultedToOverig);
   let geoPointsAdded = false;
-  if (geopPoints) {
+  if (geopPoints && !vacature.geoPoint) {
     await addGeopoint(vacature);
     geoPointsAdded = true;
   }
@@ -62,7 +63,6 @@ for (const vacature of vacatures) {
   if (isUpdated || geoPointsAdded) {
     updated++;
     log.info(`Updated ${updated}`);
-    overig.push(...defaultedToOverig);
     if (!trialRun) {
       await upsert(vacature as SelectVacature);
     }
@@ -71,4 +71,14 @@ for (const vacature of vacatures) {
   }
 }
 log.info(`Updated ${updated} out of ${count} vacatures`);
-log.info(new Set(overig));
+log.info(`${overig.length} items defaulted to overig`);
+//sort overig:
+overig.sort();
+const overigMap: Record<string, number> = {};
+for (const item of overig) {
+  if (!overigMap[item]) {
+    overigMap[item] = 1;
+  }
+  overigMap[item]++;
+}
+log.info(overigMap);

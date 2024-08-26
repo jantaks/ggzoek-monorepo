@@ -39,17 +39,17 @@ describe('Replace values with preferred spelling', () => {
     console.log(result);
     const expected = {
       isUpdated: true,
-      defaultedToOverig: [],
-      vacature: {
-        behandelmethoden: [
-          'Cognitieve gedragstherapie',
-          'Cognitive Behavioral Therapy-Enhanced (CBT-E)'
-        ],
-        behandelmethoden_ai: ['cgt', 'cbt-e'],
-        locaties: ['Den Bosch']
-      }
+      defaultedToOverig: []
     };
     expect(result).toEqual(expected);
+    expect(vacature).toEqual({
+      locaties: ['Den Bosch'],
+      behandelmethoden_ai: ['cgt', 'cbt-e'],
+      behandelmethoden: [
+        'Cognitieve gedragstherapie',
+        'Cognitive Behavioral Therapy-Enhanced (CBT-E)'
+      ]
+    });
   });
   it('Should correct beroepen and ignore double values', () => {
     const vacature = {
@@ -58,16 +58,17 @@ describe('Replace values with preferred spelling', () => {
     };
     const expected = {
       isUpdated: true,
-      defaultedToOverig: [],
-      vacature: {
-        title: 'Vacature voor een psychiater en een GZ psycholoog in den Haag en omstreken',
-        beroepen: ['GZ-Psycholoog', 'Psychiater']
-      }
+      defaultedToOverig: []
     };
 
     const result = correctSpelling(vacature, testDictionary);
     console.log(result);
     expect(result).toEqual(expected);
+
+    expect(vacature).toEqual({
+      title: 'Vacature voor een psychiater en een GZ psycholoog in den Haag en omstreken',
+      beroepen: ['GZ-Psycholoog', 'Psychiater']
+    });
   });
   it('Should classify as overig if specified.', () => {
     const vacature = {
@@ -77,17 +78,29 @@ describe('Replace values with preferred spelling', () => {
     const expected = {
       isUpdated: true,
       defaultedToOverig: [
-        'Updated Zuiptherapie,Brommers kieken in behandelmethoden_ai to Overig',
-        'Updated Zuiptherapie,Brommers kieken in behandelmethoden_ai to Overig'
-      ],
-      vacature: {
-        behandelmethoden_ai: ['Zuiptherapie', 'Brommers kieken'],
-        behandelmethoden: ['Overig'],
-        locaties: ['Blericum']
-      }
+        'Updated Zuiptherapie in behandelmethoden_ai to Overig',
+        'Updated Brommers kieken in behandelmethoden_ai to Overig'
+      ]
     };
     const result = correctSpelling(vacature, testDictionary);
     console.log(result);
     expect(result).toEqual(expected);
+    expect(vacature).toEqual({
+      behandelmethoden_ai: ['Zuiptherapie', 'Brommers kieken'],
+      behandelmethoden: ['Overig'],
+      locaties: ['Blericum']
+    });
+  });
+  it('Should not update if targetField is already correct', () => {
+    const vacature = {
+      locaties: ['Den Bosch'],
+      behandelmethoden_ai: ['cgt', 'cbt-e'],
+      behandelmethoden: [
+        'Cognitieve gedragstherapie',
+        'Cognitive Behavioral Therapy-Enhanced (CBT-E)'
+      ]
+    };
+    const result = correctSpelling(vacature, testDictionary);
+    console.log(result);
   });
 });

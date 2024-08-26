@@ -3,12 +3,18 @@ import { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema.js';
 import { getBeroepen } from '../../beroepen.js';
 import { BeroepOptions } from '@ggzoek/types/index.js';
 import { log } from '@ggzoek/logging/src/logger.js';
+import { equalArrays } from '../../utils.js';
 
 export const synonyms: SynonymsDictionary = {
   behandelmethoden_ai: {
     defaultToOverig: true,
     targetField: 'behandelmethoden',
     mappings: {
+      'Acceptance and Commitment Therapy (ACT)': [
+        'Acceptatie en Commitment Therapie (ACT)',
+        'Acceptatie en Commitment Therapie',
+        'Acceptance and Commitment Therapy'
+      ],
       'Affect Fobie Therapie (AFT)': ['aft', 'affect fobie therapie'],
       'Cognitieve gedragstherapie': [
         'cgt',
@@ -22,6 +28,7 @@ export const synonyms: SynonymsDictionary = {
         'cbt-e'
       ],
       'Community Reinforcement Approach': ['cra', 'community reinforcement approach'],
+      'Deep Brain Stimulation': ['dbs'],
       'Dialectische Gedragstherapie': [
         'dialectische gedragstherapie',
         'dialectische gedragstherapie (DGT)',
@@ -31,6 +38,7 @@ export const synonyms: SynonymsDictionary = {
       'Dialectische gedragstherapie': ['dialectische gedragstherapie', 'dgt'],
       EMDR: ['emdr', 'eye movement desensitization and reprocessing'],
       'Electroconvulsieve therapie': ['electroconvulsieve therapie', 'ect'],
+      Farmacotherapie: ['pharmacotherapie', 'farmacotherapie', 'Farmacotherapeutische behandeling'],
       Groepstherapie: [
         'groepstherapie',
         'group therapy',
@@ -50,6 +58,12 @@ export const synonyms: SynonymsDictionary = {
         'Herstelgerichte behandeling',
         'Herstelgerichte zorg',
         'Herstelondersteunende zorg'
+      ],
+      'High Intensive Care (HIC)': [
+        'hic',
+        'high intensive care',
+        'hoog intensieve zorg',
+        'zeer intensieve zorg'
       ],
       'Imaginaire Exposure': ['imaginaire exposure', 'imaginary exposure', 'ie'],
       'Intensive Home Treatment (IHT)': [
@@ -75,30 +89,17 @@ export const synonyms: SynonymsDictionary = {
         'adaptive mentalization based integrative therapy',
         'Herstel Ondersteunende Zorg (HOZ)'
       ],
-      Overige: [
-        'overige',
-        'diverse',
-        'diversen',
-        'diverse behandelmethoden',
-        'Affect regulerende vaktherapie',
-        'Ambulante zorg',
-        'Casemanagement',
-        'Crisisinterventie',
-        'Exposure',
-        'Exposure in Vivo',
-        'Geweldloos Verzet'
-      ],
-      Psychotherapie: ['Psychodynamische psychotherapie', 'Psycho-educatie'],
       'Psychomotorische therapie': ['psychomotorische therapie', 'pmt'],
+      Psychotherapie: ['Psychodynamische psychotherapie', 'Psycho-educatie'],
       Schematherapie: ['schematherapie', 'schematherapy', 'sft'],
+      Systeemtherapie: ['systeemgericht werken'],
       'flexible assertive community treatment (FACT)': [
         'flexible assertive community treatment',
         'flexible assertive community treatment (fact)',
         'fact',
         'fact methode',
         'act'
-      ],
-      Systeemtherapie: ['systeemgericht werken']
+      ]
     }
   },
   locaties: {
@@ -118,6 +119,8 @@ export const synonyms: SynonymsDictionary = {
     targetField: 'stoornissen',
     defaultToOverig: true,
     mappings: {
+      'AD(H)D': ['adhd', 'attention deficit hyperactivity disorder', 'ad(h)d', 'adhd'],
+      Angststoornissen: ['angststoornis', 'angst'],
       'Autisme Spectrum Stoornis': [
         'autisme spectrum stoornis',
         'autismespectrumstoornis',
@@ -129,27 +132,49 @@ export const synonyms: SynonymsDictionary = {
         'complexe psychiatrische problemen',
         'comorbiditeit',
         'complexe psychiatrische stoornissen',
-        'cpp'
+        'cpp',
+        'Ernstige psychische aandoeningen',
+        'Ernstige Psychiatrische Aandoening'
       ],
-      'Voedings- en eetstoornissen': ['voedings- en eetstoornissen', 'eetstoornissen'],
+      'Depressieve stoornissen': [
+        'depressieve stoornis',
+        'depressie',
+        'Stemminsstoornissen',
+        'Stemmingsstoornissen',
+        'Stemmingsproblemen'
+      ],
       'Dissociatieve Stoornissen': [],
-      'Depressieve stoornissen': ['depressieve stoornis', 'depressie'],
-      Angststoornissen: ['angststoornis', 'angst'],
+      'Forensische problematiek': [],
+      Genderdysforie: ['genderdysphoria', 'Geslachtsidentiteitsstoornis'],
+      'Licht Verstandelijke Beperking': ['lvb', ' Licht verstandelijke beperking'],
+      'Neurocognitieve stoornissen': [],
       'Obsessieve-compulsieve en gerelateerde stoornissen': [
         'OCD',
         'obsessive-compulsive disorder'
       ],
-      Verslavingsstoornissen: ['verslaving', 'verslavingsproblematiek'],
+      Ontwikkelingsstoornissen: ['Ontwikkelingsproblematiek'],
+      Persoonlijkheidsstoornissen: ['persoonlijkheidsstoornis', 'persoonlijkheid'],
+      'Schizofreniespectrum en andere psychotische stoornissen': [
+        'schizofrenie',
+        'psychose',
+        'Psychotische stoornissen'
+      ],
+      'Psychosomatische stoornissen': ['psychosomatische stoornis', 'psychosomatiek'],
+      'Seksuele stoornissen': ['seksuele stoornis', 'problematisch seksueel gedrag'],
       'Trauma- en stressorgerelateerde stoornissen': [
         'trauma',
         'traumagerelateerde stoornissen',
         'ptss',
-        'ptsd'
+        'ptsd',
+        'Traumatische stoornissen'
       ],
-      Genderdysforie: ['genderdysphoria', 'Geslachtsidentiteitsstoornis'],
-      'Schizofreniespectrum en andere psychotische stoornissen': ['schizofrenie', 'psychose'],
-      'Neurocognitieve stoornissen': [],
-      Persoonlijkheidsstoornissen: ['persoonlijkheidsstoornis', 'persoonlijkheid']
+      Verslavingsstoornissen: [
+        'verslaving',
+        'verslavingsproblematiek',
+        'Middelenafhankelijkheid',
+        'middelenmisbruik'
+      ],
+      'Voedings- en eetstoornissen': ['voedings- en eetstoornissen', 'eetstoornissen']
     }
   }
 } as const;
@@ -201,12 +226,15 @@ export function correctSpelling(
           }
           console.log(`Updating ${value} in ${field} to ${betterAlternative}`);
           updatedField.add(betterAlternative);
-          isUpdated = true;
         } else {
           updatedField.add(value);
         }
       }
-      if (updatedField.size > 0) {
+      if (
+        updatedField.size > 0 &&
+        !equalArrays(vacature[targetField] as Array<string>, Array.from(updatedField))
+      ) {
+        isUpdated = true;
         (vacature[targetField] as string[]) = Array.from(updatedField);
       }
     } else {
@@ -220,8 +248,10 @@ export function correctSpelling(
             );
           }
           console.log(`Found synonym for ${vacature[field]} in ${field}: ${betterAlternative}`);
-          (vacature[targetField] as string) = betterAlternative;
-          isUpdated = true;
+          if (vacature[targetField] !== betterAlternative) {
+            (vacature[targetField] as string) = betterAlternative;
+            isUpdated = true;
+          }
         }
       }
     }

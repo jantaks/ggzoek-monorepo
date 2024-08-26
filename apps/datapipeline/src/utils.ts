@@ -201,3 +201,7 @@ export async function selectNewLinks($: CheerioAPI, options: LinksOptions) {
   const urls = selectLinks($, options);
   return await filterNewUrls(urls);
 }
+
+export function equalArrays(array1: any[], array2: any[]) {
+  return array1.length === array2.length && array1.every((value) => array2.includes(value));
+}
