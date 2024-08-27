@@ -19,7 +19,7 @@ export async function load({
 }
 
 export const actions = {
-	deleteSearch: async (event) => {
+	delete: async (event) => {
 		console.log('deleteSearch');
 		const locals = event.locals as MyLocals;
 		const data = await event.request.formData();
