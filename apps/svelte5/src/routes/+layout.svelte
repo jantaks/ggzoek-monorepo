@@ -3,6 +3,7 @@
 	import { createSearchForm } from '$lib/stores/formStore.svelte';
 	import { createUser } from '$lib/stores/userStore.svelte';
 	import { page } from '$app/stores';
+	import NavBar from '$lib/components/navbar/NavBar.svelte';
 
 
 	console.log('Initialising index,layout. Creating userStore');
@@ -17,4 +18,13 @@
 
 	createSearchForm();
 </script>
+
+<svelte:head>
+	<style>
+      body {
+          @apply bg-secondary-100 md:bg-gradient-to-r from-secondary-300 via-primary-light to-white;
+      }
+	</style>
+</svelte:head>
+<NavBar class="bg-secondary-900 text-white" showLinks showLogin></NavBar>
 <slot></slot>

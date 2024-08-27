@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { getFacets } from '$lib/search';
-import { reconstructFilters, SearchForm } from '$lib/stores/formStore.svelte.js';
+import {
+	reconstructFilters,
+	SearchForm,
+	searchFromSearchParams
+} from '$lib/stores/formStore.svelte.js';
 
 describe('sum test', () => {});
 
@@ -31,6 +35,34 @@ describe('filter store', () => {
 			}
 		];
 		expect(result).toEqual(expected);
-		console.log(result);
+	});
+	it('Reconstructs a Search from UrlSearchParameters', () => {
+		const parmams = 'postcode=5232AB&fullText=zoekterm1&distance=30&filters=';
+		const results = searchFromSearchParams(new URLSearchParams(parmams));
+		const expected = {
+			query: 'zoekterm1',
+			postcode: '5232AB',
+			distance: 30,
+			estimatedResults: 0,
+			filters: []
+		};
+		expect(results).toEqual(expected);
+	});
+	it('Reconstructs a Search from UrlSearchParameters 2', () => {
+		const parmams =
+			'postcode=5258&fullText=hallo&distance=60&filters=%28organisatie+%3D+%22Accare%22+OR+organisatie%3D%22Altrecht%22+OR+organisatie%3D%22De+Hoop%22%29+AND+%28stoornissen+%3D+%22AD%28H%29D%22%29';
+		const results = searchFromSearchParams(new URLSearchParams(parmams));
+		console.log(JSON.stringify(results));
+		const expected = {
+			query: 'hallo',
+			postcode: '5258',
+			distance: 60,
+			estimatedResults: 0,
+			filters: [
+				{ facet: 'organisatie', selectedValues: ['Accare', 'Altrecht', 'De Hoop'], operator: 'OR' },
+				{ facet: 'stoornissen', selectedValues: [], operator: 'OR' }
+			]
+		};
+		expect(results).toEqual(expected);
 	});
 });

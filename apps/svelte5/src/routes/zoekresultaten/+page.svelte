@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Searchform from '$lib/components/searchform/Searchform.svelte';
 	import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
-	import NavBar from '$lib/components/navbar/NavBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte.js';
@@ -24,8 +23,8 @@
 	</style>
 </svelte:head>
 
-<NavBar class="md:mb-4 bg-secondary-900 text-white" showLinks showLogin></NavBar>
-<div class="flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
+
+<div class="mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
 	</div>

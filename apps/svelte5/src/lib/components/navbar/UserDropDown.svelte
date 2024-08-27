@@ -42,7 +42,7 @@
 			<a data-sveltekit-reload href="/bewaard">Bewaarde vacatures ({user?.likes?.length})</a>
 		</div>
 		<div {...$item} class="item" use:item>
-			<a data-sveltekit-reload href="/bewaard">Bewaarde zoekopdrachten ({user?.savedSearches?.length})</a>
+			<a data-sveltekit-reload href="/saved_searches">Bewaarde zoekopdrachten ({user?.savedSearches?.length})</a>
 		</div>
 		<div {...$item} class="item" use:item>
 			<a data-sveltekit-reload href="/auth/resetpassword/form">Wachtwoord wijzigen</a>

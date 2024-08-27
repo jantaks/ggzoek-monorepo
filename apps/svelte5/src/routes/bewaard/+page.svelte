@@ -1,5 +1,4 @@
 <script lang="ts">
-	import NavBar from '$lib/components/navbar/NavBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import { setContext } from 'svelte';
 	import { slide } from 'svelte/transition';
@@ -27,8 +26,7 @@
 	</style>
 </svelte:head>
 
-<NavBar class="md:mb-4 bg-secondary-900 text-white" showLinks showLogin></NavBar>
-<div class="flex flex-col justify-center items-center w-full space-y-4">
+<div class="pt-4 flex flex-col justify-center items-center w-full space-y-4">
 	<h1 class="text-xl font-bold">U heeft {found} bewaarde vacatures.</h1>
 	{#each data.vacatures as vacature}
 		{#if !removed.includes(vacature.vacature.urlHash)}

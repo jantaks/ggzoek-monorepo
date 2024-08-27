@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import RiveComponent from '$lib/components/rive/RiveComponent.svelte';
-	import NavBar from '$lib/components/navbar/NavBar.svelte';
 
 
 	export let data: PageData;
@@ -18,7 +17,6 @@
 </svelte:head>
 
 <div class="w-full bg-secondary-900 ">
-	<NavBar class="mb-4 bg-transparent text-white" showLogin></NavBar>
 	<div class="mx-auto max-w-7xl pb-4 md:pb-0 lg:px-8 text-white">
 		<div class="lg:grid lg:grid-cols-2 lg:gap-8">
 			<div

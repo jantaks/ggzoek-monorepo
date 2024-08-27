@@ -10,3 +10,19 @@ export type MyLocals = {
 	supabase: SupabaseClient;
 	next?: string;
 };
+
+export type Operator = 'AND' | 'OR';
+
+export type FilterDefinition = {
+	facet: string;
+	selectedValues: string[];
+	operator: Operator;
+};
+
+export type Search = {
+	query: string;
+	postcode: string;
+	distance: number;
+	estimatedResults: number;
+	filters: FilterDefinition[];
+};

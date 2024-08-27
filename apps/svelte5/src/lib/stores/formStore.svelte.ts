@@ -1,7 +1,6 @@
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
-
-type Operator = 'AND' | 'OR';
+import type { FilterDefinition, Operator, Search } from '$lib/types';
 
 export class Filter {
 	constructor(facet: string) {
@@ -165,12 +164,11 @@ export class SearchForm {
 	}
 
 	initiate(params: URLSearchParams) {
-		this._postcode = params.get('postcode') || '';
-		this._query = params.get('fullText') || '';
-		this._distance = [parseInt(params.get('distance') || '30')];
-		const filters = reconstructFilters(params.get('filters') || '');
-		if (!filters) return;
-		this._filters = filters.map((f) => {
+		const s: Search = searchFromSearchParams(params);
+		this._postcode = s.postcode;
+		this._query = s.query;
+		this._distance = [s.distance];
+		this._filters = s.filters.map((f) => {
 			const filter = new Filter(f.facet);
 			filter.selectedValues = new Set(f.selectedValues);
 			filter.operator = f.operator;
@@ -189,7 +187,33 @@ export function getSearchForm() {
 	return getContext<ReturnType<typeof createSearchForm>>(CONTEXT_NAME);
 }
 
-export function reconstructFilters(filter: string) {
+/**
+ * Create a Search object from URLSearchParams
+ */
+export function searchFromSearchParams(params: URLSearchParams): Search {
+	const filters = reconstructFilters(params.get('filters') || '') as FilterDefinition[];
+	return {
+		query: params.get('fullText') || '',
+		postcode: params.get('postcode') || '',
+		distance: parseInt(params.get('distance') || '30'),
+		estimatedResults: 0,
+		filters: filters
+			? filters.map((f) => {
+					return {
+						facet: f.facet,
+						selectedValues: Array.from(new Set(f.selectedValues)).sort(),
+						operator: f.operator
+					};
+				})
+			: []
+	};
+}
+
+/**
+ * Takes a filter string like '(beroepen = "A") AND (stoornissen = "B" AND stoornissen="C")' and
+ * returns an array of Filter objects
+ */
+export function reconstructFilters(filter: string): FilterDefinition[] | undefined {
 	//get all strings between brackets
 	const regex = /\((.*?)\)/g;
 	const matches = filter.match(regex);
