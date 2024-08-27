@@ -140,7 +140,6 @@ async function getVacatureByUrl(url: string, db: DB) {
 type SyncOptions = {
   professies: BeroepOptions[] | 'all';
   organisaties: string[] | 'all';
-  // If force equals true then all vacatures will be summarized, even if they have been summarized before
   // Only sync vacatures that have been scraped after this date
   scrapedAfter?: Date;
   // Limit the number of vacatures to summarize
