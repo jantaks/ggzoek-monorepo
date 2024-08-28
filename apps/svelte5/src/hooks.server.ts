@@ -64,12 +64,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		let next: string;
 		next = new URL(event.request.url).pathname;
 		const location = `/auth/login?next=${encodeURIComponent(next)}&message=${message}`;
-		log.debug(
-			`Trying to access a protected route without valid session. Redirecting to: ${location}`
-		);
+		log.debug(`${message}. Redirecting to: ${location}`);
 		redirect(301, location);
 	}
-	console.log('CONTINUING NORMALLU');
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range';

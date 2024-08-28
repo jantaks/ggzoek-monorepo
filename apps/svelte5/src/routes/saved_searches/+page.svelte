@@ -1,14 +1,14 @@
 <script lang="ts">
 
 
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { DeleteIcon } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { applyAction, enhance } from '$app/forms';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
+	import { Eye, Trash } from 'lucide-svelte';
 
 	let { data } = $props();
-	let deleting: string[] = []
+	let deleting: string[] = [];
+	let processing = $state(false);
 
 	function postcodeDistance(postcode: string, distance: number) {
 		if (!distance || !postcode) {
@@ -40,54 +40,71 @@
 	</div>
 {/snippet}
 
-
-<div class="flex flex-col items-center pt-4 mx-auto">
-	<h1 class="text-xl font-bold p-4">U heeft {data.savedSearches.length} bewaarde zoekopdrachten.</h1>
-	{#each data.savedSearches.filter((s)=> !deleting.includes(s.raw)) as ss (ss.raw)}
-		<div class="mb-4 p-4 sm:p-4 rounded-lg bg-white md:bg-white text-slate-700 border shadow max-w-xl min-w-96"
-				 out:slide={{axis:"y", duration:300, delay:150}}>
-			<div class="space-y-2">
-				{#if ss.search.query}
-					<div class="even:bg-white odd:bg-primary-light/40">
-						{@render row("Zoektermen", ss.search.query)}
-					</div>
-				{/if}
-				{#if ss.search.postcode}
-					<div class="even:bg-white odd:bg-primary-light/40">
-						{@render row("Postcode", postcodeDistance(ss.search.postcode, ss.search.distance))}
-					</div>
-				{/if}
-				{#each ss.search.filters as filter}
-					{#if filter.selectedValues.length > 0}
-						<div class="even:bg-white/40 odd:bg-primary-light/40">
-							{@render filterRow(filter)}
+<div class="mt-4 flex flex-col md:flex-row mx-auto max-w-3xl relative md:pr-4">
+	<div class="flex flex-col items-center pt-4 w-full">
+		<h1 class="text-xl font-bold p-4">U heeft {data.savedSearches.length} bewaarde zoekopdrachten.</h1>
+		{#each data.savedSearches.filter((s) => !deleting.includes(s.raw)) as ss (ss.raw)}
+			<div class="mb-4 p-4 sm:p-4 rounded-lg bg-white md:bg-white text-slate-700 border shadow w-full"
+					 out:slide={{axis:"y", duration:300, delay:150}}>
+				<div class="space-y-2">
+					{#if ss.search.query}
+						<div class="even:bg-white odd:bg-primary-light/40">
+							{@render row("Zoektermen", ss.search.query)}
 						</div>
 					{/if}
-				{/each}
-			</div>
-			<div class="p-4 flex flex-row justify-center">
-				<form action="?/delete"
-							method="POST"
-							use:enhance={() => {
+					{#if ss.search.postcode}
+						<div class="even:bg-white odd:bg-primary-light/40">
+							{@render row("Postcode", postcodeDistance(ss.search.postcode, ss.search.distance))}
+						</div>
+					{/if}
+					{#each ss.search.filters as filter}
+						{#if filter.selectedValues.length > 0}
+							<div class="even:bg-white/40 odd:bg-primary-light/40">
+								{@render filterRow(filter)}
+							</div>
+						{/if}
+					{/each}
+				</div>
+				<div class="p-4 flex flex-row justify-center">
+					<form action="?/delete"
+								method="POST"
+								use:enhance={() => {
 					deleting = [...deleting, ss.raw];
-					return async ( event) => {
+					processing = true
+					return async ( {result}) => {
+						if (result.type === "redirect") {
+							await goto(result.location);
+						}
+
 						deleting = deleting.filter((id) => id !== ss.raw);
-						await applyAction(event.result);
+						await applyAction(result);
 						await invalidate('data:root');
+						processing = false
 					};
 				}}>
-					<input type="hidden" name="search" value={ss.raw} />
-					<Button
-						class='px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
-						type="submit"
-					>
-						<DeleteIcon class={`text-primary size-5 mr-1`}  />
-						<span class="text-xs">Verwijder</span>
-					</Button>
-				</form>
+						<input type="hidden" name="search" value={ss.raw} />
+						<div class="flex flex-row gap-4">
+							<button
+								class='group w-28 px-2 h-8 rounded-lg border-primary-light border hover:fill-primary shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
+								type="submit"
+								disabled={processing}
+							>
+								<span class="text-xs ">Verwijder</span>
+								<Trash class={`transition ease-in-out text-primary size-4  group-hover:scale-125`} />
+							</button>
+							<a href="/zoekresultaten?{ss.raw}"
+								 class='group w-28 px-2 h-8 rounded-lg border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
+								 type="submit"
+							>
+								<span class="text-xs">Bekijk</span>
+								<Eye class={`transition ease-in-out text-primary size-4  group-hover:scale-125`} />
+							</a>
+						</div>
+					</form>
+				</div>
 			</div>
-		</div>
-	{/each}
+		{/each}
+	</div>
 </div>
 
 
