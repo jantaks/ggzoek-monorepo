@@ -5,10 +5,10 @@ import { deleteUserSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 
 export async function load({
 	parent
-}): Promise<{ savedSearches: { raw: string | null; search: Search | null }[] }> {
+}): Promise<{ savedSearches: { raw: string; search: Search }[] }> {
 	const { savedSearches } = await parent();
 	if (!savedSearches) {
-		return { savedSearches: [{ raw: null, search: null }] };
+		return { savedSearches: [] };
 	}
 	const searches = savedSearches.map((s) => {
 		const params = new URLSearchParams(s);

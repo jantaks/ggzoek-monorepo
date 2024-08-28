@@ -2,11 +2,13 @@
 	import { getUser } from '$lib/stores/userStore.svelte';
 	import { createDropdownMenu, melt } from '@melt-ui/svelte';
 	import { fly, scale } from 'svelte/transition';
+	import { page } from '$app/stores';
 
 	const user = getUser();
 
-	console.debug(`${new Date().toLocaleTimeString()} [UserDropDown.svelte - 78101f17] : `, { user });
+	console.log('ROUTE: ', $page.route.id);
 
+	$inspect($page.data.likes).with((type, values) => console.log('UserDropDown likes changed: ', type, values));
 	type Props = {
 		class?: string
 	}
@@ -28,9 +30,11 @@
 	class={"bg-primary rounded-lg p-2 text-white size-8 hover:ring flex items-center justify-center" + className}>
 	<button class="relative" use:melt={$trigger}>
 		<span class="uppercase text-sm font-bold">{user?.initials}</span>
-		{#key user?.likes?.length}
-		<span in:scale={{ duration: 1000, start: 0.5 }}
-					class={`absolute -top-4 left-4 bg-secondary text-xs rounded-full py-1  ${user.likes?.length>9? "px-1.5": "px-2"}`}>{user?.likes?.length}</span>
+		{#key $page.data.likes.length}
+		<span
+			class={`absolute -top-4 left-4 bg-secondary text-xs rounded-full py-1  ${$page.data.likes.length>9? "px-1.5": "px-2"}`}
+			in:scale={{ duration: 1000, start: 0.5 }}>{$page.data.likes.length}
+		</span>
 		{/key}
 	</button>
 
@@ -39,16 +43,16 @@
 
 		<hr class="h-px my-1  border-1 dark:bg-gray-700">
 		<div {...$item} class="item" use:item>
-			<a data-sveltekit-reload href="/bewaard">Bewaarde vacatures ({user?.likes?.length})</a>
+			<a href="/bewaard">Bewaarde vacatures ({$page.data.likes.length})</a>
 		</div>
 		<div {...$item} class="item" use:item>
-			<a data-sveltekit-reload href="/saved_searches">Bewaarde zoekopdrachten ({user?.savedSearches?.length})</a>
+			<a href="/saved_searches">Bewaarde zoekopdrachten ({user?.savedSearches?.length})</a>
 		</div>
 		<div {...$item} class="item" use:item>
-			<a data-sveltekit-reload href="/auth/resetpassword/form">Wachtwoord wijzigen</a>
+			<a href="/auth/resetpassword/form">Wachtwoord wijzigen</a>
 		</div>
 		<div {...$item} class="item" use:item>
-			<a data-sveltekit-reload href="/auth/logout">Uitloggen</a>
+			<a href="/auth/logout">Uitloggen</a>
 		</div>
 		<div use:melt={$arrow}></div>
 	</div>

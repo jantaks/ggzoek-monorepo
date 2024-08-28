@@ -4,12 +4,13 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { DeleteIcon } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
+	import { invalidate } from '$app/navigation';
 
 	let { data } = $props();
-	let deleting = []
+	let deleting: string[] = []
 
-	function postcodeDistance(postcode: string, distance: string) {
+	function postcodeDistance(postcode: string, distance: number) {
 		if (!distance || !postcode) {
 			return postcode;
 		}
@@ -42,7 +43,7 @@
 
 <div class="flex flex-col items-center pt-4 mx-auto">
 	<h1 class="text-xl font-bold p-4">U heeft {data.savedSearches.length} bewaarde zoekopdrachten.</h1>
-	{#each data.savedSearches.filter((s)=> !deleting.includes(s)) as ss (ss.raw)}
+	{#each data.savedSearches.filter((s)=> !deleting.includes(s.raw)) as ss (ss.raw)}
 		<div class="mb-4 p-4 sm:p-4 rounded-lg bg-white md:bg-white text-slate-700 border shadow max-w-xl min-w-96"
 				 out:slide={{axis:"y", duration:300, delay:150}}>
 			<div class="space-y-2">
@@ -68,10 +69,11 @@
 				<form action="?/delete"
 							method="POST"
 							use:enhance={() => {
-					deleting = [...deleting, ss.search];
-					return async ({ update }) => {
-						await update();
-						deleting = deleting.filter((id) => id !== ss.search);
+					deleting = [...deleting, ss.raw];
+					return async ( event) => {
+						deleting = deleting.filter((id) => id !== ss.raw);
+						await applyAction(event.result);
+						await invalidate('data:root');
 					};
 				}}>
 					<input type="hidden" name="search" value={ss.raw} />

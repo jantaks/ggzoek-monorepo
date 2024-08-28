@@ -2,9 +2,10 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Bell } from 'lucide-svelte';
 	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getUser } from '$lib/stores/userStore.svelte';
+	import { invalidate } from '$app/navigation';
 
 	const params = $page.url.searchParams;
 	const userStore = getUser()
@@ -20,7 +21,8 @@
 		processing = true;
 		return async ({ result, update }) => {
 			console.log('result', result);
-			await update()
+			await applyAction(result);
+			await invalidate('data:root');
 			processing = false;
 		};
 		

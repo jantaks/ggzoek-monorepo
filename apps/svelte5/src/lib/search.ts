@@ -43,7 +43,6 @@ export async function querySearchEngine(query?: string | null, options?: SearchP
 	const { hash, cachedItem } = await getCachedResponse(query, options);
 	if (cachedItem !== null) {
 		log.debug(`returning  ${JSON.stringify(cachedItem.estimatedTotalHits)} cached items`);
-		log.debug(`FacetDistribution: ${JSON.stringify(cachedItem.facetDistribution)}`);
 		return cachedItem;
 	}
 	const searchResponse = await index.search<SelectVacature>(query, updatedOptions);

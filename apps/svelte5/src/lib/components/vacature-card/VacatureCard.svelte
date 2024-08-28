@@ -14,7 +14,7 @@
 		hit: Hit<Partial<SelectVacature>>;
 		onSave?: () => void;
 	}
-	let { hit }: Props = $props();
+	let { hit, onSave }: Props = $props();
 
 	let locaties = $derived(hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend');
 
@@ -38,7 +38,7 @@
 		<div class="flex flex-row justify-between">
 			<h2 class="font-bold sm:text-xl mb-1 text-wrap truncate">{@html hit.title}</h2>
 			<div class="font-normal flex flex-row space-x-2 px-1">
-				<SaveVacature urlhash="{hit.urlHash}" />
+				<SaveVacature onSave={onSave} urlhash="{hit.urlHash}" />
 				<GotoWebsiteButton url={hit.url} />
 			</div>
 		</div>

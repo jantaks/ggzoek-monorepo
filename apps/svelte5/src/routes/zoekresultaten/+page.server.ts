@@ -4,10 +4,9 @@ import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
 import type { MyLocals } from '$lib/types';
 import { error, redirect } from '@sveltejs/kit';
 import { createSavedSearch, deleteUserSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
+import { likeVacature, unlikeVacature } from '@ggzoek/ggz-drizzle/dist/vacatures';
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
-	const { email } = await event.parent();
-	log.debug(`zoekresultaten page load. Email: ${email}`);
 	const _12hours = 60 * 60 * 12;
 	event.setHeaders({
 		'cache-control': `max-age=${_12hours}`
@@ -80,6 +79,30 @@ export const actions = {
 		if (response.result !== 'success') {
 			return error(404, 'Search not found');
 		}
+		return { success: true };
+	},
+	saveVacature: async (event) => {
+		console.log('saveVacature');
+		const locals = event.locals as MyLocals;
+		const userId = locals.user?.id;
+		const formData = await event.request.formData();
+		let urlHash = formData.get('urlHash') as string;
+		if (!userId) {
+			return redirect(301, '/auth/login');
+		}
+		await likeVacature(userId, urlHash);
+		return { success: true };
+	},
+	deleteVacature: async (event) => {
+		console.log('deleteVacature');
+		const locals = event.locals as MyLocals;
+		const userId = locals.user?.id;
+		const formData = await event.request.formData();
+		let urlHash = formData.get('urlHash') as string;
+		if (!userId) {
+			return redirect(301, '/auth/login');
+		}
+		await unlikeVacature(userId, urlHash);
 		return { success: true };
 	}
 };

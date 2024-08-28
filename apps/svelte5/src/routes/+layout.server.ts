@@ -5,6 +5,9 @@ import { log } from '@ggzoek/logging/src/logger.js';
 import { getSavedSearchesForUser } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 
 export const load: LayoutServerLoad = (async (event) => {
+	log.debug(`layout load`);
+	event.depends('data:root');
+
 	const locals = event.locals as MyLocals;
 	let email = undefined;
 	let likes = undefined;

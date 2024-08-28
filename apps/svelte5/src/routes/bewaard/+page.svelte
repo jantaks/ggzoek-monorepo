@@ -1,7 +1,7 @@
 <script lang="ts">
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
-	import { setContext } from 'svelte';
 	import { slide } from 'svelte/transition';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
 
@@ -9,12 +9,16 @@
 	let found = $state(data.vacatures.length);
 
 	let removed = $state<string[]>([]);
+	//
+	// function onSave(urlHash: string){
+	// 	removed.push(urlHash)
+	// 	found -= 1;
+	// }
 
-	setContext('onRemove', async (urlHash: string) => {
-		removed = [...removed, urlHash];
-		found = found - 1;
-	});
-
+	function onSave(urlHash: string){
+		invalidateAll()
+		found -= 1;
+	}
 
 </script>
 
@@ -31,7 +35,7 @@
 	{#each data.vacatures as vacature}
 		{#if !removed.includes(vacature.vacature.urlHash)}
 			<div out:slide={{axis:"y", duration:300, delay:150}} in:slide={{axis:"y", duration:500}} class="max-w-3xl">
-				<VacatureCard hit={vacature.vacature}></VacatureCard>
+				<VacatureCard onSave={()=> onSave(vacature.vacature.urlHash)} hit={vacature.vacature}></VacatureCard>
 			</div>
 		{/if}
 	{/each}

@@ -46,8 +46,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (error) {
 		log.info(`Could not get user: ${error.message}`);
-	} else {
-		log.info(`Got user: ${JSON.stringify(data)}`);
 	}
 
 	const user = data.user;
