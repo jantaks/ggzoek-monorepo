@@ -5,7 +5,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getUser } from '$lib/stores/userStore.svelte';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 
 	const params = $page.url.searchParams;
 	const userStore = getUser()
@@ -20,6 +20,9 @@
 		}
 		processing = true;
 		return async ({ result, update }) => {
+			if (result.type === "redirect") {
+				await goto(result.location)
+			}
 			console.log('result', result);
 			await applyAction(result);
 			await invalidate('data:root');

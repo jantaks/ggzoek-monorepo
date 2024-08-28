@@ -2,6 +2,7 @@
 	import type { ActionData } from './$types';
 	import { z } from 'zod';
 	import Processing from '$lib/components/Processing.svelte';
+	import { page } from '$app/stores';
 
 	type Props = {
 		form: ActionData,
@@ -24,9 +25,13 @@
 
 	}
 
+	let msg = $page.url.searchParams.get("message");
+	console.log('msg', msg);
+
 </script>
 
 <Processing processing={processing} />
+<div>{msg}</div>
 <form action="?/login" class={processing? "hidden": "space-y-4"}`
 			method="post"
 			onsubmit={() => processing = !processing}>

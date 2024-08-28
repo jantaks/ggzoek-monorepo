@@ -39,7 +39,7 @@
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
 		<div class="space-y-4">
-			{#each data.searchResponse.hits as hit}
+			{#each data.searchResponse.hits as hit (hit.urlHash)}
 				<VacatureCard hit={hit}></VacatureCard>
 			{/each}
 		</div>

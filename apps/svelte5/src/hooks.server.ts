@@ -12,15 +12,24 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 	throw new Error('Please set the SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
 }
 
-const protectedRoutes = ['/likes', '**/api/*', '**/protected/*', '/bewaard', '**/saveSearch'];
+const protectedPaths: Record<string, string> = {
+	'/bewaard': 'U moet ingelogd zijn om uw bewaarde vacatures te kunnen bekijken',
+	'**/saveSearch': 'U moet inloggen om een zoekopdracht te kunnen bewaren',
+	'**/saveVacature': 'U moet inloggen om vacatures op te kunnen slaan'
+};
 
-function isProtected(path: string) {
-	let isProtected = protectedRoutes.some((protectedRoute) => minimatch(path, protectedRoute));
-	return isProtected;
+export function authRequired(path: string) {
+	for (const key of Object.keys(protectedPaths)) {
+		if (minimatch(path, key)) {
+			return { required: true, message: protectedPaths[key] };
+		}
+	}
+	return { required: false, message: '' };
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	log.info(`Hook handling: ${event.request.url}. Protected? ${isProtected(event.request.url)}`);
+	const { required, message } = authRequired(event.request.url);
+	log.info(`Hook handling: ${event.request.url}. Protected? ${required}. Message: ${message}`);
 	const locals = event.locals as MyLocals;
 	const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 		cookies: {
@@ -50,26 +59,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const user = data.user;
 	locals.user = data.user;
-	const url = new URL(event.request.url);
 
-	if (!user && isProtected(url.pathname)) {
-		log.debug('Trying to access a protected route without valid session, redirecting to login.');
+	if (!user && required) {
 		let next: string;
-		if (
-			event.request.method === 'POST' &&
-			event.request.headers.get('content-type') === 'application/x-www-form-urlencoded'
-		) {
-			const data = await event.request.formData();
-			next = data.get('next') as string;
-			log.debug('NEXT: (HOOK): ', next);
-		} else {
-			next = url.pathname;
-		}
-		const location = `/auth/login?next=${encodeURIComponent(next)}`;
-		log.debug('Redirecting to: ', location);
+		next = new URL(event.request.url).pathname;
+		const location = `/auth/login?next=${encodeURIComponent(next)}&message=${message}`;
+		log.debug(
+			`Trying to access a protected route without valid session. Redirecting to: ${location}`
+		);
 		redirect(301, location);
 	}
-
+	console.log('CONTINUING NORMALLU');
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range';
