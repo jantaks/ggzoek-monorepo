@@ -8,13 +8,9 @@
 
 	const params = $page.url.searchParams;
 	let processing = $state(false);
-	$inspect($page.data.savedSearches);
-	$inspect(params.toString());
 
 	let saved = $state($page.data.savedSearches?.some((ss: any) => ss.searchUrlParams === params.toString()));
-	$inspect(saved).with((type, value) => {
-		console.log("SAVED", type, value);
-	});
+
 
 	const enh: SubmitFunction = async (input) => {
 		processing = true;

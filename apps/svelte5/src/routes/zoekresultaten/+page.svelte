@@ -1,37 +1,66 @@
 <script lang="ts">
-	import Searchform from '$lib/components/searchform/Searchform.svelte';
-	import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
-	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
-	import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte.js';
-	import Paginator from '$lib/components/pagination/Paginator.svelte';
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
+	import Searchform from '$lib/components/searchform/Searchform.svelte';
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
+	import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
+	import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
+	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
+	import Processing from '$lib/components/Processing.svelte';
 
 	let { data } = $props();
 
-	let vacatureList = $state<HTMLElement | null>(null);
-
-	$inspect(vacatureList);
+	let loadHits = $derived(data.searchResponse.hits);
+	let hits = $state(data.searchResponse.hits);
+	let offset = $state(0);
+	let allLoaded = $state(false);
 
 	let form = getSearchForm();
 	form.initiate($page.url.searchParams);
-	let h = $state(0);
-	let y = $state(0);
+
+	async function getVacatures() {
+		offset += 5;
+		$page.url.searchParams.set('offset', String(offset));
+		const response = await fetch(`/zoekresultaten/api?${$page.url.searchParams.toString()}`).then(res => res.json());
+		if (response.message) {
+			return [];
+		}
+		return response.searchResponse.hits;
+	}
+
+	let loading = $state(false);
+
+	const handleInfiniteScroll = async () => {
+		let endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
+		if (endOfPage && !loading && !allLoaded) {
+			loading = true;
+			const nHits = await getVacatures();
+			if (nHits?.length > 0) {
+				hits = [...hits, ...nHits];
+			} else {
+				allLoaded = true;
+			}
+			loading = false;
+		}
+	};
 
 	$effect(() => {
-		const handleScroll = () => {
-			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) {
-				console.log('Scrolled to the end of the page');
-			}
-		};
-
-		window.addEventListener('scroll', handleScroll);
+		console.log('Effect 1');
+		if (browser) {
+			window.addEventListener('scroll', handleInfiniteScroll);
+		}
 		return () => {
-			window.removeEventListener('scroll', handleScroll);
+			console.log('remove event listener');
+			window.removeEventListener('scroll', handleInfiniteScroll);
 		};
 	});
 
+	$effect(() => {
+		console.log('Effect 2');
+		hits = loadHits;
+		allLoaded = false
+	});
 
 </script>
 <svelte:head>
@@ -41,9 +70,9 @@
       }
 	</style>
 </svelte:head>
-<svelte:window bind:innerHeight={h} bind:scrollY={y} />
 
-<div bind:this={vacatureList} class="md:mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
+
+<div class="md:mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
 	</div>
@@ -58,13 +87,18 @@
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
 		<div class="space-y-4">
-			{#each data.searchResponse.hits as hit (hit.urlHash)}
+			{#each hits as hit }
 				<VacatureCard hit={hit}></VacatureCard>
 			{/each}
 		</div>
-		<div class="mx-auto">
-			<Paginator searchResponse={data.searchResponse}></Paginator>
-		</div>
+		<Processing processing={loading}></Processing>
+		{#if allLoaded}
+			<div class="text-center text-secondary-800">Geen vacatures meer</div>
+
+		{/if}
+		<!--		<div class="mx-auto">-->
+		<!--			<Paginator searchResponse={data.searchResponse}></Paginator>-->
+		<!--		</div>-->
 	</div>
 
 </div>

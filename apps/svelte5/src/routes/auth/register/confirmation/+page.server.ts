@@ -22,9 +22,10 @@ export const load = (async (event) => {
 			error(404, { message: err.message });
 		}
 	} catch (e) {
-		console.log('Ignoring: ', e.message);
+		if (e instanceof Error) {
+			console.log('Ignoring: ', e.message);
+		}
 	}
 }) satisfies PageServerLoad;
-
 
 //http://localhost:5173/auth/register/confirmation?code=a293f58a-096b-4c14-844d-6f2add79a799&token_hash=pkce_213ef6ab07a36e2a03fbc1546f971b6b3a656b8678764d08f22eaeb5

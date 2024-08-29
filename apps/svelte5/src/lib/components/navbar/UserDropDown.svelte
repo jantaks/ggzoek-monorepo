@@ -8,7 +8,6 @@
 
 	console.log('ROUTE: ', $page.route.id);
 
-	$inspect($page.data.likes).with((type, values) => console.log('UserDropDown likes changed: ', type, values));
 	type Props = {
 		class?: string
 	}
