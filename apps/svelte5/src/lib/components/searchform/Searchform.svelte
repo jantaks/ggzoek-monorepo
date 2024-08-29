@@ -6,8 +6,14 @@
 	import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
+	import { page } from '$app/stores';
 
 	const x = { Slider, Label };
+
+	$effect(() => {
+		$page.data
+		toggleOn = false;
+	});
 
 
 	type Props = {
@@ -27,7 +33,7 @@
 <svelte:window bind:innerWidth />
 
 <div
-	class="px-2 pt-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
+	class="px-2 py-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
 	<div class="md:hidden">
 		<SearchBox />
 	</div>
@@ -41,20 +47,21 @@
 			{/each}
 		</div>
 	{/if}
-	{#if innerWidth < 768}
+</div>
+{#if innerWidth < 768}
+<div class="flex flex-row mx-auto rounded-b-xl bg-primary w-fit px-2 h-6 text-white font-bold">
+
 		<button onclick={() => toggleOn = !toggleOn}
-						class="w-full flex flex-row text-primary-light justify-center items-center">
+						class="w-full flex flex-row text-primary-light justify-center items-center text-sm">
 			{#if !showFilters}
-				Toon filters
+				Filters
 				<ChevronDown
 					class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 			{:else}
-				Verberg filters
+				Filters
 				<ChevronUp
 					class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 			{/if}
 		</button>
-	{/if}
-
-
 </div>
+{/if}

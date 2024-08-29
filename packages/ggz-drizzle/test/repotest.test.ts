@@ -73,7 +73,7 @@ describe('Save, update and delete searches', () => {
 
   it('Gets a saved search', async () => {
     const result = await getSavedSearchesForUser(userId);
-    expect(result).toContain('testsearch');
+    expect(result[0].search).toContain('testsearch');
     console.log(result);
   });
 

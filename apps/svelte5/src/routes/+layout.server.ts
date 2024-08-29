@@ -3,6 +3,7 @@ import { getLikesForUser } from '@ggzoek/ggz-drizzle/dist/vacatures';
 import type { LayoutServerLoad } from './$types';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { getSavedSearchesForUser } from '@ggzoek/ggz-drizzle/dist/savedSearches';
+import { searchFromSearchParams } from '$lib/stores/formStore.svelte';
 
 export const load: LayoutServerLoad = (async (event) => {
 	log.debug(`layout load`);
@@ -17,6 +18,12 @@ export const load: LayoutServerLoad = (async (event) => {
 		email = locals.user.email;
 		likes = await getLikesForUser(locals.user.id);
 		savedSearches = await getSavedSearchesForUser(locals.user.id);
+		savedSearches = savedSearches.map((search) => {
+			return {
+				...search,
+				search: searchFromSearchParams(new URLSearchParams(search.searchUrlParams))
+			};
+		});
 	} else {
 		log.debug(`NO SESSION FOUND`);
 	}

@@ -61,12 +61,17 @@ async function getOrCreateSearch(search: string): Promise<number> {
 export async function getSavedSearchesForUser(userId: string) {
   const { db: db } = getDb();
   const searches = await db
-    .select({ search: savedSearches.search })
+    .select({
+      searchUrlParams: savedSearches.search,
+      latestResult: searchResults.result,
+      created: userSearches.createdDateTime
+    })
     .from(savedSearches)
     .leftJoin(userSearches, eq(savedSearches.id, userSearches.searchId))
+    .leftJoin(searchResults, eq(userSearches.updatedResultId, searchResults.id))
     .where(eq(userSearches.userId, userId))
     .execute();
-  return searches.map((s) => s.search);
+  return searches;
 }
 
 async function insertSearchResult(searchId, foundVacatures: string[]) {

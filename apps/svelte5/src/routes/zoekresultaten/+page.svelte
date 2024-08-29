@@ -10,8 +10,27 @@
 
 	let { data } = $props();
 
+	let vacatureList = $state<HTMLElement | null>(null);
+
+	$inspect(vacatureList);
+
 	let form = getSearchForm();
 	form.initiate($page.url.searchParams);
+	let h = $state(0);
+	let y = $state(0);
+
+	$effect(() => {
+		const handleScroll = () => {
+			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) {
+				console.log('Scrolled to the end of the page');
+			}
+		};
+
+		window.addEventListener('scroll', handleScroll);
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	});
 
 
 </script>
@@ -22,9 +41,9 @@
       }
 	</style>
 </svelte:head>
+<svelte:window bind:innerHeight={h} bind:scrollY={y} />
 
-
-<div class="mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
+<div bind:this={vacatureList} class="md:mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
 	</div>

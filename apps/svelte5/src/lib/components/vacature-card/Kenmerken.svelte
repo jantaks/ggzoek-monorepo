@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Hit } from 'meilisearch';
 	import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
+	import { DATE_TIME_FORMATTING } from '$lib/constants';
 
 	type Props = {
 		hit: Hit<SelectVacature>
@@ -28,8 +29,8 @@
 			{@render row("Behandelmethoden", hit.behandelmethoden?.join(", "))}
 			{@render row("Stoornissen", hit.stoornissen?.join(", "))}
 			{@render row("Beroepen", hit.beroepen?.join(", "))}
-			{@render row("Eerst gezien", hit.firstScraped)}
-			{@render row("Laatst gezien", hit.lastScraped)}
+			{@render row("Eerst gezien", new Date(hit.firstScraped).toLocaleDateString("nl-NL", DATE_TIME_FORMATTING))}
+			{@render row("Laatst gezien", new Date(hit.lastScraped).toLocaleDateString("nl-NL", DATE_TIME_FORMATTING))}
 		</div>
 	</div>
 </div>

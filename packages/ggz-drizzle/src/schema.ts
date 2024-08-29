@@ -115,7 +115,8 @@ export const userSearches = pgTable(
     searchId: integer('search_id')
       .notNull()
       .references(() => savedSearches.id, { onDelete: 'cascade' }),
-    updatedDateTime: timestamp('updated_date_time', { mode: 'date', withTimezone: true })
+    createdDateTime: timestamp('created', { mode: 'date', withTimezone: true }).defaultNow(),
+    updatedDateTime: timestamp('updated', { mode: 'date', withTimezone: true })
       .notNull()
       .defaultNow(),
     updatedResultId: integer('updated_result_id').references(() => searchResults.id, {
