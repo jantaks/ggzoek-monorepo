@@ -96,7 +96,7 @@
 		{#if allLoaded}
 			<div class="text-center text-white bg-secondary-900 p-4 my-2 bounce mx-1 md:mx-0 rounded-lg">
 				{#if data.searchResponse.estimatedTotalHits < MAXRESULTS}
-					<h2>Alle vacatures geladen voor uw zoekopdracht. </h2>
+					<h2>Alle {data.searchResponse.estimatedTotalHits} vacatures geladen voor uw zoekopdracht. </h2>
 				{:else}
 					<h2>De {MAXRESULTS} meest relevante vacatures geladen voor uw zoekopdracht.
 					</h2>
