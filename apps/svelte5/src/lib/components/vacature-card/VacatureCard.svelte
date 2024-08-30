@@ -33,21 +33,18 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<div class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow">
+<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow">
 	<div>
 		<div class="flex flex-row justify-between">
 			<h2 class="font-bold sm:text-xl mb-1 text-wrap truncate">{@html hit.title}</h2>
-			<div class="font-normal flex flex-row space-x-2 px-1">
+			<menu class="font-normal flex flex-row space-x-2 px-1">
 				<SaveVacature onSave={onSave} urlhash="{hit.urlHash}" />
 				<GotoWebsiteButton url={hit.url} />
-			</div>
+			</menu>
 		</div>
-
-		<h2 class="text-sm sm:text-md font-semibold uppercase py-2">{@html hit.organisatie} <span
+		<h3 class="text-sm sm:text-md font-semibold uppercase py-2">{@html hit.organisatie} <span
 			class="truncate capitalize font-light ml-1 text-wrap ">{locaties}</span>
-		</h2>
-
-
+		</h3>
 	</div>
 
 	<div class="">
@@ -66,9 +63,8 @@
 									{@html hit.summary}</p>
 							{:else}
 								<!--// line-clamp in older safari does not work with nested elements ... -->
-								<p class="">
-									{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1.5'>")}
-									not work with nested ellments
+								<p class="line-clamp-none">
+									{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-2'>")}
 								</p>
 							{/if}
 						</div>
@@ -95,7 +91,7 @@
 			</Tabs.Content>
 		</Tabs.Root>
 	</div>
-</div>
+</article>
 
 
 

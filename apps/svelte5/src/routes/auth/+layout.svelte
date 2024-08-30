@@ -11,7 +11,7 @@
 	</style>
 </svelte:head>
 <div class="flex flex-col items-center justify-center h-[90dvh] px-4">
-	<div class="max-w-lg w-full p-10 space-y-4 bg-white rounded-lg shadow-md shadow-primary-light">
+	<div class="max-w-lg w-full px-8 py-8 bg-white rounded-lg shadow-md shadow-primary-light">
 		<slot></slot>
 	</div>
 </div>
