@@ -8,6 +8,7 @@
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { slide } from 'svelte/transition';
+	import { browser } from '$app/environment';
 
 	const x = { Slider, Label };
 
@@ -26,7 +27,7 @@
 	let allFacets = Object.keys(facets) as facet[];
 
 	let innerWidth: number = $state(0);
-	let toggleOn = $state(false);
+	let toggleOn = $state(true);
 	let showFilters = $derived(innerWidth > 768 || toggleOn);
 
 
@@ -48,7 +49,7 @@
 		{/each}
 	</div>
 </div>
-{#if innerWidth < 768}
+{#if innerWidth < 768 && browser}
 	<div class="flex flex-row mx-auto rounded-b-xl bg-primary w-fit px-2 text-white font-bold">
 
 		<button onclick={() => toggleOn = !toggleOn}

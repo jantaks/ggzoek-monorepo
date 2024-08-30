@@ -8,6 +8,7 @@
 	import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import Processing from '$lib/components/Processing.svelte';
+	import { MAXRESULTS } from '$lib/constants';
 
 	let { data } = $props();
 
@@ -60,6 +61,7 @@
 		console.log('Effect 2');
 		hits = loadHits;
 		allLoaded = false;
+		offset = 0;
 	});
 
 </script>
@@ -90,10 +92,16 @@
 				<VacatureCard hit={hit}></VacatureCard>
 			{/each}
 		</div>
-		<Processing processing={loading}></Processing>
+		<Processing class="size-8" processing={loading}></Processing>
 		{#if allLoaded}
-			<div class="text-center text-secondary-800">Geen vacatures meer</div>
-
+			<div class="text-center text-white bg-secondary-900 p-4 my-2 bounce mx-1 md:mx-0 rounded-lg">
+				{#if data.searchResponse.estimatedTotalHits < MAXRESULTS}
+					<h2>Alle vacatures geladen voor uw zoekopdracht. </h2>
+				{:else}
+					<h2>De {MAXRESULTS} meest relevante vacatures geladen voor uw zoekopdracht.
+					</h2>
+				{/if}
+			</div>
 		{/if}
 		<!--		<div class="mx-auto">-->
 		<!--			<Paginator searchResponse={data.searchResponse}></Paginator>-->
@@ -101,6 +109,24 @@
 	</div>
 
 </div>
+
+<style>
+    .bounce {
+        animation: bounce 1s ease-in-out 2;
+    }
+
+    @keyframes bounce {
+        0%, 40%, 80%, 100% {
+            transform: translateY(0);
+        }
+        20% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+</style>
 
 
 
