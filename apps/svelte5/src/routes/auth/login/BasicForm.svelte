@@ -7,31 +7,28 @@
 	type Props = {
 		form: ActionData,
 		formAction: string,
-		header: snippet
 		inputs: Snippet
 		buttons: Snippet
-		validationErrors: string[]
-		message: string
+		header?: Snippet
+		message?: string
+		errors?: string
 	}
 
-	const { form, formAction, inputs, buttons, header }: Props = $props();
-
-
+	let { form, formAction, header, inputs, buttons, message, errors }: Props = $props();
 	let processing = $state(false);
-	let validationErrors = $state<string>(form?.errors);
 
 </script>
 
 
 {#snippet info(message)}
-	<div class=" flex flex-row justify-items-center">
+	<div class=" flex flex-row  justify-center bg-secondary/20 p-2">
 		<Info class="animate-pulse text-secondary-900 min-w-6 min-h-6 mr-2" />
 		<h2 class="">{message}</h2>
 	</div>
 {/snippet}
 
 {#snippet error(message)}
-	<div class=" flex flex-row justify-items-center">
+	<div class=" flex flex-row  justify-center bg-primary/20 p-2">
 		<TriangleAlert class="animate-pulse text-red-500 min-w-6 min-h-6 mr-2" />
 		<h2 class="">{message}</h2>
 	</div>
@@ -39,23 +36,24 @@
 
 <Processing processing={processing} />
 <section class={`${processing? "hidden": ""} space-y-4`}>
-	<h1 class="text-center font-semibold text-xl text-secondary-900">
-		{@render header}
-	</h1>
-	{#if message}
+	{#if header}
+		<h1 class="text-center font-semibold text-xl text-secondary-900">
+			{@render header()}
+		</h1>
+	{/if}
+	{#if message && !errors}
 		{@render info(message)}
 	{/if}
-	{#if validationErrors}
-		{@render error(validationErrors)}
+	{#if errors}
+		{@render error(errors)}
 	{/if}
 	<form action={formAction} class="space-y-4 pt-4 pb-1"
 				method="post"
-				onsubmit={() => processing = !processing}
+				onsubmit={()=> processing = true}
 	>
 		{@render inputs()}
 		{@render buttons()}
 	</form>
-
 </section>
 
 
