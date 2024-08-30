@@ -59,7 +59,7 @@
 	$effect(() => {
 		console.log('Effect 2');
 		hits = loadHits;
-		allLoaded = false
+		allLoaded = false;
 	});
 
 </script>
@@ -70,7 +70,6 @@
       }
 	</style>
 </svelte:head>
-
 
 <div class="md:mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">

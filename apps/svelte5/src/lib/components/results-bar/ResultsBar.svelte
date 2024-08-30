@@ -17,7 +17,6 @@
 	{:else}
 		<div class="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
 			<p><span class="font-bold">{count} ggzoek resultaten</span>.
-				{#if count > MAXRESULTS}De eerste {MAXRESULTS} worden getoond.{/if}
 			</p>
 			{#if count < MAXRESULTS}
 				<SaveSearchButton />

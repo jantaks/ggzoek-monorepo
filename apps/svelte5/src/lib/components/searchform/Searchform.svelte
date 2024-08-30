@@ -7,11 +7,12 @@
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { page } from '$app/stores';
+	import { slide } from 'svelte/transition';
 
 	const x = { Slider, Label };
 
 	$effect(() => {
-		$page.data
+		$page.data;
 		toggleOn = false;
 	});
 
@@ -33,35 +34,32 @@
 <svelte:window bind:innerWidth />
 
 <div
-	class="px-2 py-2 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
+	class="px-2 py-4 md:pt-0.5 md:p-4 space-y-2 sm:space-y-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
 	<div class="md:hidden">
 		<SearchBox />
 	</div>
-	{#if showFilters}
-		<div class="space-y-2 sm:space-y-4">
-			<PostCodeSelect></PostCodeSelect>
+	<div class={`space-y-2 sm:space-y-4 ${showFilters? "": "hidden"} `} transition:slide>
+		<PostCodeSelect></PostCodeSelect>
 
-			{#each allFacets as facet}
-				<FacetSelectFilterNew facets={facets[facet]}
-															filterLabel={facet}></FacetSelectFilterNew>
-			{/each}
-		</div>
-	{/if}
+		{#each allFacets as facet (facet)}
+			<FacetSelectFilterNew facets={facets[facet]}
+														filterLabel={facet}></FacetSelectFilterNew>
+		{/each}
+	</div>
 </div>
 {#if innerWidth < 768}
-<div class="flex flex-row mx-auto rounded-b-xl bg-primary w-fit px-2 h-6 text-white font-bold">
+	<div class="flex flex-row mx-auto rounded-b-xl bg-primary w-fit px-2 text-white font-bold">
 
 		<button onclick={() => toggleOn = !toggleOn}
 						class="w-full flex flex-row text-primary-light justify-center items-center text-sm">
 			{#if !showFilters}
-				Filters
+				Uitgebreid zoeken
 				<ChevronDown
 					class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 			{:else}
-				Filters
 				<ChevronUp
 					class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 			{/if}
 		</button>
-</div>
+	</div>
 {/if}

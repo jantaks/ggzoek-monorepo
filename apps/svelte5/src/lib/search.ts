@@ -35,7 +35,7 @@ export async function querySearchEngine(query?: string | null, options?: SearchP
 
 	const updatedOptions: SearchParams = {
 		...options,
-		limit: options?.limit ? options.limit : RESULTS_PER_PAGE,
+		limit: options?.limit ?? RESULTS_PER_PAGE,
 		attributesToHighlight: ['title', 'summary'],
 		facets: facets
 	};

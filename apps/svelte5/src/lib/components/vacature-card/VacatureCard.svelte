@@ -6,7 +6,7 @@
 	import SaveVacature from '$lib/components/vacature-card/SaveVacature.svelte';
 	import Kenmerken from '$lib/components/vacature-card/Kenmerken.svelte';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
-	import { slide } from 'svelte/transition';
+	import { slide, fade, fly, blur } from 'svelte/transition';
 
 	const x = Tabs; //HACK TO AVOID UNUSED IMPORTS.
 
@@ -61,11 +61,16 @@
 				<div class="bg-transparent">
 					{#if hit.summary && hit.summary.length > 0}
 						<div>
-							{#key collapsed}
-								<p in:slide={{duration: 500}}
-									 class={collapsed? "line-clamp-4 md:line-clamp-6  md:text-base": "line-clamp-none  md:text-base"}>{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1'>")}
+							{#if collapsed}
+								<p class="line-clamp-4">
+									{@html hit.summary}</p>
+							{:else}
+								<!--// line-clamp in older safari does not work with nested elements ... -->
+								<p class="">
+									{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-1.5'>")}
+									not work with nested ellments
 								</p>
-							{/key}
+							{/if}
 						</div>
 					{/if}
 					<div class="w-full justify-center flex flex-row">

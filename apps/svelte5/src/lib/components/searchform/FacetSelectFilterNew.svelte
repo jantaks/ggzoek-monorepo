@@ -102,7 +102,7 @@
 			placeholder="Type om te zoeken"
 			use:melt={$input}
 		/>
-		<div class="absolute right-1 top-1/2 z-10 -translate-y-1/2 text-primary-dark">
+		<div class="absolute right-1 top-1/2  -translate-y-1/2 text-primary-dark">
 			{#if $open}
 				<ChevronUp class="size-4" />
 			{:else}
@@ -113,7 +113,7 @@
 </div>
 {#if $open}
 	<ul
-		class=" z-10 flex max-h-[500px] flex-col overflow-hidden rounded-lg"
+		class="  flex max-h-[500px] flex-col overflow-hidden rounded-lg"
 		use:melt={$menu}
 		transition:fly={{ duration: 150, y: -5 }}
 	>
@@ -131,7 +131,7 @@
           data-[disabled]:opacity-50"
 				>
 					{#if isSelected(optionValue)}
-						<div class="check absolute left-1 top-1/2 z-10 text-primary-dark">
+						<div class="check absolute left-1 top-1/2  text-primary-dark">
 							<Check class="size-4" />
 						</div>
 					{/if}
