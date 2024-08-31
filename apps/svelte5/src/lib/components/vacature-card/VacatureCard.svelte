@@ -6,15 +6,17 @@
 	import SaveVacature from '$lib/components/vacature-card/SaveVacature.svelte';
 	import Kenmerken from '$lib/components/vacature-card/Kenmerken.svelte';
 	import { ChevronDown, ChevronUp } from 'lucide-svelte';
-	import { slide, fade, fly, blur } from 'svelte/transition';
+	import viewport from '$lib/useViewportAction.js';
 
 	const x = Tabs; //HACK TO AVOID UNUSED IMPORTS.
 
 	type Props = {
 		hit: Hit<Partial<SelectVacature>>;
 		onSave?: () => void;
+		onEnter?: () => void;
+		onExit?: () => void;
 	}
-	let { hit, onSave }: Props = $props();
+	let { hit, onSave, onEnter, onExit }: Props = $props();
 
 	let locaties = $derived(hit.locaties ? hit.locaties.join(', ') : 'Locatie onbekend');
 
@@ -33,7 +35,9 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow">
+<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow"
+				 use:viewport={{onEnter, onExit}}>
+	
 	<div>
 		<div class="flex flex-row justify-between">
 			<h2 class="font-bold sm:text-xl mb-1 text-wrap truncate">{@html hit.title}</h2>

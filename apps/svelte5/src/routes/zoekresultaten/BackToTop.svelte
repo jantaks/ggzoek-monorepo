@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
 	import { ChevronsUp } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 
 
-	const showOnPx = 150;
+	const showOnPx = 50;
 	let hidden = $state(true);
+
+	type Props = {
+		message: string;
+		class?: string;
+	}
+
+	let { message, class: className }: Props = $props();
 
 	$inspect(hidden);
 
@@ -45,25 +52,21 @@
 		);
 	};
 
-	let animateChevrons = $state(false);
+	let animate = $state(false);
 
 	onScrollStop(() => {
 		let t;
-		console.log('scrolling stopped');
-		animateChevrons = true;
+		animate = true;
 		clearTimeout(t);
 		t = setTimeout(() => {
-			console.log('stop animating');
-			animateChevrons = false;
+			animate = false;
 		}, 1000);
 	});
 </script>
 
 <style>
     .back-to-top {
-        @apply opacity-100 bg-primary fixed bottom-4 left-4 rounded-full shadow-lg;
         @apply transition-all duration-300 ease-in-out;
-        position: fixed;
         z-index: 99;
         user-select: none;
         color: white;
@@ -88,12 +91,19 @@
 
 <svelte:window on:scroll={handleOnScroll} />
 
-{#if !hidden && animateChevrons}
-	<button class="back-to-top p-3 justify-items-center rounded-lg bounce" on:click={goTop}>
-		<ChevronsUp class="size-8" />
+
+{#if !hidden && animate}
+	<button
+		class={"bounce flex flex-row items-center back-to-top p-3 opacity-100 bg-primary fixed bottom-4 left-4 rounded-full shadow-lg transition-all duration-300 ease-in-out " +className }
+		onclick={goTop}>
+		<ChevronsUp class="min-w-8" />
+		{message}
 	</button>
 {:else if !hidden}
-	<button class="back-to-top p-3 justify-items-center rounded-lg" on:click={goTop}>
-		<ChevronsUp class="size-8" />
+	<button
+		class={"flex flex-row items-center back-to-top p-3 opacity-100 bg-primary fixed bottom-4  rounded-full shadow-lg transition-all duration-300 ease-in-out " +className }
+		onclick={goTop}>
+		<ChevronsUp class="min-w-8" />
+		{message}
 	</button>
 {/if}

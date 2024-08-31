@@ -29,7 +29,7 @@ type QueryResult = Awaited<ReturnType<typeof index.search<SelectVacature>>>;
 
 // query?: string | null,     options?: SearchParams | undefined
 export async function querySearchEngine(query?: string | null, options?: SearchParams | undefined) {
-	if (options?.offset && options.offset > MAXRESULTS) {
+	if (options?.offset && options.offset >= MAXRESULTS) {
 		error(400, 'Alleen eerste 100 resultaten zijn beschikbaar. Gebruik filters om te verfijnen.');
 	}
 

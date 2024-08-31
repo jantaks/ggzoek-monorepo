@@ -10,15 +10,19 @@
 	import Processing from '$lib/components/Processing.svelte';
 	import { MAXRESULTS } from '$lib/constants';
 	import BackToTop from './BackToTop.svelte';
+	import { tick } from 'svelte';
 
 	let { data } = $props();
 
 	let loadHits = $derived(data.searchResponse.hits);
 	let hits = $state(data.searchResponse.hits);
 	let offset = $state(0);
-	let allLoaded = $state(false);
-
+	let lastInView = $state(false);
 	let form = getSearchForm();
+	let inView = $state<Set<number>>(new Set());
+	let navMessage = $state('');
+
+
 	form.initiate($page.url.searchParams);
 
 	async function getVacatures() {
@@ -35,13 +39,11 @@
 
 	const handleInfiniteScroll = async () => {
 		let endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
-		if (endOfPage && !loading && !allLoaded) {
+		if (endOfPage && !loading && !lastInView) {
 			loading = true;
 			const nHits = await getVacatures();
 			if (nHits?.length > 0) {
 				hits = [...hits, ...nHits];
-			} else {
-				allLoaded = true;
 			}
 			loading = false;
 		}
@@ -61,9 +63,38 @@
 	$effect(() => {
 		console.log('Effect 2');
 		hits = loadHits;
-		allLoaded = false;
+		lastInView = false;
 		offset = 0;
 	});
+
+
+
+	function updateMessage() {
+		navMessage = `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1}`;
+	}
+
+	async function onEnter(index: number) {
+		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index +1) {
+			lastInView = true;
+		}
+		console.log('onEnter', index);
+		const newSet = inView.add(index);
+		inView = new Set(newSet);
+		updateMessage();
+		await tick();
+	}
+
+	async function onExit(index: number) {
+		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index+1) {
+			lastInView = false;
+		}
+		console.log('onExit', index);
+		inView.delete(index);
+		updateMessage();
+		await tick();
+	}
+
+
 
 </script>
 <svelte:head>
@@ -89,29 +120,21 @@
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
 		<div class="space-y-4">
-			{#each hits as hit }
-				<VacatureCard hit={hit}></VacatureCard>
+			{#each hits as hit, index (hit.urlHash) }
+				<VacatureCard
+					hit={hit}
+					onEnter={() => onEnter(index)}
+					onExit={() => onExit(index)}></VacatureCard>
 			{/each}
 		</div>
 		<Processing class="size-8" processing={loading}></Processing>
-		{#if allLoaded}
-			<div class="text-center text-white bg-secondary-900 p-4 my-2 bounce mx-1 md:mx-0 rounded-lg">
-				{#if data.searchResponse.estimatedTotalHits < MAXRESULTS}
-					<h2>Alle {data.searchResponse.estimatedTotalHits} vacatures geladen voor uw zoekopdracht. </h2>
-				{:else}
-					<h2>De {MAXRESULTS} meest relevante vacatures geladen voor uw zoekopdracht.
-					</h2>
-				{/if}
-			</div>
-		{/if}
-		<!--		<div class="mx-auto">-->
-		<!--			<Paginator searchResponse={data.searchResponse}></Paginator>-->
-		<!--		</div>-->
 	</div>
-
 </div>
-<BackToTop />
-
+{#if !lastInView}
+	<BackToTop message={navMessage} />
+{:else}
+	<BackToTop message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`} class="bg-secondary-900" />
+{/if}
 <style>
     .bounce {
         animation: bounce 1s ease-in-out 2;
