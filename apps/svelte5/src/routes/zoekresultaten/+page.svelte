@@ -9,6 +9,7 @@
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import Processing from '$lib/components/Processing.svelte';
 	import { MAXRESULTS } from '$lib/constants';
+	import BackToTop from './BackToTop.svelte';
 
 	let { data } = $props();
 
@@ -109,6 +110,7 @@
 	</div>
 
 </div>
+<BackToTop />
 
 <style>
     .bounce {
