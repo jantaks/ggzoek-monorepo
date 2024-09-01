@@ -14,13 +14,14 @@
 
 	let { data } = $props();
 
-	let loadHits = $derived(data.searchResponse.hits);
 	let hits = $state(data.searchResponse.hits);
 	let offset = $state(0);
 	let lastInView = $state(false);
-	let form = getSearchForm();
 	let inView = $state<Set<number>>(new Set());
 	let navMessage = $state('');
+	let loading = $state(false);
+	let loadHits = $derived(data.searchResponse.hits);
+	let form = getSearchForm();
 
 
 	form.initiate($page.url.searchParams);
@@ -35,7 +36,7 @@
 		return response.searchResponse.hits;
 	}
 
-	let loading = $state(false);
+
 
 	const handleInfiniteScroll = async () => {
 		let endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
@@ -68,13 +69,12 @@
 	});
 
 
-
 	function updateMessage() {
 		navMessage = `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1}`;
 	}
 
 	async function onEnter(index: number) {
-		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index +1) {
+		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index + 1) {
 			lastInView = true;
 		}
 		console.log('onEnter', index);
@@ -85,7 +85,7 @@
 	}
 
 	async function onExit(index: number) {
-		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index+1) {
+		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index + 1) {
 			lastInView = false;
 		}
 		console.log('onExit', index);
@@ -93,7 +93,6 @@
 		updateMessage();
 		await tick();
 	}
-
 
 
 </script>
@@ -131,27 +130,16 @@
 	</div>
 </div>
 {#if !lastInView}
-	<BackToTop message={navMessage} />
-{:else}
-	<BackToTop message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`} class="bg-secondary-900" />
-{/if}
-<style>
-    .bounce {
-        animation: bounce 1s ease-in-out 2;
-    }
+	<BackToTop message={navMessage}
+						 class="bg-primary"
+						 scrollingClass="bg-primary/50" />
 
-    @keyframes bounce {
-        0%, 40%, 80%, 100% {
-            transform: translateY(0);
-        }
-        20% {
-            transform: translateY(-10px);
-        }
-        60% {
-            transform: translateY(-10px);
-        }
-    }
-</style>
+{:else}
+	<BackToTop
+		message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`}
+		class="bg-secondary-900"
+		scrollingClass="bg-secondary-900/70" />
+{/if}
 
 
 
