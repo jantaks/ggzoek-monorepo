@@ -26,17 +26,20 @@
 		scrollContainer = el;
 	}
 
+	let timeout: NodeJS.Timeout;
+
 	function handleOnScroll() {
 		if (!scrollContainer) return;
+		clearTimeout(timeout);
 		scrolling = true;
 		hidden = scrollContainer.scrollTop <= showOnPx;
 	}
 
 	function handleScrollEnd() {
+		clearTimeout(timeout);
 		scrolling = false;
-		let timeout = setTimeout(() => {
+		timeout = setTimeout(() => {
 			hidden = true;
-			clearTimeout(timeout);
 		}, 3000);
 	}
 
@@ -45,7 +48,7 @@
 <svelte:document on:scroll={handleOnScroll} on:scrollend={handleScrollEnd} use:scroll />
 
 {#if !hidden && scrolling}
-	<div class="flex flex-row justify-center fixed bottom-4 w-full text-white" transition:fade>
+	<div class="flex flex-row justify-center fixed bottom-4 right-0  w-full text-white" transition:fade>
 		<button
 			class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ` + scrollingClass}
 			onclick={goTop}>
@@ -55,7 +58,7 @@
 	</div>
 {/if}
 {#if !hidden && !scrolling}
-	<div class="flex flex-row justify-center fixed bottom-4 w-full text-white" transition:fade>
+	<div class="flex flex-row justify-center fixed bottom-4 left-0 w-full text-white" transition:fade>
 		<button
 			class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ` + className}
 			onclick={goTop}>

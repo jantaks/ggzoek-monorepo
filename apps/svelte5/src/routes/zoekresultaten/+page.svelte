@@ -37,7 +37,6 @@
 	}
 
 
-
 	const handleInfiniteScroll = async () => {
 		let endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
 		if (endOfPage && !loading && !lastInView) {
@@ -118,28 +117,34 @@
 		</div>
 		<FilterBar />
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
-		<div class="space-y-4">
+		<div class="space-y-4 relative">
 			{#each hits as hit, index (hit.urlHash) }
 				<VacatureCard
 					hit={hit}
 					onEnter={() => onEnter(index)}
 					onExit={() => onExit(index)}></VacatureCard>
 			{/each}
+			{@render navigation()}
 		</div>
+
 		<Processing class="size-8" processing={loading}></Processing>
 	</div>
 </div>
-{#if !lastInView}
-	<BackToTop message={navMessage}
-						 class="bg-primary"
-						 scrollingClass="bg-primary/50" />
 
-{:else}
-	<BackToTop
-		message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`}
-		class="bg-secondary-900"
-		scrollingClass="bg-secondary-900/70" />
-{/if}
+
+{#snippet navigation()}
+	{#if !lastInView}
+		<BackToTop message={navMessage}
+							 class="bg-primary"
+							 scrollingClass="bg-primary/50" />
+
+	{:else}
+		<BackToTop
+			message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`}
+			class="bg-secondary-900"
+			scrollingClass="bg-secondary-900/70" />
+	{/if}
+{/snippet  }
 
 
 
