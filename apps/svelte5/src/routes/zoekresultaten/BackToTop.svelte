@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { ChevronsUp } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
 
 
 	const showOnPx = 50;
 	let hidden = $state(true);
+	let scrolling = $state(false);
 	let scrollContainer: Element | null = null;
 
 	type Props = {
@@ -24,33 +26,38 @@
 		scrollContainer = el;
 	}
 
-
-	let scrolling = $state(false);
-
 	function handleOnScroll() {
 		if (!scrollContainer) return;
 		scrolling = true;
 		hidden = scrollContainer.scrollTop <= showOnPx;
 	}
 
+	function handleScrollEnd() {
+		scrolling = false;
+		let timeout = setTimeout(() => {
+			hidden = true;
+			clearTimeout(timeout);
+		}, 3000);
+	}
+
 </script>
 
-<style>
-    .back-to-top {
-        @apply transition-all duration-300 ease-in-out;
-        z-index: 99;
-        user-select: none;
-        color: white;
-    }
+<svelte:document on:scroll={handleOnScroll} on:scrollend={handleScrollEnd} use:scroll />
 
-</style>
-
-<svelte:document on:scroll={handleOnScroll} on:scrollend={() => {scrolling=false}} use:scroll />
-
-{#if !hidden}
-	<div class="flex flex-row justify-center fixed bottom-4 w-full text-white">
+{#if !hidden && scrolling}
+	<div class="flex flex-row justify-center fixed bottom-4 w-full text-white" transition:fade>
 		<button
-			class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ` + `${scrolling? scrollingClass : className}`}
+			class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ` + scrollingClass}
+			onclick={goTop}>
+			<ChevronsUp class="min-w-8" />
+			{message}
+		</button>
+	</div>
+{/if}
+{#if !hidden && !scrolling}
+	<div class="flex flex-row justify-center fixed bottom-4 w-full text-white" transition:fade>
+		<button
+			class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ` + className}
 			onclick={goTop}>
 			<ChevronsUp class="min-w-8" />
 			{message}
