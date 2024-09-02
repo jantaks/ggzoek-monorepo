@@ -20,7 +20,7 @@
 	let inView = $state<Set<number>>(new Set());
 	let navMessage = $state('');
 	let loading = $state(false);
-	let loadHits = $derived(data.searchResponse.hits);
+	let initialHitsLoaded = $derived(data.searchResponse.hits);
 	let form = getSearchForm();
 
 
@@ -37,7 +37,7 @@
 	}
 
 
-	const handleInfiniteScroll = async () => {
+	const onscroll = async () => {
 		let endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
 		if (endOfPage && !loading && !lastInView) {
 			loading = true;
@@ -50,26 +50,14 @@
 	};
 
 	$effect(() => {
-		console.log('Effect 1');
-		if (browser) {
-			window.addEventListener('scroll', handleInfiniteScroll);
-		}
-		return () => {
-			console.log('remove event listener');
-			window.removeEventListener('scroll', handleInfiniteScroll);
-		};
-	});
-
-	$effect(() => {
-		console.log('Effect 2');
-		hits = loadHits;
+		hits = initialHitsLoaded;
 		lastInView = false;
 		offset = 0;
 	});
 
 
 	function updateMessage() {
-		navMessage = `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1}`;
+		return `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1}`;
 	}
 
 	async function onEnter(index: number) {
@@ -79,7 +67,7 @@
 		console.log('onEnter', index);
 		const newSet = inView.add(index);
 		inView = new Set(newSet);
-		updateMessage();
+		navMessage = updateMessage();
 		await tick();
 	}
 
@@ -87,12 +75,13 @@
 		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index + 1) {
 			lastInView = false;
 		}
-		console.log('onExit', index);
 		inView.delete(index);
-		updateMessage();
-		await tick();
 	}
 
+	let allLoadedMessage = $derived(data!.searchResponse!.estimatedTotalHits! < MAXRESULTS ?
+		`Alle ${data.searchResponse.estimatedTotalHits} resultaten geladen`
+		:
+		`${MAXRESULTS} meeste relevante resultaten geladen`);
 
 </script>
 <svelte:head>
@@ -102,7 +91,7 @@
       }
 	</style>
 </svelte:head>
-
+<svelte:window onscroll={onscroll}></svelte:window>
 <div class="md:mt-4 flex flex-col md:flex-row mx-auto max-w-7xl relative md:pr-4">
 	<div class="hidden md:block md:w-2/5 min-w-fit">
 		<Searchform facets={data.facets}></Searchform>
@@ -133,18 +122,11 @@
 
 
 {#snippet navigation()}
-	{#if !lastInView}
-		<BackToTop message={navMessage}
-							 class="bg-primary"
-							 scrollingClass="bg-primary/50" />
-
-	{:else}
-		<BackToTop
-			message={`${Math.max(...inView) + 1} meest relevante resulaten geladen. Verfijn uw zoekcriteria als u niet hebt gevonden wat u zocht`}
-			class="bg-secondary-900"
-			scrollingClass="bg-secondary-900/70" />
-	{/if}
-{/snippet  }
+	<BackToTop
+	message = {lastInView? allLoadedMessage : navMessage}
+	tailwindBgColor = {lastInView? "bg-secondary-900" : "bg-primary"}
+	/>
+{/snippet    }
 
 
 

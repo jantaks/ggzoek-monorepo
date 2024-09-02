@@ -42,6 +42,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@af-utils/scrollend-polyfill": "^0.0.13",
     "@ggzoek/ggz-drizzle": "workspace:*",
     "@ggzoek/logging": "workspace:*",
     "@iconify/json": "^2.2.221",
