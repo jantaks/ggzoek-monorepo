@@ -7,7 +7,7 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const config = {
 	darkMode: ['class'],
 	content: ['./src/**/*.{html,js,svelte,ts}'],
-	safelist: ['dark'],
+	safelist: ['dark', 'bg-primary/50', 'bg-secondary-900/50'],
 	theme: {
 		container: {
 			center: true,

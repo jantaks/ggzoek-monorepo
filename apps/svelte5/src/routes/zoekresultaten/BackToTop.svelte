@@ -53,12 +53,13 @@
 
     .fade-out {
         animation: fadeOut 1s forwards;
-        animation-duration: 5s;
+        animation-duration: 2s;
     }
 
     @keyframes fadeOut {
         0% {
             opacity: 0.5;
+            z-index: 100;
         }
         25% {
             opacity: 1;
@@ -66,8 +67,12 @@
         75% {
             opacity: 1;
         }
+        99% {
+            z-index: 100;
+        }
         100% {
             opacity: 0;
+            z-index: -100; /*Make sure it does not cover any interacion elements. (zoals expand vacature card ... */
         }
     }
 
