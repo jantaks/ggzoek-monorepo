@@ -59,23 +59,9 @@
 
 <style>
 
-
-    .fade-in {
-        animation: fadeIn 1s;
-    }
-
     .fade-out {
         animation: fadeOut 1s forwards;
         animation-duration: 5s;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0.5;
-        }
-        to {
-            opacity: 1;
-        }
     }
 
     @keyframes fadeOut {
