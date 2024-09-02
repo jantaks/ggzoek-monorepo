@@ -9,11 +9,9 @@ export default function viewport(
 	const intersectionObserver = new IntersectionObserver((entries) => {
 		entries.forEach((entry) => {
 			if (entry.isIntersecting) {
-				console.debug('Element is in view');
 				onEnter();
 			}
 			if (!entry.isIntersecting) {
-				console.debug('Element is out of view');
 				onExit();
 			}
 		});

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getSearchForm } from '$lib/stores/formStore.svelte.js';
 	import { page } from '$app/stores';
-	import { browser } from '$app/environment';
 	import Searchform from '$lib/components/searchform/Searchform.svelte';
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
 	import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
@@ -55,10 +54,10 @@
 		offset = 0;
 	});
 
-
-	function updateMessage() {
-		return `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1}`;
-	}
+	let resultsShown = $derived<number|undefined>(data.searchResponse.estimatedTotalHits! < MAXRESULTS ?
+		data.searchResponse.estimatedTotalHits
+		:
+		MAXRESULTS);
 
 	async function onEnter(index: number) {
 		if (index === MAXRESULTS - 1 || data.searchResponse.estimatedTotalHits === index + 1) {
@@ -67,7 +66,7 @@
 		console.log('onEnter', index);
 		const newSet = inView.add(index);
 		inView = new Set(newSet);
-		navMessage = updateMessage();
+		navMessage = `${Math.min(...inView) + 1} - ${Math.max(...inView) + 1} van ${resultsShown}`;
 		await tick();
 	}
 

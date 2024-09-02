@@ -2,11 +2,8 @@
 	import { ChevronsUp } from 'lucide-svelte';
 	import '@af-utils/scrollend-polyfill'; // polyfill for scrollend event in safari
 
-
 	let hidden = $state(true);
 	let scrolling = $state(false);
-	let scrollContainer: Element | null = null;
-
 
 	type Props = {
 		message: string;
@@ -19,18 +16,13 @@
 		document.body.scrollIntoView();
 	}
 
-	function scroll(el: Element) {
-		scrollContainer = el;
-	}
+	let timeout: ReturnType<typeof setTimeout> | undefined;
 
 	function onscroll() {
 		clearTimeout(timeout);
-		if (!scrollContainer) return;
 		scrolling = true;
 		hidden = false;
 	}
-
-	let timeout: ReturnType<typeof setTimeout> | undefined;
 
 	let bgColor = $derived.by(() => {
 			if (scrolling) {
@@ -42,7 +34,7 @@
 
 </script>
 
-<svelte:document on:scroll={onscroll} on:scrollend={()=> scrolling=false} use:scroll />
+<svelte:document on:scroll={onscroll} on:scrollend={()=> scrolling=false} />
 
 {#if !hidden}
 	{#key scrolling}
