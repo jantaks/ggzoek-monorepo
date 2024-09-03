@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { getFacets } from '$lib/search';
 	import FacetSelectFilterv2 from '$lib/components/searchform/FacetSelectFilterv2.svelte';
+	import FacetSelectFilterNew from '$lib/components/searchform/FacetSelectFilterNew.svelte';
 
 	type Props = {
 		facets: Awaited<ReturnType<typeof getFacets>>,

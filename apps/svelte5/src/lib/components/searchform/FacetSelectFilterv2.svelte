@@ -34,9 +34,6 @@
 	}
 
 	let filter = form.addFilter(filterLabel);
-	const isSelected = (value: string) => {
-		return filter.selectedValues.has(value);
-	};
 
 	const handleInput: FormEventHandler<HTMLInputElement> = (event) => {
 		open = true;
@@ -56,10 +53,11 @@
 			selectedOptions.delete(option);
 		}
 		resetValue();
+		filter.selectedValues = new Set(selectedOptions);
+		form.submit();
 	}
 
 	function toggleOpen(event: MouseEvent) {
-		console.log('toggleOpen');
 		open = !open;
 		if (!open) {
 			resetValue();
@@ -68,27 +66,79 @@
 
 	function handleOutsideClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
-		console.log('target data: ', target.dataset.filter);
 		if (!target.closest(`div[data-filter="${id}"]`)) {
-			console.log('clicked outside: ', id);
 			open = false;
 			resetValue();
 		}
 	}
 
+	let selectedIndex = -1;
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			open = false;
+			inputValue = '';
+		}
+		if (event.key === 'ArrowDown' && filteredOptions.length > 0) {
+			event.preventDefault();
+			if (!open) {
+				open = true;
+			} else {
+				selectedIndex = (selectedIndex + 1) % filteredOptions.length;
+				focusOption(selectedIndex);
+			}
+		}
+		if (event.key === 'ArrowUp' && filteredOptions.length > 0) {
+			event.preventDefault();
+			if (!open) {
+				open = true;
+			} else {
+				selectedIndex = (selectedIndex - 1) % filteredOptions.length;
+				focusOption(selectedIndex);
+			}
+		}
+		if (event.key === 'Tab') {
+			open = false;
+			resetValue();
+		}
+	}
+
+	let el: HTMLElement | null;
+
+	function focusOption(index: number) {
+		const labelElements = el?.querySelectorAll('label') || [];
+		let focusElement = labelElements[index];
+		if (labelElements.length > 0 && focusElement) {
+			focusElement.focus();
+		}
+	}
+
+	function onFocusOut(event: FocusEvent) {
+		// open = false;
+		// resetValue();
+	}
+
 
 </script>
 <svelte:body onclick={handleOutsideClick}></svelte:body>
-<div class="grid-cols-1 space-y-1 filter" data-filter={id}>
+<div bind:this={el} class="grid-cols-1 space-y-1 filter">
 	<h2 class="capitalize">{filterLabel}:</h2>
 	<div class="text-secondary-900 ">
-		<div class="relative">
+		<div class="relative " data-filter={id}>
 			<div class="relative">
 				<input
 					bind:value={inputValue}
 					class="w-full py-2 px-4"
-					onfocus={() => {open = true; inputValue = ''}}
+					onfocus={(e) => {
+            if (!open) {
+              open = true;
+              resetValue();
+            }
+          }}
+					onfocusout={onFocusOut}
 					oninput={handleInput}
+					onkeydown={handleKeydown}
+					onmousedown={toggleOpen}
 					placeholder={`Selecteer ${filterLabel}`}
 					type="text"
 				>
@@ -97,16 +147,20 @@
 				</button>
 			</div>
 			{#if open}
-				<ul
-					class="md:absolute left-0 right-0 p-4 bg-white overflow-hidden space-y-2 border border-gray-300 rounded shadow-lg z-10 md:h-80 md:overflow-y-auto "
-					transition:slide={{duration:300}}>
+				<div
+					class="mt-1 md:absolute left-0 right-0 p-4 bg-white overflow-hidden space-y-2 border border-gray-300 rounded shadow-lg z-10 md:h-80 md:overflow-y-auto "
+					transition:slide={{duration:150}}>
 					{#if filteredOptions.length === 0}
-						<li class="p-1">Geen {filterLabel} gevonden</li>
+						<p class="p-1">Geen {filterLabel} gevonden</p>
 					{/if}
 					{#each filteredOptions as option (option)}
-						<li class="p-1 flex flex-row items-center space-x-4 max-w-96">
+						<label
+							class="focus:bg-green-400 cursor-pointer hover:bg-secondary-100  w-full flex flex-row items-center space-x-2 p-2 rounded label-with-focus"
+							for={option}
+							onkeydown={handleKeydown}
+						>
 							<input
-								class="custom-checkbox"
+								class="custom-checkbox group focus:bg-green-400"
 								type="checkbox"
 								id={option}
 								name={option}
@@ -114,12 +168,10 @@
 								onchange={(e) => handleSelect(e, option)}
 								checked={selectedOptions.has(option)}
 							/>
-							<label
-								class="cursor-pointer"
-								for={option}>{@render highlight(option, inputValue)}</label>
-						</li>
+							<span>{@render highlight(option, inputValue)}</span>
+						</label>
 					{/each}
-				</ul>
+				</div>
 			{/if}
 
 		</div>
@@ -137,11 +189,18 @@
 {/snippet}
 
 <style>
+
+    /* Custom CSS to change the label background when the input is focused */
+    .custom-checkbox:focus + label {
+        /*@apply bg-primary text-xl;*/
+    }
+
+
     /* Hide the native checkbox */
     .custom-checkbox {
         @apply appearance-none;
         @apply min-w-6 min-h-6 border border-secondary rounded-md bg-transparent cursor-pointer relative;
-        @apply hover:bg-primary/30
+
     }
 
     /* Create the checkmark */
@@ -154,6 +213,10 @@
     /* Background color when checked */
     .custom-checkbox:checked {
         @apply bg-primary border-primary;
+    }
+
+    .custom-checkbox:focus {
+        /*@apply bg-green-400 border-primary;*/
     }
 
 
