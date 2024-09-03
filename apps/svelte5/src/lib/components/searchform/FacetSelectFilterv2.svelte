@@ -19,18 +19,13 @@
 	let { filterLabel, facets, id }: Props = $props();
 
 	const options = facets.map((facet) => facet.value);
-	let selectedOptions = $state(new Set<string>());
 	let filteredOptions = $state(options);
 	let inputValue = $state('');
 	let open = $state(false);
 
-	$inspect(inputValue);
-
-
 	function getFacetCount(value: string) {
 		const facetCount = $page.data.searchResponse.facetDistribution[filterLabel];
 		return facetCount[value] || 0;
-
 	}
 
 	let filter = form.addFilter(filterLabel);
@@ -42,18 +37,18 @@
 	};
 
 	function resetValue() {
-		inputValue = selectedOptions.size > 0 ? `${selectedOptions.size} geselecteerd` : '';
+		inputValue = filter.selectedValues.size > 0 ? `${filter.selectedValues.size} geselecteerd` : '';
 		filteredOptions = options;
 	}
 
 	function handleSelect(event: any, option: string) {
 		if (event.target.checked) {
-			selectedOptions.add(option);
+			filter.selectedValues = new Set(filter.selectedValues.add(option));
 		} else {
-			selectedOptions.delete(option);
+			filter.selectedValues.delete(option);
+			filter.selectedValues = new Set(filter.selectedValues);
 		}
 		resetValue();
-		filter.selectedValues = new Set(selectedOptions);
 		form.submit();
 	}
 
@@ -166,10 +161,10 @@
 								value={option}
 								onkeydown={handleKeydown}
 								onchange={(e) => handleSelect(e, option)}
-								checked={selectedOptions.has(option)}
+								checked={filter.selectedValues.has(option)}
 							/>
 							<label
-								class="peer-focus:bg-primary/50 cursor-pointer hover:bg-secondary-100  w-full  p-2 rounded label-with-focus"
+								class="peer-focus:bg-secondary-100 cursor-pointer hover:bg-secondary-100  w-full  p-2 rounded label-with-focus"
 								for={option}
 								onkeydown={handleKeydown}
 
@@ -198,17 +193,10 @@
 
 <style>
 
-    /* Custom CSS to change the label background when the input is focused */
-    .custom-checkbox:focus {
-        /*@apply bg-primary text-xl;*/
-    }
-
-
     /* Hide the native checkbox */
     .custom-checkbox {
         @apply appearance-none;
         @apply min-w-6 min-h-6 border border-secondary rounded-md bg-transparent cursor-pointer relative;
-
     }
 
     /* Create the checkmark */
@@ -222,10 +210,5 @@
     .custom-checkbox:checked {
         @apply bg-primary border-primary;
     }
-
-    .custom-checkbox:focus {
-        /*@apply bg-green-400 border-primary;*/
-    }
-
 
 </style>
