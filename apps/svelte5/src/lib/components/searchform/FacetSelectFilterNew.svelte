@@ -34,7 +34,7 @@
 	});
 
 	const onChange: CreateComboboxProps<string, true>['onSelectedChange'] = ({ curr, next }) => {
-		$open = false;
+		// $open = false;
 		if (next) {
 			filter.selectedValues = new Set(next.map((value) => (value.value)));
 			form.submit();

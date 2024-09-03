@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronDown, ChevronUp } from '$lib/components/icons/index.js';
+	import { ChevronDown } from '$lib/components/icons/index.js';
 	import type { FacetHit } from 'meilisearch';
 	import type { facet } from '$lib/types';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
@@ -59,6 +59,7 @@
 
 	function toggleOpen(event: MouseEvent) {
 		open = !open;
+		focusedElementIndex = -1;
 		if (!open) {
 			resetValue();
 		}
@@ -72,20 +73,20 @@
 		}
 	}
 
-	let selectedIndex = -1;
+	let focusedElementIndex = -1;
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			open = false;
-			inputValue = '';
+			resetValue();
 		}
 		if (event.key === 'ArrowDown' && filteredOptions.length > 0) {
 			event.preventDefault();
 			if (!open) {
 				open = true;
 			} else {
-				selectedIndex = (selectedIndex + 1) % filteredOptions.length;
-				focusOption(selectedIndex);
+				focusedElementIndex = (focusedElementIndex + 1) % filteredOptions.length;
+				focusOption(focusedElementIndex);
 			}
 		}
 		if (event.key === 'ArrowUp' && filteredOptions.length > 0) {
@@ -93,8 +94,8 @@
 			if (!open) {
 				open = true;
 			} else {
-				selectedIndex = (selectedIndex - 1) % filteredOptions.length;
-				focusOption(selectedIndex);
+				focusedElementIndex = (focusedElementIndex - 1) % filteredOptions.length;
+				focusOption(focusedElementIndex);
 			}
 		}
 		if (event.key === 'Tab') {
@@ -106,9 +107,11 @@
 	let el: HTMLElement | null;
 
 	function focusOption(index: number) {
-		const labelElements = el?.querySelectorAll('label') || [];
-		let focusElement = labelElements[index];
-		if (labelElements.length > 0 && focusElement) {
+		console.log(index);
+		const inputElements = el?.querySelectorAll('.custom-checkbox') || [];
+		let focusElement = inputElements[index];
+		console.log(focusElement);
+		if (inputElements.length > 0 && focusElement) {
 			focusElement.focus();
 		}
 	}
@@ -154,22 +157,27 @@
 						<p class="p-1">Geen {filterLabel} gevonden</p>
 					{/if}
 					{#each filteredOptions as option (option)}
-						<label
-							class="focus:bg-green-400 cursor-pointer hover:bg-secondary-100  w-full flex flex-row items-center space-x-2 p-2 rounded label-with-focus"
-							for={option}
-							onkeydown={handleKeydown}
-						>
+						<div class="flex flex-row items-center space-x-2">
 							<input
-								class="custom-checkbox group focus:bg-green-400"
+								class="custom-checkbox peer"
 								type="checkbox"
 								id={option}
 								name={option}
 								value={option}
+								onkeydown={handleKeydown}
 								onchange={(e) => handleSelect(e, option)}
 								checked={selectedOptions.has(option)}
 							/>
-							<span>{@render highlight(option, inputValue)}</span>
-						</label>
+							<label
+								class="peer-focus:bg-primary/50 cursor-pointer hover:bg-secondary-100  w-full  p-2 rounded label-with-focus"
+								for={option}
+								onkeydown={handleKeydown}
+
+							>
+								<span>{@render highlight(option, inputValue)}</span>
+							</label>
+						</div>
+
 					{/each}
 				</div>
 			{/if}
@@ -191,7 +199,7 @@
 <style>
 
     /* Custom CSS to change the label background when the input is focused */
-    .custom-checkbox:focus + label {
+    .custom-checkbox:focus {
         /*@apply bg-primary text-xl;*/
     }
 
