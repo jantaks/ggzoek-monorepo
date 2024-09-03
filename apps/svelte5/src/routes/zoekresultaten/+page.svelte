@@ -112,20 +112,17 @@
 					onEnter={() => onEnter(index)}
 					onExit={() => onExit(index)}></VacatureCard>
 			{/each}
-			{@render navigation()}
 		</div>
-
+		<BackToTop
+			message = {lastInView? allLoadedMessage : navMessage}
+			tailwindBgColor = {lastInView? "bg-secondary-900" : "bg-primary"}
+		/>
 		<Processing class="size-8" processing={loading}></Processing>
 	</div>
 </div>
 
 
-{#snippet navigation()}
-	<BackToTop
-	message = {lastInView? allLoadedMessage : navMessage}
-	tailwindBgColor = {lastInView? "bg-secondary-900" : "bg-primary"}
-	/>
-{/snippet    }
+
 
 
 
