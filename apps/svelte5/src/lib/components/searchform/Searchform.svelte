@@ -9,6 +9,8 @@
 	import { page } from '$app/stores';
 	import { slide } from 'svelte/transition';
 	import { browser } from '$app/environment';
+	import FacetSelectFilterv2 from '$lib/components/searchform/FacetSelectFilterv2.svelte';
+	import FilterContainer from '$lib/components/searchform/FilterContainer.svelte';
 
 	const x = { Slider, Label };
 
@@ -23,8 +25,6 @@
 	}
 
 	let { facets }: Props = $props();
-
-	let allFacets = Object.keys(facets) as facet[];
 
 	let innerWidth: number = $state(0);
 	let toggleOn = $state(true);
@@ -42,11 +42,7 @@
 	</div>
 	<div class={`space-y-2 sm:space-y-4 ${showFilters? "": "hidden"} `} transition:slide>
 		<PostCodeSelect></PostCodeSelect>
-
-		{#each allFacets as facet (facet)}
-			<FacetSelectFilterNew facets={facets[facet]}
-														filterLabel={facet}></FacetSelectFilterNew>
-		{/each}
+		<FilterContainer facets={facets}></FilterContainer>
 	</div>
 </div>
 {#if innerWidth < 768 && browser}
