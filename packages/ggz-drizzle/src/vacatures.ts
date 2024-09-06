@@ -125,52 +125,54 @@ export async function upsertNew(vacature: { urlHash: string; [key: string]: any 
 }
 
 export async function bulkUpsertVacatures(inputs: Array<{ urlHash: string; [key: string]: any }>) {
-  const { db, client } = getDb();
+  const db = getDb().db;
   if (inputs.length === 0) return;
 
-  // Collect the user IDs (urlHash) to be updated
   const ids: string[] = inputs.map((input) => input.urlHash);
-
-  // Get all the fields that need to be updated from the first input (this assumes that all inputs have the same fields)
   const fields = Object.keys(inputs[0]).filter((field) => field !== 'urlHash');
-
-  // Create an object that will hold the final SQL for each field
   const sqlFieldUpdates: { [key: string]: SQL } = {};
 
-  // For each field to be updated, build the CASE statements
   for (const field of fields) {
     const sqlChunks: SQL[] = [];
     sqlChunks.push(sql`(case`);
 
     for (const input of inputs) {
-      // Check if the field value is undefined. If so, skip it or provide a default.
-      if (typeof input[field] !== 'undefined') {
+      let value = input[field];
+
+      // Convert Date objects to strings in ISO format
+      if (value instanceof Date) {
         sqlChunks.push(sql`when
         ${vacatureTable.urlHash}
         =
         ${input.urlHash}
         then
-        ${input[field]}`);
+        cast
+        (
+        ${value.toISOString()}
+
+        as
+        timestamp
+        )`);
+      } else if (typeof value !== 'undefined') {
+        sqlChunks.push(sql`when
+        ${vacatureTable.urlHash}
+        =
+        ${input.urlHash}
+        then
+        ${value}`);
       }
     }
 
     sqlChunks.push(sql`end )`);
 
-    // Store the final SQL for this field only if the field has valid updates
     if (sqlChunks.length > 2) {
-      // Check if there's any `when` clause
       sqlFieldUpdates[field] = sql.join(sqlChunks, sql.raw(' '));
     }
   }
 
-  // Perform the bulk update in a single query, only if there are updates to make
+  console.log(sqlFieldUpdates);
   if (Object.keys(sqlFieldUpdates).length > 0) {
-    const result = await db
-      .update(vacatureTable)
-      .set(sqlFieldUpdates)
-      .where(inArray(vacatureTable.urlHash, ids))
-      .execute();
-    return result;
+    await db.update(vacatureTable).set(sqlFieldUpdates).where(inArray(vacatureTable.urlHash, ids));
   }
 }
 
