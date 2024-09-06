@@ -1,23 +1,9 @@
 import { getFacets, getQueryParams, querySearchEngine } from '$lib/search';
 import { log } from '@ggzoek/logging/dist/logger.js';
-import type { PageServerLoad, PageServerLoadEvent } from './$types.js';
 import type { MyLocals } from '$lib/types';
 import { error, redirect } from '@sveltejs/kit';
 import { createSavedSearch, deleteUserSearch } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 import { likeVacature, unlikeVacature } from '@ggzoek/ggz-drizzle/dist/vacatures';
-
-export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
-	const _12hours = 60 * 60 * 12;
-	event.setHeaders({
-		'cache-control': `max-age=${_12hours}`
-	});
-	const { query, options } = await getQueryParams(event.url.searchParams);
-	let facets = await getFacets();
-	return {
-		facets: facets,
-		searchResponse: await querySearchEngine(query, options)
-	};
-};
 
 /*
  The MEILI HITSPERPAGE LIMIT is 1000, the default is 20.

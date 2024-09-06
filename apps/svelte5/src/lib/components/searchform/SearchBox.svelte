@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
+	import { page } from '$app/stores';
 
 	let form = getSearchForm();
+
+	form.query = $page.url.searchParams.get('fullText') ?? '';
+
+	let { data } = $props();
 
 	const delayedSubmit = (delay: number) => {
 		let timeout: number;
@@ -27,7 +32,7 @@
 	</div>
 	<input
 		bind:value={form.query}
-		class="glowing border-primary-light block w-full p-4 h-10 ps-10 text-gray-900 border rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+		class="rounded glowing border-primary-light block w-full p-4 h-10 ps-10 text-gray-900 border  bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 		data-sveltekit-keepfocus
 		id="default-search"
 		oninput={delayedSubmit(1000)}

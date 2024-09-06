@@ -6,7 +6,7 @@
 	import { CloseIcon } from '$lib/components/icons';
 	import DistanceSlider from '$lib/components/searchform/DistanceSlider.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LoaderCircle, X } from 'lucide-svelte';
 
 	const form = getSearchForm();
 
@@ -35,7 +35,7 @@
 	});
 
 	let plaats: Plaats | undefined = $state();
-	let postcode = $page.url.searchParams.get('postcode');
+	let postcode = $page.url.searchParams.get('postcode') ?? form.postcode;
 	if (postcode) {
 		plaats = { PC4: postcode };
 		$inputValue = postcode;
@@ -90,79 +90,75 @@
 	};
 </script>
 
-<div class="flex flex-col gap-1 w-full ">
-	<!-- svelte-ignore a11y_label_has_associated_control - $label contains the 'for' attribute -->
-	<label use:melt={$label}>
-    <span class="font-medium capitalize"
-		>Postcode:</span
-		>
-	</label>
+<div class="flex flex-col space-y-4">
+	<div class="flex flex-col gap-1 w-full ">
 
-	<div class="relative w-full">
-		<input
-			class="flex h-10 items-center justify-between rounded-lg bg-white border border-primary-light
-          px-3 pr-12 text-black w-full"
-			onblur={onBlur}
-			oninput={onInput}
-			placeholder="Type om te zoeken"
-			use:melt={$input}
-		/>
-		<div class="absolute right-1 top-1/2 z-10 -translate-y-1/2 text-primary-dark">
+		<div class="relative w-full">
+			<input
+				class="rounded flex h-10 items-center justify-between bg-white border border-primary-light
+          px-3 text-black w-full"
+				onblur={onBlur}
+				oninput={onInput}
+				placeholder="Zoek op postcode"
+				use:melt={$input}
+			/>
 			{#if plaats}
-				<button onclick={clear}>
-					<CloseIcon />
-				</button>
+				<div class="block flex	">
+					<button onclick={clear}>
+						<X class="size-6 absolute right-2 top-2 text-black" />
+					</button>
+				</div>
 			{/if}
 		</div>
 	</div>
-</div>
-{#if $open}
-	<ul
-		class=" z-10 flex max-h-[300px] flex-col overflow-hidden rounded-lg"
-		use:melt={$menu}
-		transition:fly={{ duration: 150, y: -5 }}
-	>
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	{#if $open}
+		<ul
+			class=" z-10 flex max-h-[300px] flex-col overflow-hidden"
+			use:melt={$menu}
+			transition:fly={{ duration: 150, y: -5 }}
+		>
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 
-		{#await filteredResults}
-			<div
-				class="flex max-h-full flex-row gap-0 overflow-y-auto bg-white px-2 py-2 text-black justify-center items-center"
-				tabindex="0"
-			>
-				<p class=" text-gray-500">Postcodes zoeken ...</p>
-				<LoaderCircle class="animate-spin size-6 text-secondary-800" />
-			</div>
-		{:then filteredResults}
-			{#if filteredResults && filteredResults.length > 0}
+			{#await filteredResults}
 				<div
-					class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
+					class="flex max-h-full flex-row gap-0 overflow-y-auto bg-white px-2 py-2 text-black justify-center items-center"
 					tabindex="0"
 				>
-					{#each filteredResults as plaats, index (index)}
-						<li
-							use:melt={$option(toOption(plaats))}
-							class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4
+					<p class=" text-gray-500">Postcodes zoeken ...</p>
+					<LoaderCircle class="animate-spin size-6 text-secondary-800" />
+				</div>
+			{:then filteredResults}
+				{#if filteredResults && filteredResults.length > 0}
+					<div
+						class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
+						tabindex="0"
+					>
+						{#each filteredResults as plaats, index (index)}
+							<li
+								use:melt={$option(toOption(plaats))}
+								class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4
         hover:bg-primary-light
         data-[highlighted]:bg-primary-light data-[highlighted]:text-primary-dark
           data-[disabled]:opacity-50"
-						>
-							<div class="pl-4">
-								<span class="font-medium">{plaats.PC4}</span>
-								<span class=" opacity-75">({plaats.Plaats})</span>
-							</div>
-						</li>
-					{/each}
-				</div>
-			{:else if filteredResults && filteredResults.length === 0 && $inputValue.length > 2}
-				<div
-					class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
-					tabindex="0"
-				>
-					<li class="">Geen postcodes gevonden die beginnen met {$input.value}</li>
-				</div>
-			{/if}
-		{/await}
+							>
+								<div class="pl-4">
+									<span class="font-medium">{plaats.PC4}</span>
+									<span class=" opacity-75">({plaats.Plaats})</span>
+								</div>
+							</li>
+						{/each}
+					</div>
+				{:else if filteredResults && filteredResults.length === 0 && $inputValue.length > 2}
+					<div
+						class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
+						tabindex="0"
+					>
+						<li class="">Geen postcodes gevonden die beginnen met {$input.value}</li>
+					</div>
+				{/if}
+			{/await}
 
-	</ul>
-{/if}
-<DistanceSlider disabled={plaats === undefined} />
+		</ul>
+	{/if}
+	<DistanceSlider disabled={plaats === undefined} />
+</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronDown } from '$lib/components/icons/index.js';
+	import { ChevronDown, X } from 'lucide-svelte';
 	import type { FacetHit } from 'meilisearch';
 	import type { facet } from '$lib/types';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
@@ -20,11 +20,11 @@
 
 	const options = facets.map((facet) => facet.value);
 	let filteredOptions = $state(options);
-	let inputValue = $state('what');
+	let inputValue = $state(filterLabel);
 	let open = $state(false);
 
 	$effect(() => {
-		console.log('effect');
+		resetValue();
 	});
 
 	function getFacetCount(value: string) {
@@ -41,11 +41,12 @@
 	};
 
 	function resetValue() {
-		inputValue = filter.selectedValues.size > 0 ? `${filter.selectedValues.size} geselecteerd` : '';
+		inputValue = filter.selectedValues.size > 0 ? `${filterLabel} (${filter.selectedValues.size})` : filterLabel;
 		filteredOptions = options;
 	}
 
 	function handleSelect(event: any, option: string) {
+		open = false;
 		if (event.target.checked) {
 			filter.selectedValues = new Set(filter.selectedValues.add(option));
 		} else {
@@ -120,17 +121,21 @@
 		// resetValue();
 	}
 
+	function clearFilter() {
+		filter.selectedValues = new Set();
+		form.submit();
+	}
+
 
 </script>
 <svelte:body onclick={handleOutsideClick}></svelte:body>
 <div bind:this={el} class="grid-cols-1 space-y-1 filter">
-	<h2 class="capitalize">{filterLabel}:</h2>
 	<div class="text-secondary-900 ">
 		<div class="relative " data-filter={id}>
 			<div class="relative">
 				<input
 					bind:value={inputValue}
-					class="w-full py-2 px-4"
+					class="rounded w-full py-2 px-4 capitalize"
 					onfocus={(e) => {
             if (!open) {
               open = true;
@@ -141,12 +146,17 @@
 					oninput={handleInput}
 					onkeydown={handleKeydown}
 					onmousedown={toggleOpen}
-					placeholder={`Selecteer ${filterLabel}`}
 					type="text"
 				>
 				<button class="block" data-filter={id} onclick={(e) => toggleOpen(e)}>
 					<ChevronDown class={`size-8 absolute right-2 top-1 ${open? "rotate-180": ""}`}></ChevronDown>
 				</button>
+				{#if filter.selectedValues.size > 0}
+					<button class="block" data-filter={id} onclick={clearFilter}>
+						<X class={`size-6 absolute right-11 top-2 ${open? "rotate-180": ""}`}></X>
+					</button>
+				{/if}
+
 			</div>
 			{#if open}
 				<div

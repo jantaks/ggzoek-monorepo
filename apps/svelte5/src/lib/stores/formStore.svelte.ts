@@ -1,6 +1,8 @@
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
 import type { FilterDefinition, Operator, Search } from '$lib/types';
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
 
 export class Filter {
 	constructor(facet: string) {
@@ -152,10 +154,12 @@ export class SearchForm {
 	}
 
 	async submit(offset?: number) {
+		const url = get(page).url.pathname;
+		console.log('URL', url);
 		this.isLoading = true;
 		const searchParams = this.searchParams();
 		if (offset) searchParams.set('offset', offset.toString());
-		await goto('/zoekresultaten?' + searchParams, { keepFocus: true });
+		await goto(`${url}?${searchParams}`, { keepFocus: true });
 		// await invalidate('data:zoekresultaten');
 		this.isLoading = false;
 	}

@@ -1,5 +1,7 @@
 import { describe, it } from 'vitest';
-import { getVacaturesNearby } from './meilisearch.js';
+import { client, getVacaturesNearby } from './meilisearch.js';
+import { bulkUpsertVacatures, upsertNew } from '@ggzoek/ggz-drizzle/src/vacatures.js';
+import { Vacature } from '../ai/types.js';
 
 // 52.06997066644755,4.300333195993115 = DEN HAAG
 
@@ -11,5 +13,15 @@ describe('Search on location', () => {
     result.hits.forEach((vacature) => {
       console.log(vacature.locaties);
     });
+  });
+});
+
+describe('get summaries from index', async () => {
+  it('get all', async () => {
+    const index = client.index('vacatures');
+    const docs = await index.getDocuments({ fields: ['summary', 'urlHash'], limit: 10 });
+    console.log(docs.results);
+    const result = await bulkUpsertVacatures([...docs.results]);
+    console.log(result);
   });
 });

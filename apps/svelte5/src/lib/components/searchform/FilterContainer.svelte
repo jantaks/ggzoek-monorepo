@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { getFacets } from '$lib/search';
-	import FacetSelectFilterv2 from '$lib/components/searchform/FacetSelectFilterv2.svelte';
-	import FacetSelectFilterNew from '$lib/components/searchform/FacetSelectFilterNew.svelte';
+	import FacetSelectFilterv3 from '$lib/components/searchform/FacetSelectFilterv3.svelte';
 
 	type Props = {
 		facets: Awaited<ReturnType<typeof getFacets>>,
@@ -13,9 +12,9 @@
 
 </script>
 {#each allFacets as facet, i (facet)}
-	<FacetSelectFilterv2 facets={facets[facet]}
+	<FacetSelectFilterv3 facets={facets[facet]}
 											 filterLabel={facet}
 											 id={i}
 	>
-	</FacetSelectFilterv2>
+	</FacetSelectFilterv3>
 {/each}

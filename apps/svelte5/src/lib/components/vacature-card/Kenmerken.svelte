@@ -43,6 +43,7 @@
 				{@render row("Beroepen", hit.beroepen?.join(", "))}
 				{@render row("Eerst gezien", new Date(hit.firstScraped))}
 				{@render row("Laatst gezien", new Date(hit.lastScraped))}
+				{@render row("ggzoek kenmerk", hit.urlHash.substring(0, 8))}
 			</dl>
 		</div>
 	</div>

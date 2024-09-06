@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import Searchform from '$lib/components/searchform/Searchform.svelte';
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
-	import FilterBar from '$lib/components/results-bar/FilterBar.svelte';
 	import ResultsBar from '$lib/components/results-bar/ResultsBar.svelte';
 	import VacatureCard from '$lib/components/vacature-card/VacatureCard.svelte';
 	import Processing from '$lib/components/Processing.svelte';
@@ -21,7 +20,6 @@
 	let loading = $state(false);
 	let initialHitsLoaded = $derived(data.searchResponse.hits);
 	let form = getSearchForm();
-
 
 	form.initiate($page.url.searchParams);
 
@@ -54,7 +52,7 @@
 		offset = 0;
 	});
 
-	let resultsShown = $derived<number|undefined>(data.searchResponse.estimatedTotalHits! < MAXRESULTS ?
+	let resultsShown = $derived<number | undefined>(data.searchResponse.estimatedTotalHits! < MAXRESULTS ?
 		data.searchResponse.estimatedTotalHits
 		:
 		MAXRESULTS);
@@ -103,7 +101,8 @@
 		<div class="md:hidden md:w-2/5 min-w-fit">
 			<Searchform facets={data.facets}></Searchform>
 		</div>
-		<FilterBar />
+
+		<!--		<FilterBar />-->
 		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
 		<div class="space-y-4 relative">
 			{#each hits as hit, index (hit.urlHash) }
@@ -114,8 +113,8 @@
 			{/each}
 		</div>
 		<BackToTop
-			message = {lastInView? allLoadedMessage : navMessage}
-			tailwindBgColor = {lastInView? "bg-secondary-900" : "bg-primary"}
+			message={lastInView? allLoadedMessage : navMessage}
+			tailwindBgColor={lastInView? "bg-secondary-900" : "bg-primary"}
 		/>
 		<Processing class="size-8" processing={loading}></Processing>
 	</div>

@@ -1,4 +1,4 @@
-import { DB, getDb, provideDb } from './client.js';
+import { client, DB, getDb, provideDb } from './client.js';
 import { log } from '@ggzoek/logging/dist/logger.js';
 import { InsertVacature, likes, SelectVacature, vacatures as vacatureTable } from './schema.js';
 import {
@@ -13,6 +13,7 @@ import {
   lt,
   max,
   or,
+  SQL,
   sql,
   SQLWrapper
 } from 'drizzle-orm';
@@ -67,7 +68,7 @@ export async function unlikeVacature(user_id: string, vacature: string) {
     .execute();
 }
 
-export async function upsert(vacature: Omit<InsertVacature, 'beroepen'>) {
+export async function upsert(vacature: Partial<InsertVacature>) {
   const { db: db } = getDb();
   const columns = Object.keys(vacatureTable);
   const valuesToInsert = columns.reduce(
@@ -99,6 +100,78 @@ export async function upsert(vacature: Omit<InsertVacature, 'beroepen'>) {
   log.debug(`UPSERTED ${vacature.url}`);
   log.silly({ json: { ...vacature, body: undefined } });
   log.silly(vacature.body);
+}
+
+export async function upsertNew(vacature: { urlHash: string; [key: string]: any }) {
+  const db = getDb().db;
+  const existingVacature = await getVacature(vacature.urlHash);
+  if (!existingVacature) {
+    log.debug(`Inserting new vacature ${vacature.urlHash}`);
+    const vac = vacature as InsertVacature;
+    try {
+      await db.insert(vacatureTable).values({ ...vac });
+    } catch (e) {
+      log.error(`Error upserting ${vacature.url} (id: ${vacature.urlHash})`);
+      log.error(e);
+    }
+  } else {
+    log.debug(`Updating existing vacature ${vacature.urlHash}. Fields: ${Object.keys(vacature)}`);
+    await db
+      .update(vacatureTable)
+      .set(vacature)
+      .where(eq(vacatureTable.urlHash, vacature.urlHash))
+      .execute();
+  }
+}
+
+export async function bulkUpsertVacatures(inputs: Array<{ urlHash: string; [key: string]: any }>) {
+  const { db, client } = getDb();
+  if (inputs.length === 0) return;
+
+  // Collect the user IDs (urlHash) to be updated
+  const ids: string[] = inputs.map((input) => input.urlHash);
+
+  // Get all the fields that need to be updated from the first input (this assumes that all inputs have the same fields)
+  const fields = Object.keys(inputs[0]).filter((field) => field !== 'urlHash');
+
+  // Create an object that will hold the final SQL for each field
+  const sqlFieldUpdates: { [key: string]: SQL } = {};
+
+  // For each field to be updated, build the CASE statements
+  for (const field of fields) {
+    const sqlChunks: SQL[] = [];
+    sqlChunks.push(sql`(case`);
+
+    for (const input of inputs) {
+      // Check if the field value is undefined. If so, skip it or provide a default.
+      if (typeof input[field] !== 'undefined') {
+        sqlChunks.push(sql`when
+        ${vacatureTable.urlHash}
+        =
+        ${input.urlHash}
+        then
+        ${input[field]}`);
+      }
+    }
+
+    sqlChunks.push(sql`end )`);
+
+    // Store the final SQL for this field only if the field has valid updates
+    if (sqlChunks.length > 2) {
+      // Check if there's any `when` clause
+      sqlFieldUpdates[field] = sql.join(sqlChunks, sql.raw(' '));
+    }
+  }
+
+  // Perform the bulk update in a single query, only if there are updates to make
+  if (Object.keys(sqlFieldUpdates).length > 0) {
+    const result = await db
+      .update(vacatureTable)
+      .set(sqlFieldUpdates)
+      .where(inArray(vacatureTable.urlHash, ids))
+      .execute();
+    return result;
+  }
 }
 
 async function allScreenshotUrls(db) {

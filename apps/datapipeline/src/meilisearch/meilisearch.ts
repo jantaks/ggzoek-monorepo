@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { MeiliSearch, Synonyms } from 'meilisearch';
 import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
+import { bulkUpsertVacatures } from '@ggzoek/ggz-drizzle/src/vacatures.js';
 
 const url = process.env.MEILISEARCH_URL;
 const key = process.env.MEILISEARCH_KEY;
@@ -24,7 +25,7 @@ const FACETS = [
   'maxUren'
 ];
 
-const client = new MeiliSearch({
+export const client = new MeiliSearch({
   host: url,
   apiKey: key
 });
@@ -78,3 +79,17 @@ export async function createIndex() {
 // console.log(await deleteIndex())
 // console.log(await search("altrecht", "stoornissen = 'autisme'"))
 await updateFilters();
+
+export async function restoreSummaryFromIndex() {
+  const index = client.index('vacatures');
+  const docs = await index.getDocuments({ fields: ['summary', 'urlHash'], limit: 5000 });
+  console.log(docs.results.length);
+  let updated = 0;
+  while (updated < docs.results.length) {
+    let vacatureBatch = [...docs.results.slice(updated, updated + 100)];
+    const result = await bulkUpsertVacatures(vacatureBatch);
+    console.log(`Updated ${updated + vacatureBatch.length} of ${docs.results.length}`);
+    updated += 100;
+  }
+  process.exit(0);
+}

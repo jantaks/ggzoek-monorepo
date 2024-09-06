@@ -20,10 +20,8 @@
 
 
 </script>
-
 <div class={"w-full sticky top-0 z-10 " + className}>
-
-	<nav class={"flex items-center py-4 mx-auto max-w-7xl justify-between pr-10 sticky top-0"}>
+	<nav class={"flex items-center py-4 mx-auto max-w-7xl justify-between pr-10 "}>
 		<Logo variant="small" />
 		{#if showLinks}
 			<ul class="hidden sm:flex flex-row  gap-8 mx-auto items-center">

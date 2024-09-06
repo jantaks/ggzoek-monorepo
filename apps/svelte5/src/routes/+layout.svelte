@@ -4,6 +4,7 @@
 	import { createUser } from '$lib/stores/userStore.svelte';
 	import { page } from '$app/stores';
 	import NavBar from '$lib/components/navbar/NavBar.svelte';
+	import { onNavigate } from '$app/navigation';
 
 
 	console.log('Initialising index,layout. Creating userStore');
@@ -17,6 +18,19 @@
 	});
 
 	createSearchForm();
+
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+		console.log('startViewTransition');
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
+
 </script>
 
 <svelte:head>

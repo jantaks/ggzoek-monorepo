@@ -30,7 +30,6 @@
 </script>
 
 <div class="flex flex-wrap gap-2 w-full justify-items-start">
-
 	{#each form.filters.filter(f => f.isActive) as filter}
 		<div class="bg-secondary-400/60 flex flex-wrap p-2 items-center rounded-lg gap-1">
 			{#each Array.from(filter.selectedValues).sort() as selected, index}

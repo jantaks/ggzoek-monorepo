@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import postgres from 'postgres';
+import {} from 'postgres';
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { log } from '@ggzoek/logging/dist/logger.js';
 import _ from 'lodash';
@@ -10,7 +11,7 @@ if (connectionString.length === 0) {
 }
 
 export const client = postgres(connectionString);
-export const db = drizzle(client);
+export const db = drizzle(client, { logger: false });
 
 export function getDb() {
   if (connectionString.length === 0) {
