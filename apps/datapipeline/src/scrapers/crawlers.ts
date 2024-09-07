@@ -25,8 +25,8 @@ import {
   selectLinks
 } from '../utils.js';
 import { Locator, Page } from 'playwright';
-import vacatures from '../../../../packages/ggz-drizzle/src/vacatures.js';
-import { InsertScrapeResult, InsertVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
+import vacatures, { bulkInsert, bulkUpsertVacatures } from '@ggzoek/ggz-drizzle/src/vacatures.js';
+import { InsertScrapeResult, InsertVacature } from '@ggzoek/ggz-drizzle/src/schema.js';
 import { getBeroepen } from '../beroepen.js';
 import { getLatest, insert } from '@ggzoek/ggz-drizzle/src/scrapeResults.js';
 
@@ -45,6 +45,8 @@ type Options = Pick<
   'requestHandlerTimeoutSecs' | 'statisticsOptions' | 'maxRequestsPerCrawl' | 'maxRequestsPerMinute'
 >;
 
+type ScraperType = 'cheerio' | 'playwright';
+
 export const DEFAULT_OPTIONS: BasicCrawlerOptions = {
   statisticsOptions: {
     logIntervalSecs: 10
@@ -57,6 +59,7 @@ export const DEFAULT_CONFIG: ConfigurationOptions = {
 };
 
 export abstract class BaseScraper implements Scraper {
+  abstract crawlerType: ScraperType;
   logger: MyLogger;
   protected abstract router:
     | RouterHandler<PlaywrightCrawlingContext>
@@ -69,6 +72,8 @@ export abstract class BaseScraper implements Scraper {
   private newUrls: string[] = [];
   private allUrls: string[] = [];
   private vacaturesUpdated: number = 0;
+  private vacaturesToUpdate: Pick<InsertVacature, 'urlHash' | 'lastScraped'>[] = [];
+  private vacaturesToInsert: Partial<InsertVacature>[] = [];
 
   protected constructor(
     readonly name: string,
@@ -89,6 +94,13 @@ export abstract class BaseScraper implements Scraper {
     this.vacaturesPromise = vacatures.getAllForOrganisation(this.name);
   }
 
+  isSlow() {
+    if (this.options?.maxRequestsPerMinute) {
+      return this.options.maxRequestsPerMinute < 20;
+    }
+    return false;
+  }
+
   abstract addDefaultHandler(...args: Parameters<typeof this.router.addDefaultHandler>): void;
 
   abstract addHandler(...args: Parameters<typeof this.router.addHandler>): void;
@@ -105,6 +117,10 @@ export abstract class BaseScraper implements Scraper {
     }
 
     await this.crawler.run(this.urls);
+    await bulkUpsertVacatures(this.vacaturesToUpdate);
+    log.debug(`Updated ${this.vacaturesToUpdate.length} vacatures`);
+    await bulkInsert(this.vacaturesToInsert as InsertVacature[]);
+    log.debug(`Inserted ${this.vacaturesToInsert.length} new vacatures`);
     const previousResults = await getLatest();
     const results: InsertScrapeResult = {
       ...this.crawler.stats.state,
@@ -130,31 +146,36 @@ export abstract class BaseScraper implements Scraper {
   }
 
   async save(data: Data) {
-    const vacature: Omit<InsertVacature, 'beroepen'> = {
+    const urlHash = createHash(data.request.uniqueKey);
+    const allVacatures = await this.getAllVacatures();
+    const existing = allVacatures.find((v) => v.urlHash === urlHash);
+    if (existing) {
+      this.logger.debug(
+        `Vacature ${existing.url} already exists, last scraped at ${formatDate(existing.lastScraped)})`
+      );
+      existing.lastScraped = new Date();
+      this.vacaturesToUpdate.push({
+        urlHash: urlHash,
+        lastScraped: new Date()
+      });
+      return;
+    }
+
+    const newVacature: Omit<InsertVacature, 'beroepen'> = {
       organisatie: this.name,
       title: cleanTitle(data.title),
       body: data.body,
       url: data.request.loadedUrl as string,
-      urlHash: createHash(data.request.uniqueKey),
+      urlHash: urlHash,
       bodyHash: createHash(data.body),
       firstScraped: new Date(),
       lastScraped: new Date(),
-      professie: getBeroepen(data.title),
-      summary: null
+      professie: getBeroepen(data.title)
     };
 
-    const allVacatures = await this.getAllVacatures();
-    const existing = allVacatures.find((v) => v.urlHash === vacature.urlHash);
-    if (existing) {
-      this.logger.debug(
-        `Vacature ${vacature.url} already exists, last scraped at ${formatDate(existing.lastScraped)})`
-      );
-      vacature.firstScraped = existing.firstScraped;
-    } else {
-      this.logger.info(`New Vacature!!! ${vacature.url}`);
-      this.newUrls.push(vacature.url);
-    }
-    await vacatures.upsert(vacature);
+    this.logger.info(`New Vacature!!! ${newVacature.url}`);
+    this.newUrls.push(newVacature.url);
+    this.vacaturesToInsert.push(newVacature);
     this.vacaturesUpdated++;
   }
 
@@ -194,6 +215,7 @@ export abstract class BaseScraper implements Scraper {
 }
 
 export class CheerioScraper extends BaseScraper {
+  crawlerType = 'cheerio' as ScraperType;
   protected override crawler: CheerioCrawler;
   protected override router: RouterHandler<CheerioCrawlingContext>;
 
@@ -228,6 +250,7 @@ export class CheerioScraper extends BaseScraper {
 }
 
 export class PlaywrightScraper extends BaseScraper {
+  crawlerType = 'playwright' as ScraperType;
   protected override crawler: PlaywrightCrawler;
   protected override router: RouterHandler<PlaywrightCrawlingContext>;
 

@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { vacatures } from '../src/schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { getAllProfessies } from '../src/vacatures';
+import { bulkUpsertVacatures, getAllProfessies } from '../src/vacatures';
 import {
   createSavedSearch,
   deleteSavedSearch,
@@ -32,6 +32,15 @@ describe('repotest', () => {
   it('should return professies', async () => {
     const result = await getAllProfessies();
     expect(result).toBeDefined();
+    console.log(result);
+  });
+});
+
+describe('Bulkupserts', () => {
+  it('inserts bulk', async () => {
+    const urlHash = '54ed2d3402f16652969598d26f495532150f1e91a9352b77367b7ec0c009ec7c';
+    const date = new Date();
+    const result = await bulkUpsertVacatures([{ urlHash: urlHash, lastScraped: date }]);
     console.log(result);
   });
 });
@@ -73,7 +82,7 @@ describe('Save, update and delete searches', () => {
 
   it('Gets a saved search', async () => {
     const result = await getSavedSearchesForUser(userId);
-    expect(result[0].search).toContain('testsearch');
+    expect(result[0].searchUrlParams).toContain('testsearch');
     console.log(result);
   });
 

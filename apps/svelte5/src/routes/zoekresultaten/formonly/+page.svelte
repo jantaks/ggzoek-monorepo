@@ -40,16 +40,45 @@
 		<hr class="h-1 bg-secondary-900/20">
 	</div>
 
-	{#key data}
-		<div class="flex justify-center p-4">
-			<div class="rounded text-white text-center font-semibold p-3 w-full bg-secondary-900"
-					 transition:scale={{opacity:1, start:0.9}}>
-				<a href={`/zoekresultaten?${$page.url.searchParams}`}>
-					Toon {data.searchResponse.estimatedTotalHits} vacatures.
-				</a>
+	{#if data.searchResponse.estimatedTotalHits > 0}
+		{#key data.searchResponse.estimatedTotalHits}
+			<div class="flex justify-center p-4 w-full">
+				<div class="rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale">
+					<a href={`/zoekresultaten?${$page.url.searchParams}`}>
+						Toon {data.searchResponse.estimatedTotalHits} vacatures.
+					</a>
+				</div>
 			</div>
-		</div>
-	{/key}
+		{/key}
+	{:else}
+		{#key data.searchResponse.estimatedTotalHits}
+			<div class="flex justify-center p-4 w-full">
+				<div class="rounded text-white text-center font-semibold p-3 w-full bg-gray-400 scale">
+					<div>
+						Geen resultaten.
+					</div>
+				</div>
+			</div>
+		{/key}
+	{/if}
 </div>
+
+<style>
+
+    .scale {
+        animation: scale 0.7s ease-in-out;
+    }
+
+    @keyframes scale {
+        0% {
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+</style>
 
 

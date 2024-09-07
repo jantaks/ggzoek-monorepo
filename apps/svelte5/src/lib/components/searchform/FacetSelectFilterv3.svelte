@@ -20,11 +20,12 @@
 
 	const options = facets.map((facet) => facet.value);
 	let filteredOptions = $state(options);
-	let inputValue = $state(filterLabel);
+	let inputValue = $state('');
+	let placeHolder = $state(filterLabel);
 	let open = $state(false);
 
 	$effect(() => {
-		resetValue();
+		resetPlaceholder();
 	});
 
 	function getFacetCount(value: string) {
@@ -40,8 +41,8 @@
 		filteredOptions = options.filter(option => option.toLowerCase().includes(value.toLowerCase()));
 	};
 
-	function resetValue() {
-		inputValue = filter.selectedValues.size > 0 ? `${filterLabel} (${filter.selectedValues.size})` : filterLabel;
+	function resetPlaceholder() {
+		placeHolder = filter.selectedValues.size > 0 ? `${filterLabel} (${filter.selectedValues.size})` : filterLabel;
 		filteredOptions = options;
 	}
 
@@ -53,23 +54,31 @@
 			filter.selectedValues.delete(option);
 			filter.selectedValues = new Set(filter.selectedValues);
 		}
-		resetValue();
+		inputValue = '';
+		resetPlaceholder();
 		form.submit();
 	}
 
 	function toggleOpen(event: MouseEvent) {
-		open = !open;
-		focusedElementIndex = -1;
 		if (!open) {
-			resetValue();
+			open = true;
+			inputElement.focus();
+		} else {
+			open = false;
+			resetPlaceholder();
 		}
+		// open = !open;
+		focusedElementIndex = -1;
+		// if (!open) {
+		// 	resetPlaceholder();
+		// }
 	}
 
 	function handleOutsideClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (!target.closest(`div[data-filter="${id}"]`)) {
 			open = false;
-			resetValue();
+			resetPlaceholder();
 		}
 	}
 
@@ -78,7 +87,7 @@
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			open = false;
-			resetValue();
+			resetPlaceholder();
 		}
 		if (event.key === 'ArrowDown' && filteredOptions.length > 0) {
 			event.preventDefault();
@@ -100,7 +109,7 @@
 		}
 		if (event.key === 'Tab') {
 			open = false;
-			resetValue();
+			resetPlaceholder();
 		}
 	}
 
@@ -117,8 +126,16 @@
 	}
 
 	function onFocusOut(event: FocusEvent) {
-		// open = false;
-		// resetValue();
+		// inputValue = '';
+		// resetPlaceholder();
+	}
+
+	function onFocus(event: FocusEvent) {
+		placeHolder = 'Type om te zoeken ...';
+		if (!open) {
+			open = true;
+			resetPlaceholder();
+		}
 	}
 
 	function clearFilter() {
@@ -126,6 +143,7 @@
 		form.submit();
 	}
 
+	let inputElement: HTMLInputElement;
 
 </script>
 <svelte:body onclick={handleOutsideClick}></svelte:body>
@@ -134,18 +152,15 @@
 		<div class="relative " data-filter={id}>
 			<div class="relative">
 				<input
+					bind:this={inputElement}
 					bind:value={inputValue}
-					class="rounded w-full py-2 px-4 capitalize"
-					onfocus={(e) => {
-            if (!open) {
-              open = true;
-              resetValue();
-            }
-          }}
+					class={`rounded w-full py-2 px-4   ${placeHolder === "Type om te zoeken ..." ? 'placeholder-secondary-900/50' : 'placeholder-secondary-900 capitalize'}`}
+					onfocus={onFocus}
 					onfocusout={onFocusOut}
 					oninput={handleInput}
 					onkeydown={handleKeydown}
 					onmousedown={toggleOpen}
+					placeholder={placeHolder}
 					type="text"
 				>
 				<button class="block" data-filter={id} onclick={(e) => toggleOpen(e)}>

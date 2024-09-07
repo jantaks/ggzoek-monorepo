@@ -41,7 +41,8 @@ import { Eleos } from '../../scrapers/cheerio/eleos.js';
 import { DeHoop } from '../../scrapers/cheerio/dehoop.js';
 import { Iriszorg } from '../../scrapers/playwright/iriszorg.js';
 import { Molemann } from '../../scrapers/playwright/molemann.js';
-import { checkbox } from '@inquirer/prompts';
+import { checkbox, select } from '@inquirer/prompts';
+import { BaseScraper, CheerioScraper, PlaywrightScraper } from '../../scrapers/crawlers.js';
 
 function removeStorageFolder() {
   const __filename = fileURLToPath(import.meta.url);
@@ -94,6 +95,12 @@ const crawlers = [
   Molemann
 ];
 
+const slowRunning = crawlers.filter((crawler) => crawler.isSlow());
+console.log(
+  'Slow running',
+  slowRunning.map((crawler) => crawler.name)
+);
+
 removeStorageFolder();
 const choices = crawlers
   .map((crawler) => {
@@ -103,14 +110,50 @@ const choices = crawlers
   })
   .sort((a, b) => a.value.localeCompare(b.value));
 
-const selectedCrawlers = await checkbox({
+const subset = await select({
   message: 'Welke scrapers wil je runnen?',
-  choices: choices,
-  loop: false,
-  pageSize: 20
+  choices: [
+    { name: 'Alleen snelle', value: 'snel' },
+    { name: 'Alleen langzame', value: 'langzaam' },
+    { name: 'Alleen Plarywright', value: 'playwright' },
+    { name: 'Alleen Cheerio', value: 'cheerio' },
+    { name: 'Alle', value: 'alle' },
+    { name: 'Individueel selecteren', value: 'selectie' }
+  ]
 });
 
-const crawlersToRun = crawlers.filter((crawler) => selectedCrawlers.includes(crawler.name));
+let crawlersToRun: Array<BaseScraper> = [];
+
+if (subset === 'selectie') {
+  const selectedCrawlers = await checkbox({
+    message: 'Welke scrapers wil je runnen?',
+    choices: choices,
+    loop: false,
+    pageSize: 20
+  });
+  crawlersToRun = crawlers.filter((crawler) => selectedCrawlers.includes(crawler.name));
+}
+
+if (subset === 'alle') {
+  crawlersToRun = crawlers;
+}
+
+if (subset === 'snel') {
+  crawlersToRun = crawlers.filter((crawler) => !crawler.isSlow());
+}
+
+if (subset === 'langzaam') {
+  crawlersToRun = crawlers.filter((crawler) => crawler.isSlow());
+}
+
+if (subset === 'playwright') {
+  crawlersToRun = crawlers.filter((crawler) => crawler.crawlerType === 'playwright');
+}
+
+if (subset === 'cheerio') {
+  crawlersToRun = crawlers.filter((crawler) => crawler.crawlerType === 'cheerio');
+}
+
 for (const crawler of crawlersToRun) {
   log.info(`Running ${crawler.name}`);
   crawler.crawl().then(() => {

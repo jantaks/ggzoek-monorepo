@@ -122,6 +122,12 @@ export class SearchForm {
 		this._distance = value;
 	}
 
+	get filteredValueCount() {
+		let filters = this._filters.reduce((acc, f) => acc + f.selectedValues.size, 0);
+		let postcode = this._postcode ? 1 : 0;
+		return filters + postcode;
+	}
+
 	get filterExpression() {
 		return this._filters
 			.filter((f) => f.isActive)

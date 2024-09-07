@@ -9,8 +9,12 @@
 	import { browser } from '$app/environment';
 	import FilterContainer from '$lib/components/searchform/FilterContainer.svelte';
 	import Modal from '$lib/components/ui/modal/Modal.svelte';
+	import { getSearchForm } from '$lib/stores/formStore.svelte';
 
 	const x = { Slider, Label };
+
+	const form = getSearchForm();
+
 
 	$effect(() => {
 		$page.data;
@@ -53,17 +57,17 @@
 
 {#snippet collapsedForm()}
 	<div
-		class="px-2 py-4 5255252 md:p-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
+		class="px-2 py-4 md:p-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
 		<div class="">
 			<SearchBox />
 		</div>
 	</div>
-	<div class="flex flex-row mx-auto rounded-b-xl bg-primary w-fit px-2 text-white font-bold">
+	<div class="flex flex-row mx-auto rounded-b-lg bg-secondary-900 w-fit px-4 py-1">
 		<a href={`/zoekresultaten/formonly?${$page.url.searchParams}`}
-			 class="w-full flex flex-row text-primary-light justify-center items-center text-sm">
-			Uitgebreid zoeken
+			 class="w-full flex flex-row  justify-center items-center text-white font-light">
+			Toon filters ({form.filteredValueCount})
 			<ChevronDown
-				class="size-8 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
+				class="ml-2 size-6 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
 		</a>
 	</div>
 {/snippet}

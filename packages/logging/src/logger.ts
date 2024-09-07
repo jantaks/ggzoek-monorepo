@@ -21,7 +21,7 @@ const customFormat = format((info) => {
 
   // Find the first call site outside the logger module
   let caller = stack[11];
-  if (caller.includes('process.processTicksAndRejections')) {
+  if (caller && caller.includes('process.processTicksAndRejections')) {
     caller = stack[10];
   }
 
@@ -64,7 +64,6 @@ function getFormatter(info: any) {
 export const log = winston.createLogger({
   level: process.env.LOG_LEVEL || 'debug',
   format: combine(
-    customFormat,
     errors({ stack: true }),
     colorize({ all: true }),
     timestamp({

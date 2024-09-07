@@ -60,6 +60,12 @@ export async function likeVacature(user_id: string, vacature: string) {
   await db.insert(likes).values({ userId: user_id, vacature: vacature }).execute();
 }
 
+export async function bulkInsert(vacatures: InsertVacature[]) {
+  if (vacatures.length === 0) return;
+  const { db: db } = getDb();
+  await db.insert(vacatureTable).values(vacatures).execute();
+}
+
 export async function unlikeVacature(user_id: string, vacature: string) {
   const { db: db } = getDb();
   await db
