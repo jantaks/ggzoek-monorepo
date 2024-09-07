@@ -3,10 +3,8 @@
 	import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
 	import FilterContainer from '$lib/components/searchform/FilterContainer.svelte';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
-	import { fade, slide, fly, blur, scale } from 'svelte/transition';
 
 	let form = getSearchForm();
 	let { data } = $props();
@@ -19,7 +17,6 @@
 	<style>
       body {
           @apply bg-secondary-900/10 md:bg-primary;
-          /*@apply overflow-hidden*/
       }
 	</style>
 </svelte:head>
@@ -35,7 +32,6 @@
 			<PostCodeSelect></PostCodeSelect>
 			<hr class="h-1 bg-secondary-900/20">
 			<FilterContainer facets={data.facets}></FilterContainer>
-			<!--			<hr>-->
 		</div>
 		<hr class="h-1 bg-secondary-900/20">
 	</div>
@@ -44,10 +40,9 @@
 		{#key data.searchResponse.estimatedTotalHits}
 			<a href={`/zoekresultaten?${$page.url.searchParams}`}>
 				<div class="flex justify-center p-4 w-full">
-					<div class="rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale">
-
-						Toon {data.searchResponse.estimatedTotalHits} vacatures.
-
+					<div
+						class={`rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale`}>
+						{form.isLoading ? 'ggzoeken ...' : `Toon ${data.searchResponse.estimatedTotalHits} vacatures.`}
 					</div>
 				</div>
 			</a>

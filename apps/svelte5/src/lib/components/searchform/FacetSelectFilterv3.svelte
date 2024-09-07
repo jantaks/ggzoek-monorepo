@@ -163,8 +163,9 @@
 					placeholder={placeHolder}
 					type="text"
 				>
-				<button class="block" data-filter={id} onclick={(e) => toggleOpen(e)}>
-					<ChevronDown class={`size-8 absolute right-2 top-1 ${open? "rotate-180": ""}`}></ChevronDown>
+				<button class="absolute inset-y-0 end-1 flex items-center ps-3" data-filter={id}
+								onclick={(e) => toggleOpen(e)}>
+					<ChevronDown class={`size-8 a ${open? "rotate-180": ""}`}></ChevronDown>
 				</button>
 				{#if filter.selectedValues.size > 0}
 					<button class="block" data-filter={id} onclick={clearFilter}>
@@ -195,8 +196,6 @@
 							<label
 								class="peer-focus:bg-secondary-100 cursor-pointer hover:bg-secondary-100  w-full  p-2 rounded label-with-focus"
 								for={option}
-								onkeydown={handleKeydown}
-
 							>
 								<span>{@render highlight(option, inputValue)}</span>
 							</label>

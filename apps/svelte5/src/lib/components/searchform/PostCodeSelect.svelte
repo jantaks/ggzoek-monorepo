@@ -6,7 +6,7 @@
 	import { CloseIcon } from '$lib/components/icons';
 	import DistanceSlider from '$lib/components/searchform/DistanceSlider.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
-	import { LoaderCircle, X } from 'lucide-svelte';
+	import { LoaderCircle, MapPin, Search, X } from 'lucide-svelte';
 
 	const form = getSearchForm();
 
@@ -94,8 +94,11 @@
 	<div class="flex flex-col gap-1 w-full ">
 
 		<div class="relative w-full">
+			<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+				<MapPin class="size-6 text-secondary-900/50"></MapPin>
+			</div>
 			<input
-				class="rounded flex h-10 items-center justify-between bg-white border border-primary-light
+				class="ps-10 rounded flex h-10 items-center justify-between bg-white border border-primary-light
           px-3 text-black w-full"
 				onblur={onBlur}
 				oninput={onInput}
@@ -103,11 +106,9 @@
 				use:melt={$input}
 			/>
 			{#if plaats}
-				<div class="block flex	">
-					<button onclick={clear}>
-						<X class="size-6 absolute right-2 top-2 text-black" />
-					</button>
-				</div>
+				<button class="absolute inset-y-0 end-2 flex items-center" onclick={clear}>
+					<X class="size-6 text-secondary-900" />
+				</button>
 			{/if}
 		</div>
 	</div>

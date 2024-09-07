@@ -94,11 +94,7 @@
 		<Searchform facets={data.facets}></Searchform>
 	</div>
 	<div class="md:ml-4 w-full gap-3 flex flex-col lg:w-3/5">
-		<div class="hidden md:block">
-			<SearchBox />
-		</div>
-
-		<div class="md:hidden md:w-2/5 min-w-fit">
+			<div class="md:hidden md:w-2/5 min-w-fit">
 			<Searchform facets={data.facets}></Searchform>
 		</div>
 
