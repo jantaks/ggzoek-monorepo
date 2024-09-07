@@ -42,13 +42,15 @@
 
 	{#if data.searchResponse.estimatedTotalHits > 0}
 		{#key data.searchResponse.estimatedTotalHits}
-			<div class="flex justify-center p-4 w-full">
-				<div class="rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale">
-					<a href={`/zoekresultaten?${$page.url.searchParams}`}>
+			<a href={`/zoekresultaten?${$page.url.searchParams}`}>
+				<div class="flex justify-center p-4 w-full">
+					<div class="rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale">
+
 						Toon {data.searchResponse.estimatedTotalHits} vacatures.
-					</a>
+
+					</div>
 				</div>
-			</div>
+			</a>
 		{/key}
 	{:else}
 		{#key data.searchResponse.estimatedTotalHits}
