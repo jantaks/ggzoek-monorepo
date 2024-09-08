@@ -42,7 +42,7 @@
 {/if}
 
 {#snippet fullForm()}
-	<div class="px-2 py-4 md:p-4 bg-primary md:rounded-xl shadow-xl text-primary-light space-y-6">
+	<div class="p-4 md:p-4 bg-primary md:rounded-xl shadow-xl text-primary-light space-y-6">
 		<div class="">
 			<SearchBox />
 		</div>
@@ -57,7 +57,7 @@
 
 {#snippet collapsedForm()}
 	<div
-		class="px-2 py-4 md:p-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
+		class="p-4 md:p-4 justify-left bg-primary md:rounded-xl shadow-xl text-primary-light">
 		<div class="">
 			<SearchBox />
 		</div>

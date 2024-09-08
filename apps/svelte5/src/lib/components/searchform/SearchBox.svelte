@@ -13,7 +13,6 @@
 			clearTimeout(timeout);
 			timeout = setTimeout(() => {
 				form.submit();
-				console.log('submit');
 			}, delay);
 		};
 	};
@@ -27,7 +26,7 @@
 	{#if form.query}
 		<button class="absolute inset-y-0 end-2 flex items-center ps-3 cursor-pointer"
 						onclick={()=> form.query = ''}>
-			<X class="size-6 text-secondary-900" onclick={()=> form.query = ''}></X>
+			<X class="size-6 text-secondary-900" onclick={()=> {form.query = ''; form.submit()}}></X>
 		</button>
 	{/if}
 	<input

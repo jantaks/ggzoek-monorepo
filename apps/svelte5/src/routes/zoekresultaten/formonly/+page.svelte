@@ -22,12 +22,11 @@
 </svelte:head>
 
 <div class="h-[calc(87dvh)] flex flex-col justify-between">
-	<div class="bg-primary px-2 py-4">
+	<div class="bg-primary p-4">
 		<SearchBox />
 	</div>
 	<div
 		class="p-4 justify-left text-primary-light space-y-6 flex flex-col">
-
 		<div class="space-y-6 sm:space-y-4 text-secondary-900">
 			<PostCodeSelect></PostCodeSelect>
 			<hr class="h-1 bg-secondary-900/20">
@@ -40,10 +39,10 @@
 		{#key data.searchResponse.estimatedTotalHits}
 			<a href={`/zoekresultaten?${$page.url.searchParams}`}>
 				<div class="flex justify-center p-4 w-full">
-					<div
+					<p
 						class={`rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale`}>
 						{form.isLoading ? 'ggzoeken ...' : `Toon ${data.searchResponse.estimatedTotalHits} vacatures.`}
-					</div>
+					</p>
 				</div>
 			</a>
 		{/key}
@@ -51,9 +50,9 @@
 		{#key data.searchResponse.estimatedTotalHits}
 			<div class="flex justify-center p-4 w-full">
 				<div class="rounded text-white text-center font-semibold p-3 w-full bg-gray-400 scale">
-					<div>
+					<p>
 						Geen resultaten.
-					</div>
+					</p>
 				</div>
 			</div>
 		{/key}
