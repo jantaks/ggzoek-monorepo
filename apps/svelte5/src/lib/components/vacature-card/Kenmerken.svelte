@@ -11,7 +11,7 @@
 
 </script>
 {#snippet row(title, value)}
-	<div class="grid grid-cols-2 items-center border-b border-b-gray-300 py-1 ">
+	<div class="grid grid-cols-2 items-center border-b border-b-gray-300 last:border-none py-2 ">
 		<dt class="truncate">{title}:</dt>
 		{#if value instanceof Date}
 			<dd>
@@ -20,25 +20,29 @@
 			</dd>
 
 		{:else}
-			<dd class="text-wrap truncate">{value || 'onbekend' }</dd>
+			<dd class="text-wrap truncate">{value || '-' }</dd>
 		{/if}
 	</div>
 {/snippet}
 <div class="bg-transparent">
 	<div class="grid grid-cols-1 lg:grid-cols-2 items-start cols-auto gap-2 w-full">
 		<div class="h-full bg-transparent mt-2">
-			<h2 class="font-semibold mb-2 border-b border-b-gray-300 py-1">Arbeidsvoorwaarden</h2>
+			<h2 class="font-semibold py-1">Arbeidsvoorwaarden</h2>
 			<dl>
+				{@render row("Salaris", hit.salarisMin ? `€${hit.salarisMin} - €${hit.salarisMax}` : undefined)}
+				{@render row("Uren", `${hit.urenMin ?? "onbekend"} - ${hit.urenMax ?? "onbekend"}`)}
+				{@render row("Contract", hit.contract)}
+				{@render row("Werklocatie", hit.werkvorm)}
 				{@render row("CAO", hit.cao)}
 				{@render row("Functiegroep", hit.fwg)}
-				{@render row("Salaris", hit.salarisMin ? `€${hit.salarisMin} - €${hit.salarisMax}` : undefined)}
 			</dl>
 
 		</div>
 		<div class="h-full bg-transparent mt-2">
-			<h2 class="font-semibold mb-2 border-b border-b-gray-300 py-1">Inhoudelijk</h2>
+			<h2 class="font-semibold  py-1">Inhoudelijk</h2>
 			<dl>
 				{@render row("Behandelmethoden", hit.behandelmethoden?.join(", "))}
+				{@render row("Organisatieonderdeel", hit.organisatieOnderdeel)}
 				{@render row("Stoornissen", hit.stoornissen?.join(", "))}
 				{@render row("Beroepen", hit.beroepen?.join(", "))}
 				{@render row("Eerst gezien", new Date(hit.firstScraped))}
