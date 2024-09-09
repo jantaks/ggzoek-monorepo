@@ -20,7 +20,7 @@ export const actions = {
 			return fail(400, { email, error: 'Er bestaat al een account met deze gebruikersnaam' });
 		}
 		if (!error) {
-			redirect(303, '/');
+			redirect(303, './register/registration_completed');
 		} else {
 			console.log(error);
 			return fail(400, { email, error: error.message });
