@@ -18,8 +18,8 @@ const config = {
 		},
 		extend: {
 			colors: {
-				secondary: { ...colors.indigo, DEFAULT: colors.indigo[400] },
-				primary: { light: colors.pink[100], DEFAULT: colors.pink[400], dark: colors.pink[800] }
+				secondary: { ...colors.blue, DEFAULT: 'rgb(0,49,113)' },
+				primary: { light: colors.green[100], DEFAULT: 'rgb(0,127,92)', dark: colors.green[800] }
 			},
 			fontFamily: {
 				sans: ['"Proxima Nova"', ...defaultTheme.fontFamily.sans]
