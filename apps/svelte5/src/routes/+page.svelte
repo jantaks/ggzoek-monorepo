@@ -22,32 +22,28 @@
 	</style>
 </svelte:head>
 
-<div class="w-full bg-secondary-900">
-	<div class="mx-auto max-w-7xl pb-4 text-primary-200 md:pb-0 lg:px-8">
-		<div class="lg:grid lg:grid-cols-2 lg:gap-8">
-			<div
-				class="mx-auto max-w-md px-6 sm:max-w-2xl sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left"
-			>
-				<div class="flex flex-col gap-4 pb-8 xl:gap-8">
-					<h1 class="text-3xl font-bold tracking-tight text-primary-200 sm:mt-5 md:text-4xl xl:text-5xl">
-						<span class="block">Alle vacatures in de GGZ</span><span
-						class="block pb-3 text-primary sm:pb-5">voor zorgprofessionals</span
-					>
-					</h1>
-					<p class="lg:text-2xl text-lg text-primary-200">
-						Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
-						vacatures. Daarom hebben wij GGZoek gemaakt, een centrale, eenvoudige plek om vacatures
-						te vinden en met elkaar te vergelijken.
-					</p>
-				</div>
+<div class="w-full bg-secondary-900 flex flex-col flex-grow items-center">
+	<div
+		class="mx-auto max-w-7xl pb-4 text-primary-200 md:pb-0 flex-grow flex flex-col">
+		<h1 class="py-20 text-6xl font-bold tracking-tight text-primary-200">Alle vacatures in de GGZ <span
+			class=" text-primary">voor zorgprofessionals</span></h1>
+
+		<div class="lg:grid lg:grid-cols-2">
+			<div class="flex flex-col gap-4 pb-8 xl:gap-8">
+
+				<p class="lg:text-2xl text-lg text-primary-200">
+					Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
+					vacatures. Daarom hebben wij GGZoek gemaakt, een centrale, eenvoudige plek om vacatures
+					te vinden en met elkaar te vergelijken.
+				</p>
 			</div>
 			<div
-				class="relative w-full px-6 sm:max-w-2xl sm:text-center lg:flex lg:items-center lg:text-left"
+				class=" w-full sm:max-w-2xl sm:text-center lg:flex lg:items-center lg:text-left"
 			>
 				<!--				<SearchBox actionUrl='/zoekresultaten'></SearchBox>-->
 				{#if browser}
 					<div
-						class="glowing slide-in absolute top-5 left-0 z-10 p-4 md:p-4 bg-gradient-to-r from-primary to-primary/90 md:rounded-xl shadow-2xl shadow-primary-400/70 text-primary-light space-y-4 w-full"
+						class="glowing slide-in p-4 md:p-4 bg-gradient-to-r from-primary to-primary/90 md:rounded-xl shadow-2xl shadow-primary-400/70 text-primary-light space-y-4 w-full"
 					>
 
 						<SearchBox />
