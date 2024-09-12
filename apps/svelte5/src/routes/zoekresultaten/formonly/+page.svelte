@@ -5,10 +5,10 @@
 	import FilterContainer from '$lib/components/searchform/FilterContainer.svelte';
 	import { page } from '$app/stores';
 	import { getSearchForm } from '$lib/stores/formStore.svelte';
+	import ResultButton from '$lib/components/searchform/ResultButton.svelte';
 
 	let form = getSearchForm();
 	let { data } = $props();
-	console.log('DATAPROPS', data, data.facets);
 	form.initiate($page.url.searchParams);
 
 
@@ -33,48 +33,14 @@
 			<FilterContainer facets={data.facets}></FilterContainer>
 		</div>
 		<hr class="h-1 bg-secondary-900/20">
+		<ResultButton
+			href={`/zoekresultaten?${$page.url.searchParams}`}
+			isLoading={form.isLoading}
+			totalHits={data.searchResponse.estimatedTotalHits}
+		/>
 	</div>
-
-	{#if data.searchResponse.estimatedTotalHits > 0}
-		{#key data.searchResponse.estimatedTotalHits}
-			<a href={`/zoekresultaten?${$page.url.searchParams}`}>
-				<div class="flex justify-center p-4 w-full">
-					<p
-						class={`rounded text-white text-center font-semibold p-3 w-full bg-secondary-900 scale`}>
-						{form.isLoading ? 'ggzoeken ...' : `Toon ${data.searchResponse.estimatedTotalHits} vacatures.`}
-					</p>
-				</div>
-			</a>
-		{/key}
-	{:else}
-		{#key data.searchResponse.estimatedTotalHits}
-			<div class="flex justify-center p-4 w-full">
-				<div class="rounded text-white text-center font-semibold p-3 w-full bg-gray-400 scale">
-					<p>
-						Geen resultaten.
-					</p>
-				</div>
-			</div>
-		{/key}
-	{/if}
 </div>
 
-<style>
-
-    .scale {
-        animation: scale 0.7s ease-in-out;
-    }
-
-    @keyframes scale {
-        0% {
-            transform: scale(0.9);
-            opacity: 0.7;
-        }
-        100% {
-            transform: scale(1);
-        }
-    }
-
-</style>
+<style></style>
 
 

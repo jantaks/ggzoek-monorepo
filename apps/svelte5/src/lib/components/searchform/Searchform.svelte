@@ -47,7 +47,7 @@
 		<div class="">
 			<SearchBox />
 		</div>
-		<div class="space-y-4 text-white">
+		<div class="space-y-4 text-primary-200">
 			<PostCodeSelect />
 		</div>
 		<div class="space-y-4">
@@ -65,10 +65,10 @@
 	</div>
 	<div class="flex flex-row mx-auto rounded-b-lg bg-secondary-900 w-fit px-4 py-1">
 		<a href={`/zoekresultaten/formonly?${$page.url.searchParams}`}
-			 class="w-full flex flex-row  justify-center items-center text-white font-light">
+			 class="w-full flex flex-row  justify-center items-center text-primary-200 font-light">
 			Toon filters ({form.filteredValueCount})
 			<ChevronDown
-				class="ml-2 size-6 text-white transform hover:scale-125 transition duration-500 ease-in-out" />
+				class="ml-2 size-6 text-primary-200 transform hover:scale-125 transition duration-500 ease-in-out" />
 		</a>
 	</div>
 {/snippet}

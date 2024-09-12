@@ -49,20 +49,20 @@
 {#snippet inputs()}
 	<div>
 		<input name="next" type="hidden" value="/zoekresultaten/" />
-		<label class="block mb-1  font-light text-gray-900 dark:text-white" for="email">Email:</label>
+		<label class="block mb-1  font-light text-gray-900 dark:text-primary-200" for="email">Email:</label>
 		<input
 			bind:value={email}
-			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-primary dark:focus:border-primary"
 			id="email"
 			name="email"
 			placeholder="psychiater@example.com"
 			required type="email" />
 	</div>
 	<div>
-		<label class="block mb-1  font-light text-gray-900 dark:text-white" for="password">Wachtwoord:</label>
+		<label class="block mb-1  font-light text-gray-900 dark:text-primary-200" for="password">Wachtwoord:</label>
 		<input
 			bind:value={password}
-			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-primary dark:focus:border-primary"
 			id="password"
 			name="password"
 			placeholder="xxxxxxxxx"

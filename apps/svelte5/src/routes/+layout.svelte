@@ -47,5 +47,5 @@
       }
 	</style>
 </svelte:head>
-<NavBar class="bg-secondary-900 text-white" showLinks showLogin></NavBar>
+<NavBar class="bg-secondary-900 text-primary-200" showLinks showLogin></NavBar>
 <slot></slot>

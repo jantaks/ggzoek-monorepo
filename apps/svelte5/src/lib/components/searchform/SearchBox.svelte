@@ -24,7 +24,7 @@
 	};
 </script>
 
-<label class="mb-2 font-medium text-gray-900 sr-only dark:text-white" for="default-search">Zoeken</label>
+<label class="mb-2 font-medium text-gray-900 sr-only dark:text-primary-200" for="default-search">Zoeken</label>
 <div class="relative w-full">
 	<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 		<Search class="size-6 text-secondary-900/50"></Search>
@@ -37,7 +37,7 @@
 	{/if}
 	<input
 		bind:value={form.query}
-		class="bg-primary-200 rounded glowing border-primary-light block w-full p-4 h-10 ps-10 text-gray-900 border  bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+		class="bg-primary-200 rounded glowing border-primary-light block w-full p-4 h-10 ps-10 text-gray-900 border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-blue-500 dark:focus:border-blue-500"
 		data-sveltekit-keepfocus
 		id="default-search"
 		oninput={delayedSubmit(1000)}

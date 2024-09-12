@@ -33,12 +33,12 @@
 	{#each form.filters.filter(f => f.isActive) as filter}
 		<div class="bg-secondary-400/60 flex flex-wrap p-2 items-center rounded-lg gap-1">
 			{#each Array.from(filter.selectedValues).sort() as selected, index}
-				<Button class='flex flex-row justify-between p-1 h-6 uppercase text-xs bg-primary text-white'>
+				<Button class='flex flex-row justify-between p-1 h-6 uppercase text-xs bg-primary text-primary-200'>
 					{selected}
 					<RemoveIcon onclick={() => removeFilter(filter.facet, selected)} class="size-4  ml-1" />
 				</Button>
 				{#if index !== filter.selectedValues.size - 1}
-					<Button class="h-6 p-1 bg-secondary-800 text-white" onclick={() => toggleOperator(filter)}>
+					<Button class="h-6 p-1 bg-secondary-800 text-primary-200" onclick={() => toggleOperator(filter)}>
 						{filter.operator === 'AND' ? 'EN' : 'OF'}
 					</Button>
 				{/if}

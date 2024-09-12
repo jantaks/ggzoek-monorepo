@@ -4,11 +4,16 @@ import type { LayoutServerLoad } from './$types';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { getSavedSearchesForUser } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 import { searchFromSearchParams } from '$lib/stores/formStore.svelte';
-import { getFacets } from '$lib/search';
+import { getFacets, getQueryParams, querySearchEngine } from '$lib/search';
 
 export const load: LayoutServerLoad = (async (event) => {
 	log.debug(`layout load`);
 	event.depends('data:root');
+	const _12hours = 60 * 60 * 12;
+	event.setHeaders({
+		'cache-control': `max-age=${_12hours}`
+	});
+	const { query, options } = await getQueryParams(event.url.searchParams);
 
 	const locals = event.locals as MyLocals;
 	let email = undefined;
@@ -30,5 +35,11 @@ export const load: LayoutServerLoad = (async (event) => {
 	}
 	log.debug(`RETURNING EMAIL: ${email}`);
 	const facets = await getFacets();
-	return { email, likes, savedSearches, facets };
+	return {
+		email,
+		likes,
+		savedSearches,
+		facets,
+		searchResponse: await querySearchEngine(query, options)
+	};
 }) satisfies LayoutServerLoad;

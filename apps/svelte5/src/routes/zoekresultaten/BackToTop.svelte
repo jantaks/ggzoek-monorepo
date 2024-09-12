@@ -38,7 +38,8 @@
 
 {#if !hidden}
 	{#key scrolling}
-		<div class={`flex flex-row justify-center fixed bottom-4 right-0  w-full text-white ${scrolling? "":" fade-out"}`}>
+		<div
+			class={`flex flex-row justify-center fixed bottom-4 right-0  w-full text-primary-200 ${scrolling? "":" fade-out"}`}>
 			<button
 				class={`flex flex-row items-center back-to-top p-3 rounded-lg mx-4 shadow-lg ${bgColor}`}
 				onclick={goTop}>

@@ -237,7 +237,7 @@
     /* Create the checkmark */
     .custom-checkbox:checked::after {
         content: '✓';
-        @apply text-white font-bold absolute top-1/2 left-1/2;
+        @apply text-primary-200 font-bold absolute top-1/2 left-1/2;
         transform: translate(-50%, -50%);
     }
 

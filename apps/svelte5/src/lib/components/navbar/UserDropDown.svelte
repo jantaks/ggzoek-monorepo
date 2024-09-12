@@ -26,7 +26,7 @@
 </script>
 
 <div
-	class={"bg-primary rounded-lg p-2 text-white size-8 hover:ring hover:ring-primary-100 flex items-center justify-center" + className}>
+	class={"bg-primary rounded-lg p-2 text-primary-200 size-8 hover:ring hover:ring-primary-100 flex items-center justify-center" + className}>
 	<button class="relative" use:melt={$trigger}>
 		<span class="uppercase text-sm font-bold">{user?.initials}</span>
 		{#key $page.data.likes.length}

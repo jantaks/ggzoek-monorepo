@@ -26,9 +26,9 @@
 			<p class="text-red-500 text-sm text-wrap truncate text-center">{form.error}</p>
 		{/if}
 		<input name="next" type="hidden" value="/zoekresultaten/" />
-		<label class="block mb-1  font-medium text-gray-900 dark:text-white" for="email">Email:</label>
+		<label class="block mb-1  font-medium text-gray-900 dark:text-primary-200" for="email">Email:</label>
 		<input
-			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-primary dark:focus:border-primary"
 			id="email"
 			name="email"
 			placeholder="psychiater@example.com"
@@ -39,18 +39,18 @@
 		{#if form?.passwordMismatch}
 			<p class="text-red-500 text-sm">Wachtwoorden komen niet overeen</p>
 		{/if}
-		<label class="block mb-1  font-medium text-gray-900 dark:text-white" for="password">Wachtwoord:</label>
+		<label class="block mb-1  font-medium text-gray-900 dark:text-primary-200" for="password">Wachtwoord:</label>
 		<input
-			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-primary dark:focus:border-primary"
 			id="password"
 			name="password1"
 			required
 			type="password" />
 	</div>
 	<div>
-		<label class="block mb-1 font-medium text-gray-900 dark:text-white" for="password">Herhaal wachtwoord:</label>
+		<label class="block mb-1 font-medium text-gray-900 dark:text-primary-200" for="password">Herhaal wachtwoord:</label>
 		<input
-			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+			class="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-primary-200 dark:focus:ring-primary dark:focus:border-primary"
 			id="password"
 			name="password2"
 			required

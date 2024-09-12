@@ -39,7 +39,7 @@
 	<div class="divider divider-vertical">OF</div>
 	<div class="items-center space-x-0 space-y-3 sm:flex sm:space-x-4 sm:space-y-0">
 		<a
-			class="w-full inline-flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+			class="w-full inline-flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-primary-200 dark:hover:bg-gray-700"
 			href="#">
 			<svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 21 20" xmlns="http://www.w3.org/2000/svg">
 				<g clip-path="url(#clip0_13183_10121)">
@@ -65,9 +65,9 @@
 			Log in met Google
 		</a>
 		<a
-			class="w-full inline-flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+			class="w-full inline-flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-primary-200 dark:hover:bg-gray-700"
 			href="#">
-			<svg class="w-5 h-5 mr-2 text-gray-900 dark:text-white" fill="none" viewBox="0 0 21 20"
+			<svg class="w-5 h-5 mr-2 text-gray-900 dark:text-primary-200" fill="none" viewBox="0 0 21 20"
 					 xmlns="http://www.w3.org/2000/svg">
 				<g clip-path="url(#clip0_13183_29163)">
 					<path
@@ -83,7 +83,7 @@
 			Log in met Apple
 		</a>
 	</div>
-	<button class="btn btn-secondary w-full text-white" type="submit">Login</button>
+	<button class="btn btn-secondary w-full text-primary-200" type="submit">Login</button>
 	<p>Nog geen account? <a class="text-secondary " href="/register">Registreer hier.</a></p>
 	<input name="next" type="hidden" value={next} />
 
