@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
 	import { SquareArrowUpRight } from 'lucide-svelte';
+	import Button3 from '$lib/components/ui/button/Button3.svelte';
 
 	type Props = {
 		url?: string;
@@ -10,9 +10,7 @@
 
 </script>
 <a href={url} target="_blank">
-	<Button
-		class="px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white ">
-		<SquareArrowUpRight class="text-primary size-5 mr-1 "></SquareArrowUpRight>
-		<p class="hidden md:flex text-xs text-slate-900">Website</p>
-	</Button>
+	<Button3 icon={SquareArrowUpRight}>
+		<p class="hidden md:flex text-xs">Website</p>
+	</Button3>
 </a>

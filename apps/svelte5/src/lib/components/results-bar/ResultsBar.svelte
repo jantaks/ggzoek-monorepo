@@ -12,14 +12,14 @@
 </script>
 
 
-<div class="gap-2 w-full h-fit lg:text-xl">
+<div
+	class="gap-4 h-fit lg:text-xl text-secondary-900 bg-primary-light rounded-lg py-2 px-4 flex flex-row justify-between items-center mx-1.5 md:mx-0">
 	<Processing class="size-8" processing={loading} />
 	{#if !loading}
-		<div class="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
-			<p><span class="font-bold">{count} ggzoek resultaten</span></p>
-			{#if count < MAXRESULTS}
-				<SaveSearchButton />
-			{/if}
-		</div>
+		<p><span class="font-bold">{count} resultaten</span></p>
+
+		{#if count < MAXRESULTS}
+			<SaveSearchButton />
+		{/if}
 	{/if}
 </div>

@@ -84,7 +84,7 @@
 <svelte:head>
 	<style>
       body {
-          @apply bg-secondary-100 md:bg-gradient-to-r from-secondary-300 via-primary-light to-white;
+          @apply bg-grijs;
       }
 	</style>
 </svelte:head>

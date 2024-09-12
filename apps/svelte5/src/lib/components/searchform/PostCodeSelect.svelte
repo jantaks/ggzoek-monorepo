@@ -98,7 +98,7 @@
 				<MapPin class="size-6 text-secondary-900/50"></MapPin>
 			</div>
 			<input
-				class="ps-10 rounded flex h-10 items-center justify-between bg-white border border-primary-light
+				class="ps-10 rounded flex h-10 items-center justify-between bg-primary-200 border border-primary-light
           px-3 text-black w-full"
 				onblur={onBlur}
 				oninput={onInput}

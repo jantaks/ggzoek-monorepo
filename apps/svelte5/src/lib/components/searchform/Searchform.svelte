@@ -42,7 +42,8 @@
 {/if}
 
 {#snippet fullForm()}
-	<div class="p-4 md:p-4 bg-primary md:rounded-xl shadow-xl text-primary-light space-y-6">
+	<div
+		class="p-4 md:p-4 bg-gradient-to-r from-primary to-primary/90 md:rounded-xl shadow-xl text-primary-light space-y-6">
 		<div class="">
 			<SearchBox />
 		</div>

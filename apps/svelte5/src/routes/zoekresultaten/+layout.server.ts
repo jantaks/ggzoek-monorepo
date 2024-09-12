@@ -7,9 +7,8 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
 		'cache-control': `max-age=${_12hours}`
 	});
 	const { query, options } = await getQueryParams(event.url.searchParams);
-	let facets = await getFacets();
+
 	return {
-		facets: facets,
 		searchResponse: await querySearchEngine(query, options)
 	};
 };

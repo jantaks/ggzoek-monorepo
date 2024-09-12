@@ -21,7 +21,7 @@
 	const options = facets.map((facet) => facet.value);
 	let filteredOptions = $state(options);
 	let inputValue = $state('');
-	let placeHolder = $state(filterLabel);
+	let placeHolder = $state<string>(filterLabel);
 	let open = $state(false);
 
 	$effect(() => {
@@ -35,15 +35,31 @@
 
 	let filter = form.addFilter(filterLabel);
 
+	function sortOptions(options: string[], selectedValues: Set<string>): string[] {
+		console.log('Sorting options');
+		let clonedOptions = [...options];
+		return clonedOptions.sort((a, b) => {
+			const aSelected = selectedValues.has(a);
+			const bSelected = selectedValues.has(b);
+
+			if (aSelected && !bSelected) return -1;
+			if (!aSelected && bSelected) return 1;
+			return a.localeCompare(b);
+		});
+	}
+
 	const handleInput: FormEventHandler<HTMLInputElement> = (event) => {
 		open = true;
 		const value = event.currentTarget.value;
-		filteredOptions = options.filter(option => option.toLowerCase().includes(value.toLowerCase()));
+		filteredOptions = sortOptions(
+			options.filter(option => option.toLowerCase().includes(value.toLowerCase())),
+			filter.selectedValues
+		);
 	};
 
 	function resetPlaceholder() {
 		placeHolder = filter.selectedValues.size > 0 ? `${filterLabel} (${filter.selectedValues.size})` : filterLabel;
-		filteredOptions = options;
+		filteredOptions = sortOptions(options, filter.selectedValues);
 	}
 
 	function handleSelect(event: any, option: string) {
@@ -67,11 +83,8 @@
 			open = false;
 			resetPlaceholder();
 		}
-		// open = !open;
 		focusedElementIndex = -1;
-		// if (!open) {
-		// 	resetPlaceholder();
-		// }
+
 	}
 
 	function handleOutsideClick(event: MouseEvent) {
@@ -118,16 +131,11 @@
 	function focusOption(index: number) {
 		console.log(index);
 		const inputElements = el?.querySelectorAll('.custom-checkbox') || [];
-		let focusElement = inputElements[index];
+		let focusElement = inputElements[index] as HTMLElement;
 		console.log(focusElement);
 		if (inputElements.length > 0 && focusElement) {
 			focusElement.focus();
 		}
-	}
-
-	function onFocusOut(event: FocusEvent) {
-		// inputValue = '';
-		// resetPlaceholder();
 	}
 
 	function onFocus(event: FocusEvent) {
@@ -154,9 +162,8 @@
 				<input
 					bind:this={inputElement}
 					bind:value={inputValue}
-					class={`rounded w-full py-2 px-4   ${placeHolder === "Type om te zoeken ..." ? 'placeholder-secondary-900/50' : 'placeholder-secondary-900 capitalize'}`}
+					class={`bg-primary-200 rounded w-full py-2 px-4   ${placeHolder === "Type om te zoeken ..." ? 'placeholder-secondary-900/50' : 'placeholder-secondary-900 capitalize'}`}
 					onfocus={onFocus}
-					onfocusout={onFocusOut}
 					oninput={handleInput}
 					onkeydown={handleKeydown}
 					onmousedown={toggleOpen}
@@ -176,13 +183,13 @@
 			</div>
 			{#if open}
 				<div
-					class="mt-1 md:absolute left-0 right-0 p-4 bg-white overflow-hidden space-y-2 border border-gray-300 rounded shadow-lg z-10 md:h-80 md:overflow-y-auto "
+					class="mt-1 md:absolute left-0 right-0 p-4 bg-primary-200 overflow-hidden space-y-1 border border-gray-300 rounded shadow-lg z-10 md:h-80 md:overflow-y-auto "
 					transition:slide={{duration:150}}>
 					{#if filteredOptions.length === 0}
 						<p class="p-1">Geen {filterLabel} gevonden</p>
 					{/if}
 					{#each filteredOptions as option (option)}
-						<div class="flex flex-row items-center space-x-2">
+						<div class="flex flex-row items-center space-x-0.5">
 							<input
 								class="custom-checkbox peer"
 								type="checkbox"
@@ -194,7 +201,7 @@
 								checked={filter.selectedValues.has(option)}
 							/>
 							<label
-								class="peer-focus:bg-secondary-100 cursor-pointer hover:bg-secondary-100  w-full  p-2 rounded label-with-focus"
+								class="peer-focus:bg-secondary-100 cursor-pointer hover:bg-primary/20 w-full p-1.5 rounded label-with-focus"
 								for={option}
 							>
 								<span>{@render highlight(option, inputValue)}</span>
@@ -224,7 +231,7 @@
     /* Hide the native checkbox */
     .custom-checkbox {
         @apply appearance-none;
-        @apply min-w-6 min-h-6 border border-secondary rounded-md bg-transparent cursor-pointer relative;
+        @apply min-w-5 min-h-5 border border-primary/50 rounded-md bg-transparent cursor-pointer relative;
     }
 
     /* Create the checkmark */

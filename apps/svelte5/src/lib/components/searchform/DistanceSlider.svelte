@@ -27,7 +27,7 @@
 
 <div class="w-full">
 	<Label.Root
-		class=" leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+		class=" leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-grijs-400"
 		for="distance-slider"
 		id="distance-slider-label"
 	>
@@ -45,7 +45,7 @@
 		step={10}
 	>
     <span
-			class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary-200"
+			class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary-900"
 		>
       <Slider.Range class="absolute h-full bg-foreground" />
     </span>

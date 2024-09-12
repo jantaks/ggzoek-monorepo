@@ -11,7 +11,7 @@
 
 </script>
 {#snippet row(title, value)}
-	<div class="grid grid-cols-2 items-center border-b border-b-gray-300 last:border-none py-2 ">
+	<div class="grid grid-cols-2 items-center border-b border-b-gray-300 last:border-none py-2">
 		<dt class="truncate">{title}:</dt>
 		{#if value instanceof Date}
 			<dd>
@@ -25,7 +25,7 @@
 	</div>
 {/snippet}
 <div class="bg-transparent">
-	<div class="grid grid-cols-1 lg:grid-cols-2 items-start cols-auto gap-2 w-full">
+	<div class="grid grid-cols-1 lg:grid-cols-2 items-start cols-auto gap-6 w-full">
 		<div class="h-full bg-transparent mt-2">
 			<h2 class="font-semibold py-1">Arbeidsvoorwaarden</h2>
 			<dl>

@@ -123,8 +123,8 @@ export class SearchForm {
 	}
 
 	get filteredValueCount() {
-		let filters = this._filters.reduce((acc, f) => acc + f.selectedValues.size, 0);
-		let postcode = this._postcode ? 1 : 0;
+		const filters = this._filters.reduce((acc, f) => acc + f.selectedValues.size, 0);
+		const postcode = this._postcode ? 1 : 0;
 		return filters + postcode;
 	}
 
@@ -141,7 +141,7 @@ export class SearchForm {
 	}
 
 	addFilter(facet: string) {
-		let existing = this.getFilter(facet);
+		const existing = this.getFilter(facet);
 		if (existing) {
 			return existing;
 		}
@@ -159,12 +159,12 @@ export class SearchForm {
 		});
 	}
 
-	async submit(offset?: number) {
-		const url = get(page).url.pathname;
+	async submit(options?: { offset?: number; actionUrl?: string }) {
+		const url = options?.actionUrl ?? get(page).url.pathname;
 		console.log('URL', url);
 		this.isLoading = true;
 		const searchParams = this.searchParams();
-		if (offset) searchParams.set('offset', offset.toString());
+		if (options?.offset) searchParams.set('offset', options?.offset.toString());
 		await goto(`${url}?${searchParams}`, { keepFocus: true });
 		// await invalidate('data:zoekresultaten');
 		this.isLoading = false;
@@ -238,7 +238,7 @@ export function reconstructFilters(filter: string): FilterDefinition[] | undefin
 			// remove quotes
 			cleanedValues = values.map((value) => value.replace(/"/g, ''));
 		}
-		let sortedValues = cleanedValues.sort(); //Improves caching. BREBURG AND REINIER equals REINIER AND BREBURG
+		const sortedValues = cleanedValues.sort(); //Improves caching. BREBURG AND REINIER equals REINIER AND BREBURG
 		const operator: Operator = match.includes(' AND ') ? 'AND' : 'OR';
 		return { facet: words[0].replace('(', ''), selectedValues: sortedValues, operator: operator };
 	});

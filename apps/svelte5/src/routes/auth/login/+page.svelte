@@ -3,6 +3,7 @@
 	import { z } from 'zod';
 	import { page } from '$app/stores';
 	import BasicForm from './BasicForm.svelte';
+	import Button3 from '$lib/components/ui/button/Button3.svelte';
 
 	type Props = {
 		form: ActionData,
@@ -70,13 +71,14 @@
 {/snippet}
 {#snippet buttons()}
 	<div class="flex flex-col justify-between items-center space-y-4">
-		<button
-			class="text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg sm:w-auto px-4 py-1.5 text-center dark:bg-primary dark:hover:bg-primary-dark dark:focus:ring-primary-dark"
+		<Button3
+			variant="secondary"
+			size="medium"
 			type="submit"
 			onclick={validateLogin}
 			value="login">
 			Inloggen
-		</button>
+		</Button3>
 		<button
 			class="hover:text-primary text-sm"
 			formaction="?/reset"

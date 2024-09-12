@@ -1,4 +1,4 @@
-import colors from 'tailwindcss/colors.js';
+import { colors } from './farrow_ball_colors.js';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const defaultTheme = require('tailwindcss/defaultTheme');
@@ -6,6 +6,9 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 /** @type {import('tailwindcss').Config} */
 const config = {
 	darkMode: ['class'],
+	experimental: {
+		classRegex: ['cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]']
+	},
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	safelist: ['dark', 'bg-primary/50', 'bg-secondary-900/50'],
 	theme: {
@@ -18,14 +21,22 @@ const config = {
 		},
 		extend: {
 			colors: {
-				secondary: { ...colors.blue, DEFAULT: 'rgb(0,49,113)' },
-				primary: { light: colors.green[100], DEFAULT: 'rgb(0,127,92)', dark: colors.green[800] }
+				secondary: { ...colors.bluemaize },
+				primary: {
+					...colors.ciarayellow,
+					light: colors.ciarayellow[100],
+					dark: colors.ciarayellow[900]
+				},
+				grijs: { ...colors.parmagray }
 			},
 			fontFamily: {
-				sans: ['"Proxima Nova"', ...defaultTheme.fontFamily.sans]
+				sans: ['Reddit Sans Condensed', ...defaultTheme.fontFamily.sans],
+				serif: ['Roboto Slab', ...defaultTheme.fontFamily.serif]
 			}
 		}
 	}
 };
 
 export default config;
+
+// Fonts: Proxima Nova,

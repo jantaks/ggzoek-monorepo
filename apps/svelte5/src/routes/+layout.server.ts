@@ -4,6 +4,7 @@ import type { LayoutServerLoad } from './$types';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { getSavedSearchesForUser } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 import { searchFromSearchParams } from '$lib/stores/formStore.svelte';
+import { getFacets } from '$lib/search';
 
 export const load: LayoutServerLoad = (async (event) => {
 	log.debug(`layout load`);
@@ -28,5 +29,6 @@ export const load: LayoutServerLoad = (async (event) => {
 		log.debug(`NO SESSION FOUND`);
 	}
 	log.debug(`RETURNING EMAIL: ${email}`);
-	return { email, likes, savedSearches };
+	const facets = await getFacets();
+	return { email, likes, savedSearches, facets };
 }) satisfies LayoutServerLoad;

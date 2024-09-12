@@ -16,7 +16,7 @@
 <svelte:head>
 	<style>
       body {
-          @apply bg-secondary-900/10 md:bg-primary;
+          @apply bg-grijs;
       }
 	</style>
 </svelte:head>

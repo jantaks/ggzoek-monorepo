@@ -5,6 +5,8 @@
 	import { applyAction, enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { goto, invalidate } from '$app/navigation';
+	import Button2 from '$lib/components/ui/button/Button2.svelte';
+	import Button3 from '$lib/components/ui/button/Button3.svelte';
 
 	const params = $page.url.searchParams;
 	let processing = $state(false);
@@ -28,15 +30,14 @@
 	};
 
 </script>
-	<form action={saved? "zoekresultaten?/deleteSearch" : "zoekresultaten?/saveSearch"} method="POST" use:enhance={enh}>
-		<input name="searchParams" type="hidden" value={params.toString()} />
-		<Button
-			class='px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white '
-			disabled={processing}
-			type="submit"
-		>
-			<Bell
-				class={`text-primary size-5 mr-1 ${saved? "fill-primary" : "" } ${processing? "text-primary-light fill-primary animate-spin" : "" }`} />
-			<span class="text-xs">{saved? "Verwijder zoekopdracht" : "Bewaar zoekopdracht" }</span>
-		</Button>
-	</form>
+<form action={saved? "zoekresultaten?/deleteSearch" : "zoekresultaten?/saveSearch"} method="POST" use:enhance={enh}>
+	<input name="searchParams" type="hidden" value={params.toString()} />
+	<Button3
+		disabled={processing}
+		type="submit"
+	>
+		<Bell
+			class={`text-secondary size-5 mr-1 ${saved? "fill-secondary" : "" } ${processing? "text-secondary-light fill-secondary animate-spin" : "" }`} />
+		<span class="text-xs">{saved ? "Verwijder zoekopdracht" : "Bewaar zoekopdracht" }</span>
+	</Button3>
+</form>

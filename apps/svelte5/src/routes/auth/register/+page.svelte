@@ -3,6 +3,7 @@
 
 	import type { ActionData } from './$types';
 	import Processing from '$lib/components/Processing.svelte';
+	import Button3 from '$lib/components/ui/button/Button3.svelte';
 
 	type Props = {
 		form: ActionData,
@@ -70,11 +71,12 @@
 		</div>
 	</div>
 
-	<button
-		class="mb-8 text-white bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg  w-full sm:w-auto px-5 py-2.5 text-center dark:bg-primary dark:hover:bg-primary-dark dark:focus:ring-primary-dark"
+	<Button3
 		onsubmit={() => processing = !processing}
-		type="submit">
+		size="medium"
+		type="submit"
+		variant="secondary">
 		Registreer nu!
-	</button>
-	<p>Al een account? <a class="text-primary" href="login">Hier inloggen.</a></p>
+	</Button3>
+	<p>Al een account? <a class="text-primary-600" href="login">Hier inloggen.</a></p>
 </form>

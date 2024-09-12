@@ -21,7 +21,9 @@
 
 
 	function onPageChange(page: number) {
-		form.submit(((page - 1) * RESULTS_PER_PAGE));
+		form.submit({
+			offset: ((page - 1) * RESULTS_PER_PAGE)
+		});
 	}
 
 	let hidePaginator = $derived.by(() => {
@@ -38,7 +40,7 @@
 		return 0;
 	});
 	console.debug(`${new Date().toLocaleTimeString()} [Paginator.svelte - 2b89d347] : Testing log messages`);
-	
+
 </script>
 {#if !hidePaginator}
 	<Pagination.Root count={count} let:pages let:range onPageChange={onPageChange}

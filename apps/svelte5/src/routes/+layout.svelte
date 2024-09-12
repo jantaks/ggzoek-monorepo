@@ -34,9 +34,16 @@
 </script>
 
 <svelte:head>
+	<link href="https://fonts.googleapis.com" rel="preconnect">
+	<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Reddit+Sans+Condensed:wght@200..900&family=Roboto+Slab:wght@100..900&display=swap"
+		rel="stylesheet">
+
 	<style>
       body {
-          @apply bg-secondary-100 md:bg-gradient-to-r from-secondary-300 via-primary-light to-white;
+          @apply bg-grijs;
+          @apply font-sans;
       }
 	</style>
 </svelte:head>

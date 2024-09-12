@@ -4,7 +4,7 @@
 
 
 em{
-    @apply bg-secondary-500/30 not-italic
+    @apply bg-primary-400 not-italic
 }
 
 [data-tabs-trigger] {

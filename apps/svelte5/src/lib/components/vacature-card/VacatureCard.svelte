@@ -35,24 +35,25 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg  bg-white md:bg-white/50 text-slate-700 border shadow"
+<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg bg-primary-200 text-slate-700 border shadow"
 				 use:viewport={{onEnter, onExit}}>
-	
+
 	<div>
 		<div class="flex flex-row justify-between">
-			<h2 class="font-bold sm:text-xl mb-1 text-wrap truncate">{@html hit.title}</h2>
+			<h2 class="font-extrabold text-lg sm:text-xl  text-wrap hyphens-auto truncate"
+					lang="nl">{@html hit.title}</h2>
 			<menu class="font-normal flex flex-row space-x-2 px-1">
 				<SaveVacature onSave={onSave} urlhash="{hit.urlHash}" />
 				<GotoWebsiteButton url={hit.url} />
 			</menu>
 		</div>
-		<h3 class="text-sm sm:text-md font-semibold uppercase py-2">{@html hit.organisatie} <span
-			class="truncate capitalize font-light ml-1 text-wrap ">{locaties}</span>
+		<h3 class="text-md font-bold uppercase py-0.5">{@html hit.organisatie} <span
+			class="truncate capitalize font-medium ml-1 text-wrap ">{locaties}</span>
 		</h3>
 	</div>
 
 	<div class="">
-		<Tabs.Root class="mt-4 text-sm md:text-base">
+		<Tabs.Root class="mt-1 text-base md:text-base">
 			<Tabs.List
 				class="lg:w-fit flex sm:flex-row">
 				{@render tabTrigger("overzicht", "Samenvatting")}
@@ -63,11 +64,11 @@
 					{#if hit.summary && hit.summary.length > 0}
 						<div>
 							{#if collapsed}
-								<p class="line-clamp-4">
+								<p class="line-clamp-4 hyphens-auto text-justify font-serif" lang="nl">
 									{@html hit.summary}</p>
 							{:else}
 								<!--// line-clamp in older safari does not work with nested elements ... -->
-								<p class="line-clamp-none">
+								<p class="line-clamp-none hyphens-auto text-justify font-serif" lang="nl">
 									{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-2'>")}
 								</p>
 							{/if}
@@ -79,11 +80,11 @@
 						>
 							{#if collapsed}
 								<ChevronDown
-									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out"
+									class="size-8 text-secondary transform hover:scale-125 transition duration-500 ease-in-out"
 									onclick={() => collapsed = !collapsed} />
 							{:else}
 								<ChevronUp
-									class="size-8 text-primary transform hover:scale-125 transition duration-500 ease-in-out"
+									class="size-8 text-secondary transform hover:scale-125 transition duration-500 ease-in-out"
 									onclick={() => collapsed = !collapsed} />
 							{/if}
 						</button>

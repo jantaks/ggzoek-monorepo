@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
+
 	import { Heart } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { applyAction, enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
+	import Button2 from '$lib/components/ui/button/Button2.svelte';
+	import Button3 from '$lib/components/ui/button/Button3.svelte';
 
 
 	type Props = {
@@ -36,15 +38,15 @@
 					};
 				}}>
 	<input name="urlHash" type="hidden" value={urlhash} />
-	<Button
-		class="px-2 h-8 border-primary-light border shadow flex flex-row items-center justify-between font-bold bg-transparent text-slate-900 bg-white hover:border-primary hover:bg-white "
-		disabled={updatePending}
+	<Button3
+		icon={Heart}
+		iconClass={`size-5 mr-1 ${liked? "fill-secondary text-secondary-900 " : "" } ${updatePending? "fill-secondary text-secondary-light animate-spin " : "" }`}
 		title={urlhash}
-		type="submit">
-		<Heart
-			class={`text-primary size-5 mr-1 ${liked? "fill-primary" : "" } ${updatePending? "fill-primary text-primary-light animate-spin" : "" }`}></Heart>
-		<p class="hidden md:flex text-xs text-slate-900">{liked ? "Bewaard" : "Bewaar"}</p>
-	</Button>
+		type="submit"
+		updatePending={updatePending}
+		variant="primary">
+		<p class="hidden md:flex text-xs">{liked ? "Bewaard" : "Bewaar"}</p>
+	</Button3>
 </form>
 
 
