@@ -35,7 +35,7 @@
 	</Tabs.Trigger>
 {/snippet}
 
-<article class="mx-1.5 md:mx-0 p-2 sm:p-4 rounded-lg bg-primary-200 text-slate-700 border shadow"
+<article class="p-2 sm:p-4 rounded-lg bg-primary-200 text-slate-700 border shadow"
 				 use:viewport={{onEnter, onExit}}>
 
 	<div>

@@ -13,7 +13,7 @@
 
 
 <div
-	class="gap-4 h-fit lg:text-xl text-secondary-900 bg-primary-light rounded-lg py-2 px-4 flex flex-row justify-between items-center mx-1.5 md:mx-0">
+	class="gap-4 h-fit lg:text-xl text-secondary-900 bg-primary-light rounded-lg py-2 px-4 flex flex-row justify-between items-center md:mx-0">
 	<Processing class="size-8" processing={loading} />
 	{#if !loading}
 		<p><span class="font-bold">{count} resultaten</span></p>

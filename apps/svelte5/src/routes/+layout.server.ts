@@ -10,9 +10,9 @@ export const load: LayoutServerLoad = (async (event) => {
 	log.debug(`layout load`);
 	event.depends('data:root');
 	const _12hours = 60 * 60 * 12;
-	event.setHeaders({
-		'cache-control': `max-age=${_12hours}`
-	});
+	// event.setHeaders({
+	// 	'cache-control': `max-age=${_12hours}`
+	// });
 	const { query, options } = await getQueryParams(event.url.searchParams);
 
 	const locals = event.locals as MyLocals;

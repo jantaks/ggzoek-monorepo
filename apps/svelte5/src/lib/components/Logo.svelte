@@ -11,9 +11,9 @@
 	}
 
 	let className = {
-		small: 'text-2xl px-2 font-light',
-		default: 'text-3xl px-2 font-semibold',
-		large: 'text-6xl px-2 font-semibold'
+		small: 'text-2xl  font-light',
+		default: 'text-3xl  font-semibold',
+		large: 'text-6xl  font-semibold'
 	}[variant];
 
 </script>

@@ -21,18 +21,19 @@
 	</style>
 </svelte:head>
 
-<div class="h-[calc(87dvh)] flex flex-col justify-between">
+<div class="flex flex-col justify-between w-full">
 	<div class="bg-primary p-4">
 		<SearchBox />
 	</div>
+
 	<div
 		class="p-4 justify-left text-primary-light space-y-6 flex flex-col">
 		<div class="space-y-6 sm:space-y-4 text-secondary-900">
 			<PostCodeSelect></PostCodeSelect>
-			<hr class="h-1 bg-secondary-900/20">
+			<hr class="h-0.5 bg-secondary-900 border-none">
 			<FilterContainer facets={data.facets}></FilterContainer>
 		</div>
-		<hr class="h-1 bg-secondary-900/20">
+		<hr class="h-0.5 bg-secondary-900 border-none">
 		<ResultButton
 			href={`/zoekresultaten?${$page.url.searchParams}`}
 			isLoading={form.isLoading}

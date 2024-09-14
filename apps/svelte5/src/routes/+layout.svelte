@@ -35,7 +35,7 @@
 
 <svelte:head>
 	<link href="https://fonts.googleapis.com" rel="preconnect">
-	<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+	<link href="https://fonts.gstatic.com" rel="preconnect">
 	<link
 		href="https://fonts.googleapis.com/css2?family=Reddit+Sans+Condensed:wght@200..900&family=Roboto+Slab:wght@100..900&display=swap"
 		rel="stylesheet">
@@ -48,7 +48,9 @@
 	</style>
 </svelte:head>
 <div class="flex flex-col min-h-screen">
-	<NavBar class="bg-secondary-900 text-primary-200" showLinks showLogin></NavBar>
-	<slot></slot>
+	<NavBar showLinks showLogin></NavBar>
+	<div class="w-full flex flex-col flex-grow items-center min-h-screen  sm:py-2 sm:px-4 max-w-7xl mx-auto">
+		<slot></slot>
+	</div>
 </div>
 
