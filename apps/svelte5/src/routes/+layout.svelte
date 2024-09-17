@@ -49,8 +49,6 @@
 </svelte:head>
 <div class="flex flex-col min-h-screen">
 	<NavBar showLinks showLogin></NavBar>
-	<div class="w-full flex flex-col flex-grow items-center min-h-screen  sm:py-2 sm:px-4 max-w-7xl mx-auto">
-		<slot></slot>
-	</div>
+	<slot></slot>
 </div>
 
