@@ -10,10 +10,32 @@
 	import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 	let { data } = $props();
+
+
 	let form = getSearchForm();
 
+	// let kpis = [
+	// 	{ title: 'Verpleegkundigen', number: 347 },
+	// 	{ title: 'Psychiaters', number: 900 },
+	// 	{ title: 'GZ-psychologen', number: 1200 },
+	// 	{ title: 'Orthopedagogen', number: 500 },
+	// 	{ title: 'Sociaal psychiatrisch verpleegkundigen', number: 200 },
+	// 	{ title: 'Klinisch psychologen', number: 100 }
+	// ];
+
+	// $inspect(data.facets.beroepen);
+
+	let kpis = $derived.by(() => {
+		return data.facets.beroepen.map((beroep) => {
+			return { title: beroep.value, number: beroep.count };
+		});
+	});
+
+	$inspect(kpis);
 
 	$effect(() => {
+
+
 		gsap.registerPlugin(ScrollTrigger);
 
 		const tl = gsap.timeline()
@@ -48,19 +70,23 @@
 				}
 			});
 
+
 		gsap.from('#storage-number', {
 			scrollTrigger: {
-				trigger: '#box-3',
+				trigger: '#section-3',
 				start: 'top 50%',
 				end: 'top 20%',
-				toggleActions: 'restart reverse restart reverse',
-				markers: true,
-				scrub: 2
+				toggleActions: 'restart none none none',
+				markers: true
+
+				// scrub: 5
 
 			},
 			innerText: 0,
-			duration: 3,
-			ease: 'steps(30)',
+			stagger: 0.5,
+			opacity: 0.5,
+			duration: 1,
+			ease: 'steps(25)',
 			snap: {
 				innerText: 1
 			}
@@ -113,21 +139,23 @@
 	</div>
 </section>
 
-<div class="bg-primary-400">
-	<section class="w-full flex flex-row justify-between items-center" id="section-3">
-		<div class="flex flex-col w-full max-w-xl gap-4" id="text-1">
-			<h2 class="text-3xl/10">Voor alle GGZ professionals.</h2>
-			<p class="text-xl/8 text-primary-200 font-serif text-justify">
-				Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
-				vacatures. Daarom maken wij dagelijks een samenvatting van de vacatures van alle GGZ instellingen. We zoeken
-				naar de details die belangrijk zijn voor GGZ professionals en zetten deze voor jou op een rijtje. Wij zijn
-				gg<span class="">zoek</span>: het startpunt van jouw zoektocht naar een nieuwe baan in de GGZ.
-			</p>
+
+<div class="bg-primary-200">
+	<section class="w-full flex flex-row justify-center items-center min-h-[70vh]" id="section-3">
+		{#snippet kpi(title, number)}
+			<div class="rounded min-w-xl p-4 space-y-2 h-[100px] bg-secondary-900 flex flex-col items-center justify-center "
+					 id="box-3">
+				<p>{title}</p>
+				<p class="text-5xl" id="storage-number">{number}</p>
+			</div>
+		{/snippet}
+		<div class="grid grid-cols-4 gap-12 items-center justify-center align-middle">
+			{#each kpis as { title, number }}
+				{@render kpi(title, number)}
+			{/each}
 		</div>
-		<div class="w-[600px] h-[800px] bg-blue-500 flex flex-col items-center justify-center text-9xl"
-				 id="box-3">
-			<p id="storage-number">347</p>
-		</div>
+
+
 	</section>
 </div>
 <div class="bg-secondary-900	 h-full">
