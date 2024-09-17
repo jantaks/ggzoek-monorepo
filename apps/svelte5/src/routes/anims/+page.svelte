@@ -74,7 +74,16 @@
 		let tl2 = gsap.timeline();
 
 		tl2
-			.from('#box-3', { opacity: '0', stagger: { amount: 1, from: 'random' } })
+			.to('#section-1', {
+				opacity: 0
+			})
+			.to('#box-3', {
+				opacity: '1',
+				backgroundColor: '#3E4665',
+				stagger: { amount: 1, from: 'random' },
+				duration: 0.2,
+				fontSize: '100%'
+			}, '<')
 			.from('#storage-number', {
 				innerText: 0,
 				stagger: { amount: 1, from: 'random' },
@@ -84,14 +93,34 @@
 				snap: {
 					innerText: 1
 				}
-			});
+			}, '<')
+			.to('#storage-number', {
+				fontSize: '+=7',
+				color: '#D1B87D',
+				repeat: 1,
+				duration: 0.7,
+				yoyo: true
+			})
+			.to('#box-3', {
+				boxShadow: '5px 5px 10px #D1B87D',
+				duration: 0.7,
+				repeat: 1,
+				yoyo: true
+			}, '<');
+
 
 		ScrollTrigger.create({
 			trigger: '#section-3',
-			start: 'top 50%',
-			end: 'top 20%',
-			toggleActions: 'restart none none none',
-			animation: tl2
+			start: 'top 30%',
+			end: 'top top',
+			toggleActions: 'restart none reverse reverse',
+			animation: tl2,
+			// scrub: 2,
+			pin: true,
+			pinSpacer: true,
+			markers: true
+			// toggleClass: { targets: '#box-3', className: 'hidden' }
+
 		});
 
 
@@ -108,7 +137,7 @@
       }
 	</style>
 </svelte:head>
-<section class="h-fit min-h-[75vh]" id="section-1">
+<section class="h-fit min-h-[60vh]" id="section-1">
 	<h1 class="py-10 text-6xl font-bold tracking-tight text-primary-200 text-center">Alle vacatures in de GGZ
 		<span
 			class=" text-primary">voor zorgprofessionals.</span></h1>
@@ -142,9 +171,11 @@
 </section>
 
 {#snippet kpi(title, number)}
+
 	<a href={"/zoekresultaten?filters=" + encodeURIComponent(`(beroepen = "${title}")`)}>
+
 		<div id="box-3"
-				 class="rounded min-w-xl p-2 h-[100px] bg-secondary-900  "
+				 class="rounded min-w-xl p-2 h-[100px] bg-transparent opacity-100 border-secondary border"
 		>
 			<div class="flex flex-col items-center justify-center space-y-1"><p class="text-center">{title}</p>
 				<p class="text-3xl" id="storage-number">{number}</p></div>
@@ -154,7 +185,7 @@
 {/snippet}
 
 <div class="bg-primary-200">
-	<section class="" id="section-3">
+	<section class="min-h-screen" id="section-3">
 		<div class="w-full grid grid-cols-2 gap-10 ">
 			<div class="grid grid-cols-3 gap-2 items-center ">
 				{#each kpis as { title, number }}
