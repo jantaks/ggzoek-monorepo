@@ -71,25 +71,27 @@
 			});
 
 
-		gsap.from('#storage-number', {
-			scrollTrigger: {
-				trigger: '#section-3',
-				start: 'top 50%',
-				end: 'top 20%',
-				toggleActions: 'restart none none none',
-				markers: true
+		let tl2 = gsap.timeline();
 
-				// scrub: 5
+		tl2
+			.from('#box-3', { opacity: '0', stagger: { amount: 1, from: 'random' } })
+			.from('#storage-number', {
+				innerText: 0,
+				stagger: { amount: 1, from: 'random' },
+				opacity: 0.5,
+				duration: 2,
+				ease: 'steps(25)',
+				snap: {
+					innerText: 1
+				}
+			});
 
-			},
-			innerText: 0,
-			stagger: 0.5,
-			opacity: 0.5,
-			duration: 1,
-			ease: 'steps(25)',
-			snap: {
-				innerText: 1
-			}
+		ScrollTrigger.create({
+			trigger: '#section-3',
+			start: 'top 50%',
+			end: 'top 20%',
+			toggleActions: 'restart none none none',
+			animation: tl2
 		});
 
 
@@ -106,11 +108,11 @@
       }
 	</style>
 </svelte:head>
-<section id="section-1">
+<section class="h-fit min-h-[75vh]" id="section-1">
 	<h1 class="py-10 text-6xl font-bold tracking-tight text-primary-200 text-center">Alle vacatures in de GGZ
 		<span
 			class=" text-primary">voor zorgprofessionals.</span></h1>
-	<div class="flex flex-row space-x-12 py-8 ">
+	<div class="grid grid-cols-2 gap-10 py-8 ">
 		<div class="flex flex-col w-full max-w-xl gap-8" id="text-1">
 			<h2 class="text-3xl/10">Je hebt geen tijd om alle vacatures in de gaten te houden. Daarom doen wij het voor
 				je.</h2>
@@ -139,20 +141,37 @@
 	</div>
 </section>
 
+{#snippet kpi(title, number)}
+	<a href={"/zoekresultaten?filters=" + encodeURIComponent(`(beroepen = "${title}")`)}>
+		<div id="box-3"
+				 class="rounded min-w-xl p-2 h-[100px] bg-secondary-900  "
+		>
+			<div class="flex flex-col items-center justify-center space-y-1"><p class="text-center">{title}</p>
+				<p class="text-3xl" id="storage-number">{number}</p></div>
+		</div>
+	</a>
+
+{/snippet}
 
 <div class="bg-primary-200">
-	<section class="w-full flex flex-row justify-center items-center min-h-[70vh]" id="section-3">
-		{#snippet kpi(title, number)}
-			<div class="rounded min-w-xl p-4 space-y-2 h-[100px] bg-secondary-900 flex flex-col items-center justify-center "
-					 id="box-3">
-				<p>{title}</p>
-				<p class="text-5xl" id="storage-number">{number}</p>
+	<section class="" id="section-3">
+		<div class="w-full grid grid-cols-2 gap-10 ">
+			<div class="grid grid-cols-3 gap-2 items-center ">
+				{#each kpis as { title, number }}
+					{@render kpi(title, number)}
+				{/each}
 			</div>
-		{/snippet}
-		<div class="grid grid-cols-4 gap-12 items-center justify-center align-middle">
-			{#each kpis as { title, number }}
-				{@render kpi(title, number)}
-			{/each}
+			<div class="flex flex-col w-full max-w-xl gap-8 text-secondary-900" id="text-1">
+				<h2 class="text-3xl/10">Iedereen op de juiste plek. Dat is onze missie. </h2>
+				<p class="text-xl/8  font-serif text-justify">
+					De GGZ kampt met een groot capaciteitsprobleem. Veel professionals kampen met een hoge werkdruk. Dit gaat ten
+					koste van
+					werkplezier, kwaliteit van zorg en de gezondheid van de professional. Uiteindelijk komt dit ook de
+					productiviteit niet ten goede. Door er voor te zorgen
+					dat zoveel mogelijk professionals op de juiste plek terecht komen, draagt ggzoek een steentje bij aan het
+					oplossen van dit probleem.
+				</p>
+			</div>
 		</div>
 
 
@@ -161,12 +180,9 @@
 <div class="bg-secondary-900	 h-full">
 	<section class="text-white w-full flex flex-row justify-between items-center" id="section-2">
 		<div class="flex flex-col w-full max-w-xl gap-4" id="text-1">
-			<h2 class="text-3xl/10">Voor alle GGZ professionals.</h2>
+			<h2 class="text-3xl/10">Toch niet gevonden wat je zoekt?</h2>
 			<p class="text-xl/8 text-primary-200 font-serif text-justify">
-				Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
-				vacatures. Daarom maken wij dagelijks een samenvatting van de vacatures van alle GGZ instellingen. We zoeken
-				naar de details die belangrijk zijn voor GGZ professionals en zetten deze voor jou op een rijtje. Wij zijn
-				gg<span class="">zoek</span>: het startpunt van jouw zoektocht naar een nieuwe baan in de GGZ.
+				GGZoek gaat graag met je in gesprek over jouw wensen en uitdagingen.
 			</p>
 		</div>
 		<div class=" w-[600px] h-[800px] bg-pink-400" id="box-2"></div>
@@ -177,7 +193,7 @@
 <style>
 
     section {
-        @apply max-w-7xl mx-auto w-full
+        @apply max-w-7xl mx-auto w-full py-10;
     }
 
     :global(.glowing) {
