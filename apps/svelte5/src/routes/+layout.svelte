@@ -39,6 +39,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Reddit+Sans+Condensed:wght@200..900&family=Roboto+Slab:wght@100..900&display=swap"
 		rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
 
 	<style>
       body {

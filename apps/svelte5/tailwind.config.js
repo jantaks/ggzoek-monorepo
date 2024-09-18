@@ -31,7 +31,8 @@ const config = {
 			},
 			fontFamily: {
 				sans: ['Reddit Sans Condensed', ...defaultTheme.fontFamily.sans],
-				serif: ['Roboto Slab', ...defaultTheme.fontFamily.serif]
+				serif: ['Roboto Slab', ...defaultTheme.fontFamily.serif],
+				mono: ['Kalam', ...defaultTheme.fontFamily.mono]
 			}
 		}
 	}
