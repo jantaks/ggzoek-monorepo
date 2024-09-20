@@ -54,6 +54,8 @@ function removeStorageFolder() {
   }
 }
 
+removeStorageFolder();
+
 const crawlers = [
   OostBrabant,
   Propersona,
@@ -101,7 +103,7 @@ console.log(
   slowRunning.map((crawler) => crawler.name)
 );
 
-removeStorageFolder();
+
 const choices = crawlers
   .map((crawler) => {
     return {
@@ -153,6 +155,8 @@ if (subset === 'playwright') {
 if (subset === 'cheerio') {
   crawlersToRun = crawlers.filter((crawler) => crawler.crawlerType === 'cheerio');
 }
+
+removeStorageFolder(); 
 
 for (const crawler of crawlersToRun) {
   log.info(`Running ${crawler.name}`);
