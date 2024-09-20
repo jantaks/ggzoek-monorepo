@@ -99,7 +99,7 @@
 		</div>
 
 		<!--		<FilterBar />-->
-		<ResultsBar count={data.searchResponse.estimatedTotalHits} loading={form.isLoading} />
+		<ResultsBar count={data.searchResponse.estimatedTotalHits >= 1000? data.indexSize: data.searchResponse.estimatedTotalHits } loading={form.isLoading} />
 		<div class="space-y-4 relative">
 			{#each hits as hit, index (hit.urlHash) }
 				<VacatureCard

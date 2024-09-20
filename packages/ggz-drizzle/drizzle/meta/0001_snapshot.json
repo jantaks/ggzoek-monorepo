@@ -1,0 +1,771 @@
+{
+  "id": "2d4c89e4-182d-47c5-ba5a-a6a3471be224",
+  "prevId": "72fe6c84-009b-4eb4-8dfb-b2d2aa86034c",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "likes": {
+      "name": "likes",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vacature": {
+          "name": "vacature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "likes_user_id_users_id_fk": {
+          "name": "likes_user_id_users_id_fk",
+          "tableFrom": "likes",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "likes_vacature_vacatures_url_hash_fk": {
+          "name": "likes_vacature_vacatures_url_hash_fk",
+          "tableFrom": "likes",
+          "tableTo": "vacatures",
+          "columnsFrom": [
+            "vacature"
+          ],
+          "columnsTo": [
+            "url_hash"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "plaatsen": {
+      "name": "plaatsen",
+      "schema": "",
+      "columns": {
+        "Plaats": {
+          "name": "Plaats",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "PC4": {
+          "name": "PC4",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Gemeente": {
+          "name": "Gemeente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Provincie": {
+          "name": "Provincie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "GeoPoint": {
+          "name": "GeoPoint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "plaatsen_PC4_Plaats_unique": {
+          "name": "plaatsen_PC4_Plaats_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "PC4",
+            "Plaats"
+          ]
+        }
+      }
+    },
+    "saved_searches": {
+      "name": "saved_searches",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "search": {
+          "name": "search",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "saved_searches_search_unique": {
+          "name": "saved_searches_search_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "search"
+          ]
+        }
+      }
+    },
+    "scrape_results": {
+      "name": "scrape_results",
+      "schema": "",
+      "columns": {
+        "scraper": {
+          "name": "scraper",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vacatures_found": {
+          "name": "vacatures_found",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vacatures_updated": {
+          "name": "vacatures_updated",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "new_urls": {
+          "name": "new_urls",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requests_finished": {
+          "name": "requests_finished",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requests_failed": {
+          "name": "requests_failed",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requests_retries": {
+          "name": "requests_retries",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requests_failed_per_minute": {
+          "name": "requests_failed_per_minute",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requests_finished_per_minute": {
+          "name": "requests_finished_per_minute",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_min_duration_millis": {
+          "name": "request_min_duration_millis",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_max_duration_millis": {
+          "name": "request_max_duration_millis",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_total_failed_duration_millis": {
+          "name": "request_total_failed_duration_millis",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_total_finished_duration_millis": {
+          "name": "request_total_finished_duration_millis",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crawler_started_at": {
+          "name": "crawler_started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crawler_finished_at": {
+          "name": "crawler_finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stats_persisted_at": {
+          "name": "stats_persisted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crawler_runtime_millis": {
+          "name": "crawler_runtime_millis",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requests_with_status_code": {
+          "name": "requests_with_status_code",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "errors": {
+          "name": "errors",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retry_errors": {
+          "name": "retry_errors",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "search_results": {
+      "name": "search_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "search_id": {
+          "name": "search_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "result": {
+          "name": "result",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_time": {
+          "name": "date_time",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "search_results_search_id_saved_searches_id_fk": {
+          "name": "search_results_search_id_saved_searches_id_fk",
+          "tableFrom": "search_results",
+          "tableTo": "saved_searches",
+          "columnsFrom": [
+            "search_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "search_results_search_id_id_unique": {
+          "name": "search_results_search_id_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "search_id",
+            "id"
+          ]
+        }
+      }
+    },
+    "user_searches": {
+      "name": "user_searches",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "search_id": {
+          "name": "search_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_result_id": {
+          "name": "updated_result_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_searches_user_id_users_id_fk": {
+          "name": "user_searches_user_id_users_id_fk",
+          "tableFrom": "user_searches",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_searches_search_id_saved_searches_id_fk": {
+          "name": "user_searches_search_id_saved_searches_id_fk",
+          "tableFrom": "user_searches",
+          "tableTo": "saved_searches",
+          "columnsFrom": [
+            "search_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_searches_updated_result_id_search_results_id_fk": {
+          "name": "user_searches_updated_result_id_search_results_id_fk",
+          "tableFrom": "user_searches",
+          "tableTo": "search_results",
+          "columnsFrom": [
+            "updated_result_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_searches_user_id_search_id_unique": {
+          "name": "user_searches_user_id_search_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "search_id"
+          ]
+        },
+        "user_searches_user_id_search_id_updated_result_id_unique": {
+          "name": "user_searches_user_id_search_id_updated_result_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "search_id",
+            "updated_result_id"
+          ]
+        }
+      }
+    },
+    "users": {
+      "name": "users",
+      "schema": "auth",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "vacatures": {
+      "name": "vacatures",
+      "schema": "",
+      "columns": {
+        "url_hash": {
+          "name": "url_hash",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie": {
+          "name": "organisatie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instelling": {
+          "name": "instelling",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organisatie_onderdeel": {
+          "name": "organisatie_onderdeel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ai_title": {
+          "name": "ai_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salaris_min": {
+          "name": "salaris_min",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salaris_max": {
+          "name": "salaris_max",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contract": {
+          "name": "contract",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reiskostenvergoeding": {
+          "name": "reiskostenvergoeding",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "werkvorm": {
+          "name": "werkvorm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "opleidingsbudget": {
+          "name": "opleidingsbudget",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "opleidingsbudget_size": {
+          "name": "opleidingsbudget_size",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "body": {
+          "name": "body",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary_model": {
+          "name": "summary_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary_batch_id": {
+          "name": "summary_batch_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary_cost": {
+          "name": "summary_cost",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary_timestamp": {
+          "name": "summary_timestamp",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_model": {
+          "name": "extraction_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_cost": {
+          "name": "extraction_cost",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "body_hash": {
+          "name": "body_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_scraped": {
+          "name": "first_scraped",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_scraped": {
+          "name": "last_scraped",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "synced": {
+          "name": "synced",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "uren_min": {
+          "name": "uren_min",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uren_max": {
+          "name": "uren_max",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "professie": {
+          "name": "professie",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beroepen": {
+          "name": "beroepen",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stoornissen_ai": {
+          "name": "stoornissen_ai",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stoornissen": {
+          "name": "stoornissen",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "behandelmethoden_ai": {
+          "name": "behandelmethoden_ai",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "behandelmethoden": {
+          "name": "behandelmethoden",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "locaties": {
+          "name": "locaties",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CAO": {
+          "name": "CAO",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "FWG": {
+          "name": "FWG",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "schaal_min": {
+          "name": "schaal_min",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "schaal_max": {
+          "name": "schaal_max",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "screenshot_url": {
+          "name": "screenshot_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geo_point": {
+          "name": "geo_point",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "aal_level": {
+      "name": "aal_level",
+      "values": {
+        "aal1": "aal1",
+        "aal2": "aal2",
+        "aal3": "aal3"
+      }
+    },
+    "code_challenge_method": {
+      "name": "code_challenge_method",
+      "values": {
+        "s256": "s256",
+        "plain": "plain"
+      }
+    },
+    "factor_status": {
+      "name": "factor_status",
+      "values": {
+        "unverified": "unverified",
+        "verified": "verified"
+      }
+    },
+    "factor_type": {
+      "name": "factor_type",
+      "values": {
+        "totp": "totp",
+        "webauthn": "webauthn"
+      }
+    },
+    "key_status": {
+      "name": "key_status",
+      "values": {
+        "default": "default",
+        "valid": "valid",
+        "invalid": "invalid",
+        "expired": "expired"
+      }
+    },
+    "key_type": {
+      "name": "key_type",
+      "values": {
+        "aead-ietf": "aead-ietf",
+        "aead-det": "aead-det",
+        "hmacsha512": "hmacsha512",
+        "hmacsha256": "hmacsha256",
+        "auth": "auth",
+        "shorthash": "shorthash",
+        "generichash": "generichash",
+        "kdf": "kdf",
+        "secretbox": "secretbox",
+        "secretstream": "secretstream",
+        "stream_xchacha20": "stream_xchacha20"
+      }
+    }
+  },
+  "schemas": {
+    "auth": "auth"
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

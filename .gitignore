@@ -34,3 +34,9 @@ yarn-error.log*
 /packages/ggz-drizzle/src/location_data/pc4_plaats_mapping.csv
 /packages/ggz-drizzle/src/location_data/spellfix.dylib
 .vercel
+apps/datapipeline/screenshots/**/*.jpg
+packages/ggz-drizzle/dist/**
+packages/config-typescript/dist/**
+packages/logging/dist/**
+packages/logging/dist/main.js
+

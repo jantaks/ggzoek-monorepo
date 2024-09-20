@@ -19,5 +19,5 @@
 </script>
 
 
-<h1 class={twMerge(className, "font-sans font-medium")}><a href="/zoekresultaten">gg<span
+<h1 class={twMerge(className, "font-sans font-medium")}><a href="/">gg<span
 	class="text-primary">zoek</span></a></h1>

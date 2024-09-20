@@ -27,6 +27,11 @@ const index = client.index('vacatures');
 
 type QueryResult = Awaited<ReturnType<typeof index.search<SelectVacature>>>;
 
+export async function indexSize() {
+	const stats = await index.getStats();
+	return stats.numberOfDocuments;
+}
+
 // query?: string | null,     options?: SearchParams | undefined
 export async function querySearchEngine(query?: string | null, options?: SearchParams | undefined) {
 	if (options?.offset && options.offset >= MAXRESULTS) {

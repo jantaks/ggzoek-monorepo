@@ -4,7 +4,7 @@ import type { LayoutServerLoad } from './$types';
 import { log } from '@ggzoek/logging/src/logger.js';
 import { getSavedSearchesForUser } from '@ggzoek/ggz-drizzle/dist/savedSearches';
 import { searchFromSearchParams } from '$lib/stores/formStore.svelte';
-import { getFacets, getQueryParams, querySearchEngine } from '$lib/search';
+import { getFacets, getQueryParams, indexSize, querySearchEngine } from '$lib/search';
 
 export const load: LayoutServerLoad = (async (event) => {
 	log.debug(`layout load`);
@@ -40,6 +40,7 @@ export const load: LayoutServerLoad = (async (event) => {
 		likes,
 		savedSearches,
 		facets,
+		indexSize: await indexSize(),
 		searchResponse: await querySearchEngine(query, options)
 	};
 }) satisfies LayoutServerLoad;

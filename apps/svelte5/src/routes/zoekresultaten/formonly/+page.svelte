@@ -37,7 +37,7 @@
 		<ResultButton
 			href={`/zoekresultaten?${$page.url.searchParams}`}
 			isLoading={form.isLoading}
-			totalHits={data.searchResponse.estimatedTotalHits}
+			totalHits={data.searchResponse.estimatedTotalHits >=	 1000? data.indexSize : data.searchResponse.estimatedTotalHits}
 		/>
 	</div>
 </div>

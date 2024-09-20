@@ -1,7 +1,6 @@
 import { colors } from './farrow_ball_colors.js';
 import { fontFamily } from 'tailwindcss/defaultTheme';
-
-const defaultTheme = require('tailwindcss/defaultTheme');
+import fluid, { extract, screens, fontSize } from 'fluid-tailwind';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
@@ -9,9 +8,12 @@ const config = {
 	experimental: {
 		classRegex: ['cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]']
 	},
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: { files: ['./src/**/*.{html,js,svelte,ts}'], extract },
 	safelist: ['dark', 'bg-primary/50', 'bg-secondary-900/50'],
+	plugins: [fluid],
 	theme: {
+		screens,
+		fontSize,
 		container: {
 			center: true,
 			padding: '2rem',
@@ -30,9 +32,9 @@ const config = {
 				grijs: { ...colors.parmagray }
 			},
 			fontFamily: {
-				sans: ['Reddit Sans Condensed', ...defaultTheme.fontFamily.sans],
-				serif: ['Roboto Slab', ...defaultTheme.fontFamily.serif],
-				mono: ['Kalam', ...defaultTheme.fontFamily.mono]
+				sans: ['Reddit Sans Condensed'],
+				serif: ['Roboto Slab'],
+				mono: ['Kalam']
 			}
 		}
 	}

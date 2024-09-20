@@ -17,7 +17,7 @@
 				<div class="flex justify-center w-full">
 					<p
 						class={`rounded text-primary-200 text-center font-semibold p-3 w-full bg-secondary-900 scale`}>
-						{isLoading ? 'ggzoeken ...' : `Toon ${totalHits} vacatures.`}
+						{isLoading ? 'ggzoeken ...' : totalHits > 1000 ? `Zoek in ${totalHits} vacatures` : `Toon ${totalHits} vacatures.`}
 					</p>
 				</div>
 			</a>

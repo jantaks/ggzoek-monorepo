@@ -1,0 +1,19 @@
+{
+  "id": "msg_01CA9pMYMyRbTddxoq8oRHUr",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-3-sonnet-20240229",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 3467,
+    "output_tokens": 571
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "```json\n{\n\"title\": \"Psychiater voor poliklinische zorg Rivierduinen\",  \n\"instellingREMOVE\": \"GGZ Rivierduinen\",\n\"organisatieOnderdeel\": \"Polikliniek volwassenen\",\n\"beroepen\": [\"Psychiater\"],\n\"stoornissen\": [\"Angststoornissen\", \"Depressie\", \"Persoonlijkheidsstoornissen\"],\n\"behandelmethoden\": [\"Cognitieve Gedragstherapie\", \"Schematherapie\", \"Overig\"],\n\"minSalaris\": 6050,\n\"maxSalaris\": 10376,\n\"minUren\": 32,\n\"maxUren\": 36,\n\"locaties\": [\"Leiden\"],\n\"locatieDetails\": \"\",\n\"CAO\": \"AMS\",\n\"FWG\": \"\",\n\"minSchaal\": \"\",\n\"maxSchaal\": \"\", \n\"contract\": \"Onbepaalde tijd\",\n\"eindejaarsuitkering\": \"Ja\",\n\"reiskostenvergoeding\": \"Ja\",\n\"werkvorm\": \"Op locatie\",\n\"opleidingsbudget\": \"Ja\",\n\"opleidingsbudgetSize\": 500,\n\"summary\": \"GGZ Rivierduinen zoekt een bevlogen psychiater voor de polikliniek volwassenen in Leiden. De kandidaat richt zich op de diagnostisering en behandeling van cliënten met angst-, depressie- en persoonlijkheidsstoornissen. De behandelingen bestaan voornamelijk uit cognitieve gedragstherapie en schematherapie. De kandidaat adviseert en superviseert collega's waar nodig. De kandidaat superviseert arts-assistenten en participeert in het onderwijs voor co-assistenten. De kandidaat neemt deel aan de diensten buiten kantooruren. Er is mogelijkheid tot wetenschappelijk onderzoek met een promotietraject. Het team bestaat uit ruim 60 hulpverleners zoals psychiaters, psychologen, verpleegkundigen en vaktherapeuten. De omvang van de polikliniek geeft het team een uniek karakter. Het uitgangspunt is om samen met de cliënt te werken aan herstel waarbij de cliënt regie behoudt.\"\n}\n```"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "caller": "summarize (file:///Users/jantaks/dev_projects/ggzoek-monorepo/apps/datapipeline/src/ai/anthropic.ts:1:817)"
+}
