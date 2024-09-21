@@ -7,17 +7,16 @@ https://ishadeed.com/article/responsive-design-height/
 
 <script lang="ts">
 	import SearchBox from '$lib/components/searchform/SearchBox.svelte';
+	import KpiCard from '$lib/components/KpiCard.svelte';
 	import FilterContainer from '$lib/components/searchform/FilterContainer.svelte';
 	import PostCodeSelect from '$lib/components/searchform/PostCodeSelect.svelte';
 	import ResultButton from '$lib/components/searchform/ResultButton.svelte';
 	import { getSearchForm } from '$lib/stores/formStore.svelte.js';
 	import { page } from '$app/stores';
-	import { browser } from '$app/environment';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 	import { ScrollToPlugin } from 'gsap/dist/ScrollToPlugin';
 	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
-	import ViewPortDimensions from '$lib/components/ViewPortDimensions.svelte';
 
 	let { data } = $props();
 
@@ -25,7 +24,10 @@ https://ishadeed.com/article/responsive-design-height/
 
 	function getBeroepAfkorting(beroep: string) {
 		const mappings: Record<string, string> = {
-			'sociaal psychiatrisch verpleegkundige': 'SPV'
+			'sociaal psychiatrisch verpleegkundige': 'SPV',
+			'gedragswetenschapper': 'Gedrags&shy;weten&shy;schapper',
+			'systeemtherapeut': 'Systeem&shy;thera&shy;peut',
+			'basispsycholoog': 'Basis&shy;psycholoog'
 		};
 		const mapped = mappings[beroep.toLowerCase()];
 		return mapped ? mapped : beroep;
@@ -33,7 +35,11 @@ https://ishadeed.com/article/responsive-design-height/
 
 	let kpis = $derived.by(() => {
 		return data.facets.beroepen.map((beroep) => {
-			return { title: getBeroepAfkorting(beroep.value), number: beroep.count };
+			return {
+				title: getBeroepAfkorting(beroep.value),
+				number: beroep.count,
+				href: `/zoekresultaten?filters=${encodeURIComponent(`(beroepen = "${beroep.value}")`)}`
+			};
 		});
 	});
 
@@ -130,59 +136,6 @@ https://ishadeed.com/article/responsive-design-height/
 				'-=0.5'
 			);
 
-		let tl = gsap.timeline();
-
-		tl.to(
-			'#box-3',
-			{
-				opacity: '1',
-				backgroundColor: '#3E4665',
-				stagger: { amount: 2, from: 'random' },
-				duration: 2
-			},
-			'+=2'
-		)
-			.from(
-				'#storage-number',
-				{
-					innerText: 0,
-					stagger: { amount: 1, from: 'random' },
-					opacity: 0.5,
-					duration: 2,
-					ease: 'steps(25)',
-					snap: {
-						innerText: 1
-					}
-				},
-				'<'
-			)
-			.to('#storage-number', {
-				fontSize: '+=2',
-				color: '#D1B87D',
-				repeat: 1,
-				duration: 0.7,
-				yoyo: true
-			})
-
-			.from(
-				'#zoek-nu-2',
-				{
-					opacity: 0,
-					x: '20%',
-					duration: 1.5,
-					ease: 'elastic'
-					// rotate: 10
-				},
-				'<'
-			);
-
-		ScrollTrigger.create({
-			trigger: '#header-2',
-			start: 'top 50%',
-			end: 'top top',
-			toggleActions: 'play none none none',
-			animation: tl
-		});
 
 		return () => {
 			ScrollTrigger.getAll().forEach((st) => st.kill());
@@ -193,10 +146,10 @@ https://ishadeed.com/article/responsive-design-height/
 
 <svelte:head>
 	<style>
-		body {
-			@apply bg-primary-200;
-			@apply text-primary-200;
-		}
+      body {
+          @apply bg-primary-200;
+          @apply text-primary-200;
+      }
 	</style>
 </svelte:head>
 <!--<ViewPortDimensions />-->
@@ -211,9 +164,9 @@ https://ishadeed.com/article/responsive-design-height/
 				<div>
 					<h2 class="mb-4 ~text-lg/3xl">
 						Je hebt geen tijd om alle vacatures in de gaten te houden. <span
-							class={`${skipAnimation ? 'opacity-100' : 'opacity-0'}`}
-							id="tagline">Daarom doen wij het voor je.</span
-						>
+						class={`${skipAnimation ? 'opacity-100' : 'opacity-0'}`}
+						id="tagline">Daarom doen wij het voor je.</span
+					>
 					</h2>
 					<p class="text-justify font-serif font-light text-primary-200 ~text-base/2xl">
 						Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
@@ -224,13 +177,26 @@ https://ishadeed.com/article/responsive-design-height/
 					</p>
 				</div>
 				<div
-					class="flex flex-grow flex-row items-end justify-end space-x-2 py-4 font-mono text-3xl text-primary-200"
+					class="hidden md:flex flex-grow flex-row items-end justify-end space-x-2 py-4 font-mono text-3xl text-primary-200"
 					id="zoek-nu-1"
 				>
 					<p class=" text-right font-thin decoration-wavy underline-offset-8">
 						Start hier met ggzoeken
 					</p>
 					<ArrowRight class="w-12"></ArrowRight>
+				</div>
+				<div class="flex md:hidden flex-col items-center justify-center">
+					<ResultButton
+						href={`/zoekresultaten?${$page.url.searchParams}`}
+						isLoading={form.isLoading}
+						totalHits={data.searchResponse?.estimatedTotalHits !== undefined
+						? data.searchResponse.estimatedTotalHits >= 1000
+							? data.indexSize
+							: data.searchResponse.estimatedTotalHits
+						: undefined}
+						twBgColor="bg-primary"
+						twTextColor="text-secondary-900"
+					/>
 				</div>
 			</div>
 			<div
@@ -257,6 +223,7 @@ https://ishadeed.com/article/responsive-design-height/
 								? data.indexSize
 								: data.searchResponse.estimatedTotalHits
 							: undefined}
+						twBgColor="bg-secondary-900"
 					/>
 				</div>
 			</div>
@@ -266,37 +233,13 @@ https://ishadeed.com/article/responsive-design-height/
 	</section>
 </div>
 
-{#snippet kpi(title: string, number: number)}
-	{@const clazz = `${skipAnimation ? 'bg-secondary-900 text-primary-200' : ''}`}
-	<a href={'/zoekresultaten?filters=' + encodeURIComponent(`(beroepen = "${title}")`)}>
-		<div
-			id="box-3"
-			class={`fluid-box line-clamp-1 hyphens-auto rounded border border-primary p-2 ${clazz}`}
-		>
-			<div class="title grid h-full grid-rows-2">
-				<!-- First row, text at the top -->
-				<div class=" flex h-full items-center justify-center text-center" lang="nl">
-					{title}
-				</div>
-
-				<!-- Second row, text at the bottom -->
-				<div
-					class="content flex h-full items-center justify-center text-center"
-					id="storage-number"
-				>
-					{number}
-				</div>
-			</div>
-		</div>
-	</a>
-{/snippet}
 
 <div class="panel bg-primary-200">
 	<section id="section-2 -mt-10">
 		<div class="w-full gap-10 md:grid md:grid-cols-2">
 			<div class="grid max-h-screen grid-cols-3 items-center gap-1 2xl:gap-3">
-				{#each kpis as { title, number }}
-					{@render kpi(title, number)}
+				{#each kpis as { title, number, href }}
+					<KpiCard title={title} number={number} href={href} animate={!skipAnimation} />
 				{/each}
 			</div>
 
@@ -337,36 +280,16 @@ https://ishadeed.com/article/responsive-design-height/
 </div>
 
 <style lang="postcss">
-	section {
-		@apply mx-auto w-full max-w-7xl py-10;
-	}
+    section {
+        @apply mx-auto w-full max-w-7xl py-10;
+    }
 
-	.panel {
-		@apply -mt-4 flex flex-col items-center justify-center px-4;
-		min-height: 100vh;
-	}
+    .panel {
+        @apply -mt-4 flex flex-col items-center justify-center px-4;
+        @media (min-width: 768px) {
+            min-height: 100vh;
+        }
+    }
 
-	:global(.fluid-box) {
-		height: clamp(10vh, 11vh, 12vh); /* Adjusts between 10vh and 12vh depending on viewport size */
-		padding: 1rem;
-	}
 
-	:global(.fluid-box .title) {
-		font-size: clamp(
-			1rem,
-			2vh,
-			1.2rem
-		); /* Scales from 1rem to a maximum of 1.2rem based on viewport height */
-		font-weight: normal;
-		line-height: 1.3rem; /* Adjust the line height to ensure readability */
-	}
-
-	:global(.fluid-box .content) {
-		font-size: clamp(
-			1rem,
-			3vh,
-			2.5rem
-		); /* Scales from 0.8rem to a maximum of 2.5rem based on viewport height */
-		font-weight: normal;
-	}
 </style>

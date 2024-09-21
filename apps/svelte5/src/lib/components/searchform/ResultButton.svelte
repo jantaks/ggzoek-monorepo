@@ -4,9 +4,11 @@
 		totalHits?: number;
 		href: string;
 		isLoading: boolean
+		twBgColor?: string
+		twTextColor?: string
 	}
 
-	let { totalHits, href, isLoading }: Props = $props();
+	let { totalHits, href, isLoading, twBgColor = 'bg-secondary-900', twTextColor = 'text-primary-200' }: Props = $props();
 
 </script>
 
@@ -16,7 +18,7 @@
 			<a href={`/zoekresultaten?${href}`}>
 				<div class="flex justify-center w-full">
 					<p
-						class={`rounded text-primary-200 text-center font-semibold p-3 w-full bg-secondary-900 scale`}>
+						class={`rounded text-primary-200 text-center font-semibold p-3 w-full ${twBgColor} scale ${twTextColor}`}>
 						{isLoading ? 'ggzoeken ...' : totalHits > 1000 ? `Zoek in ${totalHits} vacatures` : `Toon ${totalHits} vacatures.`}
 					</p>
 				</div>
