@@ -63,11 +63,8 @@
 			trigger: element,
 			start: 'top bottom',
 			end: 'top top',
-			toggleActions: 'restart restart restart restart',
-			animation: tl,
-			onEnter: () => {
-				console.log('onEnter', element?.id, number);
-			}
+			toggleActions: 'restart none none none',
+			animation: tl
 		});
 	});
 

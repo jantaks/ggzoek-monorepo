@@ -155,22 +155,21 @@ https://ishadeed.com/article/responsive-design-height/
 <!--<ViewPortDimensions />-->
 <div class="panel bg-secondary-900" id="section-1">
 	<section class="-mt-10 flex flex-col">
-		<h1 class="mb-[7vh] mt-[5vh] font-bold tracking-tight text-primary-200 ~text-2xl/5xl">
+		<h1 class="mt-[5vh] text-primary-200 heading-large">
 			Alle vacatures in de GGZ
 			<span class=" text-primary">voor zorgprofessionals.</span>
 		</h1>
 		<div class="gap-10 md:grid md:grid-cols-2">
 			<div class="flex h-full max-w-xl flex-col gap-8" id="text-1">
 				<div>
-					<h2 class="mb-4 ~text-lg/3xl">
+					<h2 class="mb-4 heading-medium">
 						Je hebt geen tijd om alle vacatures in de gaten te houden. <span
 						class={`${skipAnimation ? 'opacity-100' : 'opacity-0'}`}
 						id="tagline">Daarom doen wij het voor je.</span
 					>
 					</h2>
-					<p class="text-justify font-serif font-light text-primary-200 ~text-base/2xl">
-						Voor professionals in de ggz is het moeilijk om een overzicht te krijgen van alle
-						vacatures. Daarom maken wij dagelijks een samenvatting van de vacatures van alle GGZ
+					<p class="hyphens-auto text-justify font-serif font-light text-primary-200 ~text-base/2xl">
+						GGZoek maakt dagelijks een samenvatting van de vacatures van alle GGZ
 						instellingen. We zoeken naar de details die belangrijk zijn voor GGZ professionals en
 						zetten deze voor jou op een rijtje. Wij zijn gg<span class="">zoek</span>: het startpunt
 						van jouw zoektocht naar een nieuwe baan in de GGZ.
@@ -194,8 +193,8 @@ https://ishadeed.com/article/responsive-design-height/
 							? data.indexSize
 							: data.searchResponse.estimatedTotalHits
 						: undefined}
-						twBgColor="bg-primary"
-						twTextColor="text-secondary-900"
+						twBgColor="bg-secondary-300"
+						twTextColor="text-primary-200"
 					/>
 				</div>
 			</div>
@@ -235,8 +234,12 @@ https://ishadeed.com/article/responsive-design-height/
 
 
 <div class="panel bg-primary-200">
-	<section id="section-2 -mt-10">
-		<div class="w-full gap-10 md:grid md:grid-cols-2">
+	<section id="section-2 md:-mt-10 ">
+		<div class="md:hidden text-secondary-900">
+			<h2 class=" heading-large">
+				Iedereen op de juiste plek. Dat is onze missie.</h2>
+		</div>
+		<div class="w-full gap-10 md:grid md:grid-cols-2 space-y-4">
 			<div class="grid max-h-screen grid-cols-3 items-center gap-1 2xl:gap-3">
 				{#each kpis as { title, number, href }}
 					<KpiCard title={title} number={number} href={href} animate={!skipAnimation} />
@@ -244,8 +247,9 @@ https://ishadeed.com/article/responsive-design-height/
 			</div>
 
 			<div class="flex w-full max-w-xl flex-col gap-8 text-secondary-900">
-				<h2 class="text-3xl/10" id="header-2">Iedereen op de juiste plek. Dat is onze missie.</h2>
-				<p class="hyphens-auto text-justify font-serif text-xl/8 font-light" lang="nl">
+				<h2 class="hidden md:block heading-large" id="header-2">Iedereen op de juiste plek. Dat is onze missie.</h2>
+				<p class="hyphens-auto text-justify font-serif font-light text-secondary-900 ~text-base/2xl"
+					 lang="nl">
 					De GGZ kampt met een groot capaciteitsprobleem. Veel professionals ervaren een (te) hoge
 					werkdruk. Dit gaat ten koste van werkplezier, kwaliteit van zorg en de gezondheid van de
 					professional. Uiteindelijk komt dit ook de productiviteit niet ten goede. Door er voor te
@@ -253,7 +257,7 @@ https://ishadeed.com/article/responsive-design-height/
 					een steentje bij aan het oplossen van dit probleem.
 				</p>
 				<div
-					class="flex h-full w-full flex-row items-center space-x-2 font-mono text-3xl text-black"
+					class="hidden md:flex h-full w-full flex-row items-center space-x-2 font-mono text-3xl text-black"
 					id="zoek-nu-2"
 				>
 					<ArrowLeft></ArrowLeft>
@@ -264,15 +268,16 @@ https://ishadeed.com/article/responsive-design-height/
 	</section>
 </div>
 <div class="panel bg-secondary-900" id="section-3">
-	<section class="grid w-full grid-cols-2 justify-between gap-10 text-white">
+	<section class="md:grid w-full md:grid-cols-2 justify-between gap-10 text-white">
 		<div class="flex w-full max-w-xl flex-col gap-8 text-primary-200">
-			<h2 class="text-3xl/10">Vind je niet wat je zoekt? Wij helpen je graag.</h2>
-			<p class="text-justify font-serif text-xl/8 text-primary-200" id="uitdagingen">
+			<h2 class="heading-large">Vind je niet wat je zoekt? Wij helpen je graag.</h2>
+			<p class="hyphens-auto  font text-justify font-serif font-light text-primary-200 ~text-base/2xl content"
+				 id="uitdagingen">
 				GGZoek gaat graag met je in gesprek over jouw wensen en uitdagingen.
 			</p>
 		</div>
 		<div class="flex min-h-[50vh] flex-col items-center" id="img-5">
-			hallo daar
+
 			<!--			<img alt="Jan Taks" class="" src="/karin.png" />-->
 			<!--			<img alt="Jan Taks" class="" src="/boef.png" />-->
 		</div>
@@ -282,6 +287,14 @@ https://ishadeed.com/article/responsive-design-height/
 <style lang="postcss">
     section {
         @apply mx-auto w-full max-w-7xl py-10;
+    }
+
+    .heading-large {
+        @apply ~text-3xl/5xl font-bold tracking-tight mb-[2vh] md:mb-[7vh]
+    }
+
+    .heading-medium {
+        @apply ~text-2xl/3xl;
     }
 
     .panel {
