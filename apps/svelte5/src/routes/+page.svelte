@@ -270,10 +270,14 @@ https://ishadeed.com/article/responsive-design-height/
 <div class="panel bg-secondary-900" id="section-3">
 	<section class="md:grid w-full md:grid-cols-2 justify-between gap-10 text-white">
 		<div class="flex w-full max-w-xl flex-col gap-8 text-primary-200">
-			<h2 class="heading-large">Vind je niet wat je zoekt? Wij helpen je graag.</h2>
+			<h2 class="heading-large">Weet je niet zeker wat je zoekt? Wij helpen je graag.</h2>
 			<p class="hyphens-auto  font text-justify font-serif font-light text-primary-200 ~text-base/2xl content"
 				 id="uitdagingen">
-				GGZoek gaat graag met je in gesprek over jouw wensen en uitdagingen.
+				Je kiest niet voor niets voor werken in de GGZ. Je wilt iets betekenen voor mensen die het nodig hebben. Voor
+				jou is werken meer dan een manier om
+				de kost te verdienen. De juiste baan vinden is daarom belangrijk voor je en je wilt geen overhaaste beslissingen
+				nemen. Wij weten dat en ondersteunen je graag in jouw zoektocht. Hieronder lees je meer over wie wij zijn en hoe
+				wij werken.
 			</p>
 		</div>
 		<div class="flex min-h-[50vh] flex-col items-center" id="img-5">
