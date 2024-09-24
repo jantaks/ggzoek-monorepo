@@ -1,7 +1,12 @@
 import type { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema';
 import { type SupabaseClient, type User } from '@supabase/supabase-js';
 
-export const facets: Array<facet> = ['beroepen', 'behandelmethoden', 'organisatie', 'stoornissen'];
+export const facets: Array<facet> = [
+	'beroepen',
+	'behandelmethoden',
+	'organisatie',
+	'aandachtsgebieden'
+];
 export type facet = keyof SelectVacature;
 export const RESULTS_PER_PAGE = 5;
 

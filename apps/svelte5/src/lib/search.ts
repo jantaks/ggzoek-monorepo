@@ -82,7 +82,7 @@ function cleanResponse(response: SearchResponse<SelectVacature>) {
 }
 
 export async function getFacets() {
-	const facets: facet[] = ['organisatie', 'beroepen', 'stoornissen', 'behandelmethoden'];
+	const facets: facet[] = ['organisatie', 'beroepen', 'aandachtsgebieden', 'behandelmethoden'];
 	const facetMap: Record<string, FacetHit[]> = {};
 	for (const facet of facets) {
 		const facetValues: SearchForFacetValuesResponse = await index.searchForFacetValues({

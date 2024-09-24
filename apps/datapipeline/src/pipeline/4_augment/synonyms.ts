@@ -99,7 +99,8 @@ export const synonyms: SynonymsDictionary = {
         'fact',
         'fact methode',
         'act'
-      ]
+      ],
+      Traumatherapie: []
     }
   },
   locaties: {
@@ -115,10 +116,22 @@ export const synonyms: SynonymsDictionary = {
       ]
     }
   },
-  stoornissen_ai: {
-    targetField: 'stoornissen',
+  aandachtsgebieden_ai: {
+    targetField: 'aandachtsgebieden',
     defaultToOverig: true,
     mappings: {
+      Ziekenhuispsychiatrie: [
+        'ziekenhuis psychiatrie',
+        'PAAZ',
+        'psychiatrische afdeling algemeen ziekenhuis'
+      ],
+      'Forensische psychiatrie': ['forensische psychiatrie', 'forensisch'],
+      'Zwangerschapsgerelateerde problematiek': [
+        'POP',
+        'POP-poli',
+        'zwangerschapsgerelateerde problemen'
+      ],
+      Seksuologie: ['seksuele stoornis', 'problematisch seksueel gedrag'],
       'AD(H)D': ['adhd', 'attention deficit hyperactivity disorder', 'ad(h)d', 'adhd'],
       Angststoornissen: ['angststoornis', 'angst'],
       'Autisme Spectrum Stoornis': [
@@ -160,7 +173,6 @@ export const synonyms: SynonymsDictionary = {
         'Psychotische stoornissen'
       ],
       'Psychosomatische stoornissen': ['psychosomatische stoornis', 'psychosomatiek'],
-      'Seksuele stoornissen': ['seksuele stoornis', 'problematisch seksueel gedrag'],
       'Trauma- en stressorgerelateerde stoornissen': [
         'trauma',
         'traumagerelateerde stoornissen',
@@ -210,7 +222,7 @@ export function correctSpelling(
   }
 
   let isUpdated = false;
-  let defaultedToOverig = [];
+  const defaultedToOverig = [];
   for (const field in vacature) {
     assertField(field, vacature);
     const fieldSynonyms: Synonyms = getSynonyms(field, dictionary);

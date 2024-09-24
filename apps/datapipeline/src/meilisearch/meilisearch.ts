@@ -19,7 +19,7 @@ const FACETS = [
   'minSchaal',
   'maxSchaal',
   'beroepen',
-  'stoornissen',
+  'aandachtsgebieden',
   'behandelmethoden',
   'minUren',
   'maxUren'
@@ -86,7 +86,7 @@ export async function restoreSummaryFromIndex() {
   console.log(docs.results.length);
   let updated = 0;
   while (updated < docs.results.length) {
-    let vacatureBatch = [...docs.results.slice(updated, updated + 100)];
+    const vacatureBatch = [...docs.results.slice(updated, updated + 100)];
     const result = await bulkUpsertVacatures(vacatureBatch);
     console.log(`Updated ${updated + vacatureBatch.length} of ${docs.results.length}`);
     updated += 100;

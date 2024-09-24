@@ -8,24 +8,24 @@ import { SelectVacature } from '@ggzoek/ggz-drizzle/dist/schema.js';
 
 let count = 0;
 let updated = 0;
-let overig: string[] = [];
+const overig: string[] = [];
 
 const vacatures = await getSummarizedVacatures({
-  summaryAfter: new Date('2024-08-20')
+  summaryAfter: new Date('2024-09-22')
 });
-let proceed = await confirm({
+const proceed = await confirm({
   message: `${vacatures.length} vacatures gevonden om te augmenten. Doorgaan?`
 });
 if (!proceed) {
   process.exit(1);
 }
 
-let trialRun = await confirm({
+const trialRun = await confirm({
   message: 'Wil je eerst een trial run doen om te kijken of je nieuwe synoniemen moet toevoegen?',
   default: true
 });
 
-let geopPoints = await confirm({
+const geopPoints = await confirm({
   message: 'Wil je ook de geopoints updaten?',
   default: true
 });

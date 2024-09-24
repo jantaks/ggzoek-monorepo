@@ -177,10 +177,10 @@ export const vacatures = pgTable('vacatures', {
   urenMax: bigint('uren_max', { mode: 'number' }),
   professie: text('professie').array().notNull(),
   beroepen: text('beroepen').array().notNull(),
-  //Stores values as determined by AI. These values are further processed / normalised / standardized in the augmentation step and stored in the stoornissen field.
-  stoornissen_ai: text('stoornissen_ai').array(),
-  stoornissen: text('stoornissen').array(),
-  // See comment on stoornissen
+  //Stores values as determined by AI. These values are further processed / normalised / standardized in the augmentation step and stored in the aandachtsgebieden field.
+  aandachtsgebieden_ai: text('aandachtsgebieden_ai').array(),
+  aandachtsgebieden: text('aandachtsgebieden').array(),
+  // See comment on aandachtsgebieden
   behandelmethoden_ai: text('behandelmethoden_ai').array(),
   behandelmethoden: text('behandelmethoden').array(),
   locaties: text('locaties').array(),

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import 'dotenv/config';
 import { ChatCompletion } from 'openai/resources/index';
 import { OpenAIModels } from './summarizeNew.js';
-import { SelectVacature } from '../../../../packages/ggz-drizzle/src/schema.js';
+import { SelectVacature } from '@ggzoek/ggz-drizzle/src/schema.js';
 import fs from 'fs';
 import { synonyms } from '../pipeline/4_augment/synonyms.js';
 
@@ -132,7 +132,7 @@ export function processResponse(response: string) {
 }
 
 const behandelmethoden = Object.keys(synonyms.behandelmethoden_ai.mappings);
-const stoornissen = Object.keys(synonyms.stoornissen_ai.mappings);
+const aandachtsgebieden = Object.keys(synonyms.aandachtsgebieden_ai.mappings);
 
 const systemPrompt = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke Gezondheid Zorg (GGZ). Je taak is om een samenvatting te maken van 3 paragrafen en maximaal 300 woorden van vacatureteksten. 
@@ -166,7 +166,7 @@ Maak, naast de samenvatting een JSON met de volgende velden:
 "instelling": string  // De hoofd / -moeder organisatie waar de vacature betrekking op heeft
 "sub-instelling": string  // De sub / dochter organisatie waar de vacature betrekking op heeft. Alleen als expliciet vermeld in de tekst.
 "organisatieOnderdeel": string  // het onderdeel of de afdeling binnen de organisatie. Alleen als expliciet vermeld in de tekst.
-"stoornissen_ai": array of strings  // Welke stoornissen worden in de tekst expliciet genoemd? Kies uit onderstaande lijst. 
+"aandachtsgebieden_ai": array of strings  // Welke stoornissen / aandachtsgebieden worden in de tekst expliciet genoemd? Kies uit onderstaande lijst. 
 "behandelmethoden_ai": array of strings  // Welke behandelmethoden worden expliciet genoemd (maximaal 3). Kies uit onderstaande lijst? 
 "locaties": array of strings  // in welke plaatsen of regios is de vacature
 "locatieDetails": string  // bijvoorbeeld de naam van de wijk, de straat of het gebouw. Alleen als expliciet vermeld in de tekst.
@@ -186,7 +186,7 @@ Maak, naast de samenvatting een JSON met de volgende velden:
 
 Keuzemogelijkheden: 
 Behandelmethoden: ${behandelmethoden.join(', ')}
-Stoornissen: ${stoornissen.join(', ')}
+Aandachtsgebieden: ${aandachtsgebieden.join(', ')}
 
 Geef het antwoord in MarkDown formaat, zonder headers,  met de Json in een code block (drie backticks). Gebruik voldoende linebreaks, in ieder geval tussen de paragrafen. 
 `;

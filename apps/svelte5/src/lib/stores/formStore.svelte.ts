@@ -221,7 +221,7 @@ export function searchFromSearchParams(params: URLSearchParams): Search {
 }
 
 /**
- * Takes a filter string like '(beroepen = "A") AND (stoornissen = "B" AND stoornissen="C")' and
+ * Takes a filter string like '(beroepen = "A") AND (aandachtsgebieden = "B" AND aandachtsgebieden="C")' and
  * returns an array of Filter objects
  */
 export function reconstructFilters(filter: string): FilterDefinition[] | undefined {
