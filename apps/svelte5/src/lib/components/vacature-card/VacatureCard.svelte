@@ -22,6 +22,13 @@
 
 	let collapsed = $state(true);
 
+	function removeHashLines(text: string): string {
+		return text.split('\n')
+			.filter(line => !line.trim().startsWith('#'))
+			.filter(line => !line.trim().startsWith('*'))
+			.join('\n');
+	}
+
 
 </script>
 
@@ -65,11 +72,11 @@
 						<div>
 							{#if collapsed}
 								<p class="line-clamp-4 hyphens-auto text-justify font-serif" lang="nl">
-									{@html hit.summary}</p>
+									{@html removeHashLines(hit.summary)}</p>
 							{:else}
 								<!--// line-clamp in older safari does not work with nested elements ... -->
 								<p class="line-clamp-none hyphens-auto text-justify font-serif" lang="nl">
-									{@html hit.summary.replaceAll("\n", "<hr class='border-0 h-2'>")}
+									{@html removeHashLines(hit.summary).replaceAll("\n", "<hr class='border-0 h-2'>")}
 								</p>
 							{/if}
 						</div>
