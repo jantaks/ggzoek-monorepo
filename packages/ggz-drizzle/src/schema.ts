@@ -181,8 +181,8 @@ export const vacatures = pgTable('vacatures', {
   aandachtsgebieden_ai: text('aandachtsgebieden_ai').array(),
   aandachtsgebieden: text('aandachtsgebieden').array(),
   // See comment on aandachtsgebieden
-  behandelmethoden_ai: text('behandelmethoden_ai').array(),
-  behandelmethoden: text('behandelmethoden').array(),
+  therapievormen_ai: text('therapievormen_ai').array(),
+  therapievormen: text('therapievormen').array(),
   locaties: text('locaties').array(),
   cao: text('CAO'),
   fwg: text('FWG'),

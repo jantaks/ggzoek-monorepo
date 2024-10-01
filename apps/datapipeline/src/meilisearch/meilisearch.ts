@@ -20,7 +20,7 @@ const FACETS = [
   'maxSchaal',
   'beroepen',
   'aandachtsgebieden',
-  'behandelmethoden',
+  'therapievormen',
   'minUren',
   'maxUren'
 ];

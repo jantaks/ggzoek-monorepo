@@ -143,7 +143,7 @@ export async function bulkUpsertVacatures(inputs: Array<{ urlHash: string; [key:
     sqlChunks.push(sql`(case`);
 
     for (const input of inputs) {
-      let value = input[field];
+      const value = input[field];
 
       // Convert Date objects to strings in ISO format
       if (value instanceof Date) {
@@ -386,6 +386,8 @@ type SummarizeOptions = {
   force: boolean;
   // Only summarize vacatures that have been scraped for the last time this many days ago
   lastScrapedAfterDays?: number;
+  // Only summarize vacatures that have been summarized before this date
+  summaryTimeStampBefore: Date;
   // Only summarize vacatures that have been summarized before this date (only effective if force is false)
   summaryDateBefore?: Date;
   // Limit the number of vacatures to summarize
@@ -396,12 +398,15 @@ type SummarizeOptions = {
  * Retrieves all vacatures that have not been summarized yet.
  * @param options
  */
+const todayMinusOneDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
 export async function getVacaturesToSummarize(
   options: SummarizeOptions = {
     professies: ['Psychiater'],
     organisaties: 'all',
     force: false,
     lastScrapedAfterDays: 1,
+    summaryTimeStampBefore: todayMinusOneDay,
     limit: 10000
   }
 ) {
@@ -413,6 +418,9 @@ export async function getVacaturesToSummarize(
   }
   if (options.organisaties && options.organisaties.length > 0 && options.organisaties !== 'all') {
     clauses.push(inArray(vacatureTable.organisatie, options.organisaties));
+  }
+  if (options.summaryTimeStampBefore) {
+    clauses.push(lt(vacatureTable.summaryTimestamp, options.summaryTimeStampBefore));
   }
   if (!options.force) {
     clauses.push(or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary)));

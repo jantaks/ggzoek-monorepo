@@ -63,7 +63,7 @@ mutualSynonyms.forEach(async (mutualSynonyms) => {
 const completed = await getVacaturesToSync({
   limit: 10000,
   organisaties: 'all',
-  scrapedAfter: new Date('2024-08-23'),
+  scrapedAfter: new Date('2024-09-23'),
   minBatchId: 4,
   professies: [
     'Psychiater',

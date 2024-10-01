@@ -1,4 +1,5 @@
 import fs from 'fs';
+import pMap from 'p-map';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { log } from '@ggzoek/logging/src/logger.js';
@@ -47,10 +48,13 @@ import { BaseScraper, CheerioScraper, PlaywrightScraper } from '../../scrapers/c
 function removeStorageFolder() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const storageFolderPath = path.join(__dirname, '../storage');
+  log.debug(__dirname);
+  const storageFolderPath = path.join(__dirname, '../../../storage');
   if (fs.existsSync(storageFolderPath)) {
     log.info('Removing storage folder');
     fs.rmSync(storageFolderPath, { recursive: true, force: true });
+  } else {
+    log.info('Storage folder does not exist');
   }
 }
 
@@ -102,7 +106,6 @@ console.log(
   'Slow running',
   slowRunning.map((crawler) => crawler.name)
 );
-
 
 const choices = crawlers
   .map((crawler) => {
@@ -156,11 +159,13 @@ if (subset === 'cheerio') {
   crawlersToRun = crawlers.filter((crawler) => crawler.crawlerType === 'cheerio');
 }
 
-removeStorageFolder(); 
+const tasks: Array<Promise<void>> = [];
 
 for (const crawler of crawlersToRun) {
-  log.info(`Running ${crawler.name}`);
-  crawler.crawl().then(() => {
-    log.info(`Finished ${crawler.name}`);
-  });
+  log.info(`Adding ${crawler.name}`);
+  tasks.push(crawler.crawl());
 }
+
+await Promise.all(tasks);
+console.log('Done!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+process.exit(0);

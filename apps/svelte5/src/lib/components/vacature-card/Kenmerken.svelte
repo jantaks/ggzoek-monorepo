@@ -41,9 +41,9 @@
 		<div class="h-full bg-transparent mt-2">
 			<h2 class="font-semibold  py-1">Inhoudelijk</h2>
 			<dl>
-				{@render row("Behandelmethoden", hit.behandelmethoden?.join(", "))}
+				{@render row("Therapievormen", hit.therapievormen?.join(", "))}
 				{@render row("Organisatieonderdeel", hit.organisatieOnderdeel)}
-				{@render row("Stoornissen", hit.stoornissen?.join(", "))}
+				{@render row("Stoornissen", hit.aandachtsgebieden?.join(", "))}
 				{@render row("Beroepen", hit.beroepen?.join(", "))}
 				{@render row("Eerst gezien", new Date(hit.firstScraped))}
 				{@render row("Laatst gezien", new Date(hit.lastScraped))}

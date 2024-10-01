@@ -3,7 +3,7 @@ import { type SupabaseClient, type User } from '@supabase/supabase-js';
 
 export const facets: Array<facet> = [
 	'beroepen',
-	'behandelmethoden',
+	'therapievormen',
 	'organisatie',
 	'aandachtsgebieden'
 ];

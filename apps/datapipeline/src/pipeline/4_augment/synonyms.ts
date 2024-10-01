@@ -6,9 +6,9 @@ import { log } from '@ggzoek/logging/src/logger.js';
 import { equalArrays } from '../../utils.js';
 
 export const synonyms: SynonymsDictionary = {
-  behandelmethoden_ai: {
+  therapievormen_ai: {
     defaultToOverig: true,
-    targetField: 'behandelmethoden',
+    targetField: 'therapievormen',
     mappings: {
       'Acceptance and Commitment Therapy (ACT)': [
         'Acceptatie en Commitment Therapie (ACT)',
@@ -20,7 +20,8 @@ export const synonyms: SynonymsDictionary = {
         'cgt',
         'cognitievegedragstherapie',
         'cognitieve gedragstherapie',
-        'cognitieve gedragstherapie(cgt)'
+        'cognitieve gedragstherapie(cgt)',
+        'gedragstherapie'
       ],
       'Cognitive Behavioral Therapy-Enhanced (CBT-E)': [
         'cognitive behavioral therapy-enhanced',
@@ -38,7 +39,12 @@ export const synonyms: SynonymsDictionary = {
       'Dialectische gedragstherapie': ['dialectische gedragstherapie', 'dgt'],
       EMDR: ['emdr', 'eye movement desensitization and reprocessing'],
       'Electroconvulsieve therapie': ['electroconvulsieve therapie', 'ect'],
-      Farmacotherapie: ['pharmacotherapie', 'farmacotherapie', 'Farmacotherapeutische behandeling'],
+      Farmacotherapie: [
+        'pharmacotherapie',
+        'farmacotherapie',
+        'Farmacotherapeutische behandeling',
+        'medicamenteuze therapie'
+      ],
       Groepstherapie: [
         'groepstherapie',
         'group therapy',
@@ -92,15 +98,41 @@ export const synonyms: SynonymsDictionary = {
       'Psychomotorische therapie': ['psychomotorische therapie', 'pmt'],
       Psychotherapie: ['Psychodynamische psychotherapie', 'Psycho-educatie'],
       Schematherapie: ['schematherapie', 'schematherapy', 'sft'],
-      Systeemtherapie: ['systeemgericht werken'],
+      Systeemtherapie: [
+        'Multi Dimensionele Familietherapie (MDFT)',
+        'Multi Dimensionele Familietherapie',
+        'systeemgericht werken',
+        'gezinstherapie',
+        'multisysteem therapie',
+        'Multi Systeem Therapie (MST)',
+        'Multi Systeem Therapie',
+        'MST',
+        'MultiSystemic Therapy',
+        'Multi Family Therapy',
+        'Multi Family Therapie',
+        'Multi Family Therapy (MFT)',
+        'multi familie therapie',
+        'multi familie therapie (mft)'
+      ],
       'flexible assertive community treatment (FACT)': [
         'flexible assertive community treatment',
         'flexible assertive community treatment (fact)',
         'fact',
         'fact methode',
-        'act'
+        'act',
+        'Assertive Community Treatment (ACT)',
+        'Assertive Community Treatment'
       ],
-      Traumatherapie: []
+      Traumatherapie: [],
+      'Vroege Interventie Psychose Therapie (VIP)': ['Vroege Interventie Psychose Therapie', 'VIP'],
+      Vaktherapie: ['vaktherapie', 'creatieve therapie', 'dramatherapie'],
+      'repetitieve Transcraniële Magnetische Stimulatie.': [
+        'rTMS',
+        'TMS',
+        'repetitieve Transcraniële Magnetische Stimulatie',
+        'repetitieve TMS',
+        'rTMS behandeling'
+      ]
     }
   },
   locaties: {
@@ -120,6 +152,23 @@ export const synonyms: SynonymsDictionary = {
     targetField: 'aandachtsgebieden',
     defaultToOverig: true,
     mappings: {
+      Ouderenpsychiatrie: [
+        'ouderenpsychiatrie',
+        'ouderenzorg',
+        'ouderen',
+        'geriatrie',
+        'gerontopsychiatrie'
+      ],
+      'Kinderen en Jeugd': [
+        'Jeugd- en Jongvolwassenen',
+        'kinderen en jeugd',
+        'kinderen',
+        'Jeugd- en- jongvolwassenen',
+        'Jeugd',
+        'jeugd ggz'
+      ],
+      'Acute Psychiatrie': ['acute psychiatrie', 'acute zorg'],
+      Opleiden: ['opleiden', 'opleiding'],
       Ziekenhuispsychiatrie: [
         'ziekenhuis psychiatrie',
         'PAAZ',
@@ -133,28 +182,46 @@ export const synonyms: SynonymsDictionary = {
       ],
       Seksuologie: ['seksuele stoornis', 'problematisch seksueel gedrag'],
       'AD(H)D': ['adhd', 'attention deficit hyperactivity disorder', 'ad(h)d', 'adhd'],
-      Angststoornissen: ['angststoornis', 'angst'],
-      'Autisme Spectrum Stoornis': [
+      Angststoornissen: ['angststoornis', 'angst', 'Angstoornissen'],
+      'Autisme Spectrum Stoornis (ASS)': [
         'autisme spectrum stoornis',
         'autismespectrumstoornis',
         'autism spectrum disorder',
-        'asa'
+        'ass',
+        'ASS'
       ],
       'Bipolaire Stoornissen': ['bipolaire stoornis', 'bipolaire en gerelateerde stoornissen'],
-      'Complexe psychiatrische problematiek': [
+      'Ernstige Psychiatrische Aandoeningen (EPA)': [
+        'Ernstige Psychische Aandoeningen (EPA)',
+        'Ernstige psychiatrische aandoeningen',
+        'Complexe psychiatrische problematiek',
         'complexe psychiatrische problemen',
         'comorbiditeit',
         'complexe psychiatrische stoornissen',
         'cpp',
         'Ernstige psychische aandoeningen',
+        'Ernstige psychiatrische problematiek',
         'Ernstige Psychiatrische Aandoening'
       ],
       'Depressieve stoornissen': [
+        'Deppressieve stoornissen',
+        'Depressieve Stoornissen',
         'depressieve stoornis',
         'depressie',
         'Stemminsstoornissen',
         'Stemmingsstoornissen',
-        'Stemmingsproblemen'
+        'Stemmingsproblemen',
+        'Stemming',
+        'Stemmingsklachten',
+        'Stemmingsproblematiek',
+        'Stemmingstoornissen'
+      ],
+      'Niet Aangeboren Hersenletsel (NAH)': [
+        'niet aangeboren hersenletsel',
+        'nah',
+        'hersenletsel',
+        'hersenbeschadiging',
+        'hersenletsel problematiek'
       ],
       'Dissociatieve Stoornissen': [],
       'Forensische problematiek': [],
@@ -169,24 +236,39 @@ export const synonyms: SynonymsDictionary = {
       Persoonlijkheidsstoornissen: ['persoonlijkheidsstoornis', 'persoonlijkheid'],
       'Schizofreniespectrum en andere psychotische stoornissen': [
         'schizofrenie',
+        'Psychosecircuit',
         'psychose',
-        'Psychotische stoornissen'
+        'Psychotische stoornissen',
+        'Psychotische kwetsbaarheid'
       ],
-      'Psychosomatische stoornissen': ['psychosomatische stoornis', 'psychosomatiek'],
+      'Psychosomatische stoornissen': [
+        'psychosomatische stoornis',
+        'psychosomatiek',
+        'Somatisch-symptoomstoornissen',
+        'Somatisch symptoomstoornissen',
+        'Somatoforme stoornissen'
+      ],
       'Trauma- en stressorgerelateerde stoornissen': [
         'trauma',
+        'Trauma en stressorgerelateerde stoornissen',
         'traumagerelateerde stoornissen',
         'ptss',
         'ptsd',
         'Traumatische stoornissen'
       ],
+
       Verslavingsstoornissen: [
         'verslaving',
         'verslavingsproblematiek',
         'Middelenafhankelijkheid',
         'middelenmisbruik'
       ],
-      'Voedings- en eetstoornissen': ['voedings- en eetstoornissen', 'eetstoornissen']
+      'Voedings- en eetstoornissen': [
+        'voedings- en eetstoornissen',
+        'eetstoornissen',
+        'eetproblematiek',
+        'eetproblemen'
+      ]
     }
   }
 } as const;

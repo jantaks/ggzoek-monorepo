@@ -131,13 +131,13 @@ export function processResponse(response: string) {
   return { summarySection, vacature };
 }
 
-const behandelmethoden = Object.keys(synonyms.behandelmethoden_ai.mappings);
+const therapievormen = Object.keys(synonyms.therapievormen_ai.mappings);
 const aandachtsgebieden = Object.keys(synonyms.aandachtsgebieden_ai.mappings);
 
 const systemPrompt = `
 Je bent een recruitment AI, gespecialiseerd in banen in de Geestelijke Gezondheid Zorg (GGZ). Je taak is om een samenvatting te maken van 3 paragrafen en maximaal 300 woorden van vacatureteksten. 
 De samenvatting wordt gebruikt voor een website om vacatures te vergelijken. De lezer is een hoogopgeleide GGZ professional die geïnteresseerd is in de vakinhoudelijke aspecten van de vacature en de onderscheidende kenmerken. Beschrijf daarom indien mogelijk 
-de specifieke aandachtsgebieden, stoornissen en behandelmethoden die in de vacaturetekst worden genoemd. Daarnaast wil de lezer waarschijnlijk meer weten over de organisatie context (team, organisatie, cultuur) waar hij of zij te werken komt.
+de specifieke aandachtsgebieden, stoornissen en therapievormen die in de vacaturetekst worden genoemd. Daarnaast wil de lezer waarschijnlijk meer weten over de organisatie context (team, organisatie, cultuur) waar hij of zij te werken komt.
 
 De samenvatting heeft een zakelijke, professionele stijl. Houd rekening met de volgende punten:
 
@@ -167,10 +167,10 @@ Maak, naast de samenvatting een JSON met de volgende velden:
 "sub-instelling": string  // De sub / dochter organisatie waar de vacature betrekking op heeft. Alleen als expliciet vermeld in de tekst.
 "organisatieOnderdeel": string  // het onderdeel of de afdeling binnen de organisatie. Alleen als expliciet vermeld in de tekst.
 "aandachtsgebieden_ai": array of strings  // Welke stoornissen / aandachtsgebieden worden in de tekst expliciet genoemd? Kies uit onderstaande lijst. 
-"behandelmethoden_ai": array of strings  // Welke behandelmethoden worden expliciet genoemd (maximaal 3). Kies uit onderstaande lijst? 
+"therapievormen_ai": array of strings  // Welke therapievormen worden expliciet genoemd (maximaal 3). Kies uit onderstaande lijst? 
 "locaties": array of strings  // in welke plaatsen of regios is de vacature
 "locatieDetails": string  // bijvoorbeeld de naam van de wijk, de straat of het gebouw. Alleen als expliciet vermeld in de tekst.
-"CAO": string  // Welke CAO is van toepassing. Bijvoorbeeld "AMS", "CAO GGZ", "CAO VVT", CAO Ziekenhuizen", CAO Gehandicaptenzorg", "CAO Jeugdzorg". 
+"CAO": string  // Welke CAO is van toepassing. Bijvoorbeeld "AMS", "CAO GGZ", "CAO VVT", CAO Ziekenhuizen", CAO Gehandicaptenzorg", "CAO Jeugdzorg". Alleen als expliciet vermeld in de tekst.
 "minSchaal": string | null  // in welke minimale schaal of functiewaarderingsgroep (FWG) binnen de CAO is de vacature ingedeeld. Alleen als expliciet vermeld in de tekst.
 "maxSchaal": string | null  // in welke maximale schaal of functiewaarderingsgroep (FWG) binnen de CAO is de vacature ingedeeld. Alleen als expliciet vermeld in de tekst.
 "contract": string  | null // Kies uit een van de volgende opties: [Onbepaalde tijd, Bepaalde tijd, Oproepkracht, Overig]. Alleen als expliciet vermeld in de tekst.
@@ -185,8 +185,8 @@ Maak, naast de samenvatting een JSON met de volgende velden:
 "dienstFrequentie": string  // Hoe vaak moet de kandidaat diensten draaien. Bijvoorbeeld 1x per week, 1x per maand, onbekend.
 
 Keuzemogelijkheden: 
-Behandelmethoden: ${behandelmethoden.join(', ')}
+Therapievormen: ${therapievormen.join(', ')}
 Aandachtsgebieden: ${aandachtsgebieden.join(', ')}
 
-Geef het antwoord in MarkDown formaat, zonder headers,  met de Json in een code block (drie backticks). Gebruik voldoende linebreaks, in ieder geval tussen de paragrafen. 
+Geef het antwoord in MarkDown formaat. Gebruik geen headers, koptitels. Stop de Json in een code block (drie backticks). Gebruik voldoende linebreaks, in ieder geval tussen de paragrafen. 
 `;
