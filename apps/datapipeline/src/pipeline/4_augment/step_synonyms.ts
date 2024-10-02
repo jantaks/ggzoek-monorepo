@@ -11,7 +11,7 @@ let updated = 0;
 const overig: string[] = [];
 
 const vacatures = await getSummarizedVacatures({
-  summaryAfter: new Date('2024-09-22')
+  summaryAfter: new Date(Date.now() - 24 * 60 * 60 * 1000)
 });
 const proceed = await confirm({
   message: `${vacatures.length} vacatures gevonden om te augmenten. Doorgaan?`

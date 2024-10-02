@@ -387,10 +387,8 @@ type SummarizeOptions = {
   // Only summarize vacatures that have been scraped for the last time this many days ago
   lastScrapedAfterDays?: number;
   // Only summarize vacatures that have been summarized before this date
-  summaryTimeStampBefore: Date;
+  summaryTimeStampBefore?: Date;
   // Only summarize vacatures that have been summarized before this date (only effective if force is false)
-  summaryDateBefore?: Date;
-  // Limit the number of vacatures to summarize
   limit?: number;
 };
 
@@ -424,9 +422,6 @@ export async function getVacaturesToSummarize(
   }
   if (!options.force) {
     clauses.push(or(eq(vacatureTable.summary, ''), isNull(vacatureTable.summary)));
-  }
-  if (options.summaryDateBefore && !options.force) {
-    clauses.push(lt(vacatureTable.summaryTimestamp, options.summaryDateBefore));
   }
   return await db
     .select()

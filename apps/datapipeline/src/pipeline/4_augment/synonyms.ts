@@ -43,7 +43,8 @@ export const synonyms: SynonymsDictionary = {
         'pharmacotherapie',
         'farmacotherapie',
         'Farmacotherapeutische behandeling',
-        'medicamenteuze therapie'
+        'medicamenteuze therapie',
+        'medicatiebeleid'
       ],
       Groepstherapie: [
         'groepstherapie',
@@ -180,7 +181,11 @@ export const synonyms: SynonymsDictionary = {
         'POP-poli',
         'zwangerschapsgerelateerde problemen'
       ],
-      Seksuologie: ['seksuele stoornis', 'problematisch seksueel gedrag'],
+      Seksuologie: [
+        'seksuele stoornis',
+        'problematisch seksueel gedrag',
+        'Seksueel overschrijdend gedrag'
+      ],
       'AD(H)D': ['adhd', 'attention deficit hyperactivity disorder', 'ad(h)d', 'adhd'],
       Angststoornissen: ['angststoornis', 'angst', 'Angstoornissen'],
       'Autisme Spectrum Stoornis (ASS)': [
@@ -201,7 +206,8 @@ export const synonyms: SynonymsDictionary = {
         'cpp',
         'Ernstige psychische aandoeningen',
         'Ernstige psychiatrische problematiek',
-        'Ernstige Psychiatrische Aandoening'
+        'Ernstige Psychiatrische Aandoening',
+        'Complexe problematiek'
       ],
       'Depressieve stoornissen': [
         'Deppressieve stoornissen',

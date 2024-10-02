@@ -52,9 +52,9 @@ async function stepfunction() {
         'Maatschappelijk Werker'
       ],
       organisaties: 'all',
-      force: true,
-      lastScrapedAfterDays: 4,
-      summaryTimeStampBefore: new Date(Date.now() - 24 * 60 * 60 * 1000)
+      force: false,
+      lastScrapedAfterDays: 1
+      // summaryTimeStampBefore: new Date(Date.now() - 24 * 60 * 60 * 1000)
     })
   ).slice(0, 5000);
   todo = vacatures.length;
